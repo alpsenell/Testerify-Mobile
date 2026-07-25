@@ -18,29 +18,33 @@ const GOAL_CHIPS = [
 
 const errMessage = (e: unknown, fallback: string) => (e instanceof Error ? e.message : fallback)
 
-function IdeaCard({ idea, building, onBuild }: { idea: AiIdea; building: boolean; onBuild: () => void }) {
+function IdeaCard({ idea, active, disabled, onBuild }: {
+  idea: AiIdea; active: boolean; disabled: boolean; onBuild: () => void
+}) {
   return (
     <View style={{ backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, borderRadius: radius.card, padding: 14, marginBottom: 10 }}>
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-        <View style={{ backgroundColor: colors.accentSoft, borderRadius: radius.chip, paddingHorizontal: 10, paddingVertical: 4 }}>
-          <Text style={{ fontFamily: fonts.sansSemi, fontSize: 11.5, color: colors.accent }}>{ideaTag(idea)}</Text>
+        <View style={{ backgroundColor: colors.accentSoft, borderRadius: 6, paddingHorizontal: 8, paddingVertical: 3 }}>
+          <Text style={{ fontFamily: fonts.monoMedium, fontSize: 10, letterSpacing: 0.5, textTransform: 'uppercase', color: colors.accent }}>
+            {ideaTag(idea)}
+          </Text>
         </View>
         <Text style={{ fontFamily: fonts.mono, fontSize: 11, color: impactColor(idea.impact) }}>{idea.impact} impact</Text>
       </View>
       <Text style={{ fontFamily: fonts.sansSemi, fontSize: 14.5, color: colors.ink, marginBottom: 4 }}>{idea.title}</Text>
       <Text style={[type.body, { marginBottom: 12 }]}>{idea.hypothesis}</Text>
       <Pressable
-        disabled={building}
+        disabled={disabled}
         onPress={onBuild}
         style={{
           flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8,
           backgroundColor: colors.accent, borderRadius: 12, minHeight: 44,
-          opacity: building ? 0.6 : 1,
+          opacity: disabled ? 0.6 : 1,
         }}
       >
         <Icon name="sparkle" size={16} color="#fff" />
         <Text style={{ fontFamily: fonts.sansSemi, fontSize: 13.5, color: '#fff' }}>
-          {building ? 'Building…' : 'Build draft'}
+          {active ? 'Building…' : 'Build draft'}
         </Text>
       </Pressable>
     </View>
@@ -79,7 +83,10 @@ export function CopilotSheet() {
   const listHeader = generate.isSuccess ? 'Generated ideas' : 'Suggested for your store'
   const status = generate.isPending ? 'thinking…' : generate.isSuccess ? 'ready' : 'online'
 
-  const isBuilding = (idea: AiIdea) => build.isPending && build.variables?.name === idea.title
+  // Concurrent builds aren't supported (a success closes the whole sheet), so
+  // ANY card's Build button is disabled while a build is in flight — only the
+  // one actually being built shows "Building…"; the rest just look dimmed.
+  const isActiveBuild = (idea: AiIdea) => build.isPending && build.variables?.name === idea.title
 
   return (
     <View>
@@ -160,7 +167,8 @@ export function CopilotSheet() {
           <IdeaCard
             key={`${idea.title}-${i}`}
             idea={idea}
-            building={isBuilding(idea)}
+            active={isActiveBuild(idea)}
+            disabled={build.isPending}
             onBuild={() => build.mutate(draftRequestFor(idea))}
           />
         ))

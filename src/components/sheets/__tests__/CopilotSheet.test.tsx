@@ -20,6 +20,10 @@ const IDEA: AiIdea = {
 const SAVED: SavedSuggestions = { ideas: [IDEA], source: 'company', goal: null, generatedAt: '2026-07-20T00:00:00Z' }
 
 beforeEach(() => {
+  // Clear call history between tests — the mocks below are re-armed every
+  // time, but jest.mock()'s auto-mocks don't reset .mock.calls on their own,
+  // and the double-submit regression test asserts an exact call count.
+  jest.clearAllMocks()
   useSheets.setState({ sheet: { kind: 'copilot' } })
   useToast.setState({ message: null })
   ;(ai.fetchSuggestions as jest.Mock).mockResolvedValue(SAVED)
@@ -88,4 +92,37 @@ test('a failed generate shows the server message inline and keeps the previous i
   expect(useSheets.getState().sheet).toEqual({ kind: 'copilot' })
   // Previously-fetched saved ideas remain visible underneath the inline error.
   expect(getByText('Sticky add-to-cart bar')).toBeTruthy()
+})
+
+test('pressing Build on a second idea while the first build is pending does not fire a second request', async () => {
+  const IDEA_B: AiIdea = {
+    ...IDEA,
+    title: 'Exit-intent discount modal',
+    hypothesis: 'A modal recovers visitors who are about to abandon checkout.',
+    page: 'checkout', metric: null,
+  }
+  ;(ai.fetchSuggestions as jest.Mock).mockResolvedValue({ ...SAVED, ideas: [IDEA, IDEA_B] })
+
+  let resolveBuild!: (value: { campaign: { id: string }; hypothesis: string | null }) => void
+  ;(ai.generateTestDraft as jest.Mock).mockImplementation(
+    () => new Promise((resolve) => { resolveBuild = resolve })
+  )
+
+  const { getByText, getAllByText } = await renderSheet()
+
+  await waitFor(() => expect(getByText(IDEA.title)).toBeTruthy())
+  await waitFor(() => expect(getByText(IDEA_B.title)).toBeTruthy())
+
+  // Build on idea A (first card).
+  await fireEvent.press(getAllByText('Build draft')[0])
+  await waitFor(() => expect(getByText('Building…')).toBeTruthy())
+
+  // Idea B's button still reads "Build draft" but must now be disabled —
+  // pressing it must not fire a second, concurrent generateTestDraft call.
+  await fireEvent.press(getAllByText('Build draft')[0])
+
+  expect(ai.generateTestDraft).toHaveBeenCalledTimes(1)
+  expect(ai.generateTestDraft).toHaveBeenCalledWith(draftRequestFor(IDEA))
+
+  resolveBuild({ campaign: { id: 'c1' }, hypothesis: null })
 })
