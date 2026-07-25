@@ -14,7 +14,7 @@ import { colors, fonts, type } from '../theme'
 const KIND_META: Record<AlertKind, { icon: IconName; solid: string; soft: string }> = {
   ship_ready: { icon: 'flag', solid: colors.pos, soft: colors.posSoft },
   shipped: { icon: 'check', solid: colors.accent, soft: colors.accentSoft },
-  concluded: { icon: 'mail', solid: colors.muted, soft: colors.track },
+  concluded: { icon: 'mail', solid: colors.secondary, soft: colors.track },
 }
 
 function AlertRow({ item, unread, onPress }: { item: AlertItem; unread: boolean; onPress: () => void }) {

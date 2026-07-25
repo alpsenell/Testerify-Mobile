@@ -21,7 +21,7 @@ const dayKey = (d: Date) => d.toISOString().slice(0, 10)
 
 const daysAgo = (iso: string, now: Date) => Math.floor((now.getTime() - new Date(iso).getTime()) / 86_400_000)
 
-function alertFor(c: CampaignListItem): AlertItem | null {
+function alertFor(c: CampaignListItem, now: Date): AlertItem | null {
   if (shipReady(c)) {
     return {
       id: `ship_ready:${c.id}`,
@@ -41,7 +41,7 @@ function alertFor(c: CampaignListItem): AlertItem | null {
       kind: 'shipped',
       campaignId: c.id,
       title: `${c.name} shipped to 100%`,
-      body: `Rolled out ${relTime(c.rollout.promotedAt)} · rollback until ${rollback}`,
+      body: `Rolled out ${relTime(c.rollout.promotedAt, now)} · rollback until ${rollback}`,
       at: c.rollout.promotedAt,
       tone: 'accent',
     }
@@ -70,7 +70,7 @@ function alertFor(c: CampaignListItem): AlertItem | null {
 // so the function stays pure and deterministic under test.
 export function deriveAlerts(campaigns: CampaignListItem[], now: Date = new Date()): AlertGroup[] {
   const items = campaigns
-    .map(alertFor)
+    .map((c) => alertFor(c, now))
     .filter((item): item is AlertItem => item !== null)
 
   const today: AlertItem[] = []

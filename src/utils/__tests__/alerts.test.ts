@@ -153,6 +153,51 @@ test('mixed campaigns land in the right groups together, newest-first', () => {
   expect(earlier.items.map((i) => i.id)).toEqual(['concluded:c3'])
 })
 
+test('shipped body forwards the injected `now` to relTime (regression: must not read the wall clock)', () => {
+  const promotedAt = '2026-07-25T11:30:00Z' // 30 minutes before the fixed NOW
+  const justShipped: CampaignListItem = {
+    ...base,
+    id: 'c9', name: 'Nav: sticky search bar', status: 'rollout',
+    rollout: { winnerVariantId: 'v2', promotedAt, uplift: 5 },
+    endsAt: null, updatedAt: promotedAt,
+    challenger: null, uplift: 5, confidence: 95, sigStatus: 'winning',
+  }
+  const groups = deriveAlerts([justShipped], NOW)
+  const item = groups.flatMap((g) => g.items).find((i) => i.id === 'shipped:c9')
+  expect(item).toBeTruthy()
+  // With the real wall clock (the bug this guards against) this would not read "30 mins ago"
+  // unless the suite happened to run at exactly this fixed NOW.
+  expect(item!.body).toContain('Rolled out 30 mins ago')
+})
+
+test('exactly 7 days old lands in "This week" (boundary)', () => {
+  const promotedAt = '2026-07-18T12:00:00Z' // exactly 7 days before NOW
+  const c: CampaignListItem = {
+    ...base,
+    id: 'c10', name: 'Boundary: seven days', status: 'rollout',
+    rollout: { winnerVariantId: 'v2', promotedAt, uplift: 3 },
+    endsAt: null, updatedAt: promotedAt,
+    challenger: null, uplift: 3, confidence: 96, sigStatus: 'winning',
+  }
+  const groups = deriveAlerts([c], NOW)
+  expect(groups.map((g) => g.label)).toEqual(['This week'])
+  expect(groups[0].items.map((i) => i.id)).toEqual(['shipped:c10'])
+})
+
+test('exactly 14 days old lands in "Earlier" (boundary; concluded\'s 14-day cap is inclusive)', () => {
+  const anchor = '2026-07-11T12:00:00Z' // exactly 14 days before NOW
+  const c: CampaignListItem = {
+    ...base,
+    id: 'c11', name: 'Boundary: fourteen days', status: 'completed',
+    rollout: { winnerVariantId: 'v2', promotedAt: '2026-07-10T00:00:00Z', uplift: 4 },
+    endsAt: anchor, updatedAt: anchor,
+    challenger: null, uplift: 4, confidence: 97, sigStatus: 'winning',
+  }
+  const groups = deriveAlerts([c], NOW)
+  expect(groups.map((g) => g.label)).toEqual(['Earlier'])
+  expect(groups[0].items.map((i) => i.id)).toEqual(['concluded:c11'])
+})
+
 test('deriveAlerts defaults `now` to the current time when omitted', () => {
   const real = Date.now()
   const today: CampaignListItem = { ...WINNING_RUNNING, id: 'c8', updatedAt: new Date(real).toISOString() }
