@@ -33,6 +33,13 @@ const ROLLOUT: CampaignDetailData = {
   rollout: { winnerVariantId: 'v2', promotedAt: '2026-07-20T00:00:00Z' },
 }
 
+// Winning but below the 95% ship-ready confidence threshold — the ship bar
+// is a one-way, hard-to-undo action, so it must not render below the gate.
+const BELOW_THRESHOLD: CampaignDetailData = {
+  ...WINNING, id: 't4',
+  significance: { ...WINNING.significance!, confidence: 84 },
+}
+
 const renderDetail = async () => {
   const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } })
   return await render(<QueryClientProvider client={qc}><TestDetailScreen /></QueryClientProvider>)
@@ -57,4 +64,17 @@ test('rollout campaign renders the roll-back action', async () => {
   ;(campaigns.fetchCampaign as jest.Mock).mockResolvedValue(ROLLOUT)
   const { getByText } = await renderDetail()
   await waitFor(() => expect(getByText('Roll back')).toBeTruthy())
+})
+
+test('winning campaign above the ship threshold renders the ship bar', async () => {
+  ;(campaigns.fetchCampaign as jest.Mock).mockResolvedValue(WINNING)
+  const { getByText } = await renderDetail()
+  await waitFor(() => expect(getByText(/Ship /)).toBeTruthy())
+})
+
+test('winning campaign below the confidence threshold does not render the ship bar', async () => {
+  ;(campaigns.fetchCampaign as jest.Mock).mockResolvedValue(BELOW_THRESHOLD)
+  const { getByText, queryByText } = await renderDetail()
+  await waitFor(() => expect(getByText(/is winning by/)).toBeTruthy())
+  expect(queryByText(/Ship /)).toBeNull()
 })

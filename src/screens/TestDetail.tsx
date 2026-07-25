@@ -51,6 +51,13 @@ function verdictContent(c: CampaignDetailData): { kicker: string; headline: stri
       body: `${compact(c.stats.visitors)} visitors over ${daysBetween(c.createdAt)} days, ${pct(sig.confidence, 0)} confidence.`,
     }
   }
+  if (c.status === 'paused' && sig?.status === 'winning') {
+    return {
+      kicker,
+      headline: `${challenger?.name ?? 'Challenger'} was ahead by ${signedPct(sig.uplift)}`,
+      body: 'The test is paused — it stopped collecting with this lead. Resume it on the desktop panel to keep testing.',
+    }
+  }
   if (sig?.status === 'losing') {
     return {
       kicker,
@@ -140,7 +147,7 @@ export function TestDetailScreen() {
 
   const seriesA = c.controlId ? c.timeline.byVariant[c.controlId] : undefined
   const seriesB = c.challengerId ? c.timeline.byVariant[c.challengerId] : undefined
-  const hasChartData = !!c.controlId && !!c.challengerId && !!seriesA?.length && !!seriesB?.length
+  const hasChartData = !!c.controlId && !!c.challengerId && (seriesA?.length ?? 0) >= 2 && (seriesB?.length ?? 0) >= 2
 
   const shipReadyNow = c.status === 'running' && c.significance?.status === 'winning'
     && c.significance.confidence >= 95 && c.significance.uplift > 0
