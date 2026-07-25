@@ -2,6 +2,7 @@ import { Pressable, Text, View } from 'react-native'
 import { Icon, IconName } from '../Icon'
 import { colors, fonts } from '../../theme'
 import { useToast } from '../../stores/toast'
+import { useSheets } from '../../stores/sheets'
 
 const ITEMS: { label: string; icon: IconName }[] = [
   { label: 'Learnings', icon: 'flag' },
@@ -24,6 +25,12 @@ const ITEMS: { label: string; icon: IconName }[] = [
 
 export function MoreSheet() {
   const show = useToast((s) => s.show)
+  const close = useSheets((s) => s.close)
+
+  const tap = (label: string) => {
+    close()
+    show(`${label} is coming to mobile — it lives on the desktop panel for now.`)
+  }
 
   return (
     <View>
@@ -35,7 +42,7 @@ export function MoreSheet() {
         {ITEMS.map((item) => (
           <Pressable
             key={item.label}
-            onPress={() => show(`${item.label} is coming to mobile — it lives on the desktop panel for now.`)}
+            onPress={() => tap(item.label)}
             style={{ width: '47.5%', flexDirection: 'row', alignItems: 'center', gap: 10, minHeight: 56, backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, borderRadius: 14, padding: 13 }}
           >
             <View style={{ width: 32, height: 32, borderRadius: 9, backgroundColor: colors.accentSoft, alignItems: 'center', justifyContent: 'center' }}>

@@ -21,7 +21,7 @@ export function SheetHost() {
       ref={ref}
       enableDynamicSizing
       onDismiss={close}
-      backdropComponent={(p) => <BottomSheetBackdrop {...p} appearsOnIndex={0} disappearsOnIndex={-1} opacity={0.34} />}
+      backdropComponent={(p) => <BottomSheetBackdrop {...p} appearsOnIndex={0} disappearsOnIndex={-1} opacity={0.34} style={{ backgroundColor: colors.ink }} />}
       backgroundStyle={{ backgroundColor: colors.paper, borderTopLeftRadius: Platform.OS === 'android' ? 16 : radius.sheet, borderTopRightRadius: Platform.OS === 'android' ? 16 : radius.sheet }}
       handleIndicatorStyle={{ backgroundColor: colors.handle, width: 38 }}
     >
