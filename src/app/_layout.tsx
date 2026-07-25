@@ -14,7 +14,9 @@ export default function RootLayout() {
     IBMPlexMono_400Regular, IBMPlexMono_500Medium, IBMPlexMono_600SemiBold,
   })
   const restore = useAuth((s) => s.restore)
-  useEffect(() => { restore() }, [restore])
+  useEffect(() => {
+    restore().catch(() => useAuth.setState({ status: 'signedOut', user: null, company: null }))
+  }, [restore])
   if (!loaded) return null
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>

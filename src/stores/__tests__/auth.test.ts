@@ -35,3 +35,24 @@ test('restore with tokens loads /api/auth/me', async () => {
   await useAuth.getState().restore()
   expect(useAuth.getState().status).toBe('signedIn')
 })
+
+test('restore with tokens but /api/auth/me rejecting → clears tokens, signedOut', async () => {
+  ;(tokens.getTokens as jest.Mock).mockResolvedValue({ access: 'A', refresh: 'R' })
+  apiFetch.mockRejectedValue(new Error('401'))
+  await useAuth.getState().restore()
+  expect(tokens.clearTokens).toHaveBeenCalled()
+  expect(useAuth.getState().status).toBe('signedOut')
+})
+
+test('restore when getTokens itself rejects → ends signedOut, never stuck restoring', async () => {
+  ;(tokens.getTokens as jest.Mock).mockRejectedValue(new Error('SecureStore unavailable'))
+  await useAuth.getState().restore()
+  expect(useAuth.getState().status).toBe('signedOut')
+})
+
+test('signOut with logout POST rejecting still clears tokens and signs out', async () => {
+  apiFetch.mockRejectedValue(new Error('network error'))
+  await useAuth.getState().signOut()
+  expect(tokens.clearTokens).toHaveBeenCalled()
+  expect(useAuth.getState().status).toBe('signedOut')
+})

@@ -44,13 +44,17 @@ export const useAuth = create<AuthState>((set) => ({
   },
 
   async restore() {
-    const tokens = await getTokens()
-    if (!tokens) return set({ status: 'signedOut' })
     try {
+      const tokens = await getTokens()
+      if (!tokens) return set({ status: 'signedOut', user: null, company: null })
       const me = await apiFetch<{ user: User; company: Company }>('/api/auth/me')
       set({ status: 'signedIn', user: me.user, company: me.company })
     } catch {
-      await clearTokens()
+      try {
+        await clearTokens()
+      } catch {
+        // best-effort: we're already failing closed to signedOut regardless
+      }
       set({ status: 'signedOut', user: null, company: null })
     }
   },
