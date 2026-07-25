@@ -87,7 +87,7 @@ Flows (`api/flows`), Nudges (`api/nudges`), Audiences (`api/audiences`), Team (`
 
 ## 4. Data flow, auth & error handling
 
-- **Auth flow:** email/password → `POST /api/auth/login` → access + refresh tokens stored in `expo-secure-store` → `Authorization: Bearer <access>` on every request (middleware "door 2" already accepts this) → on 401, one `POST /api/auth/refresh` and retry → hard logout if refresh fails. Multi-store accounts use `POST /api/auth/switch-store`.
+- **Auth flow:** email/password → `POST /api/auth/login` → access + refresh tokens stored in `expo-secure-store` → `Authorization: Bearer <access>` on every request (accepted by middleware "door 3", added during Phase 1 — the pre-existing Bearer branch only verified Shopify session tokens) → on 401, one `POST /api/auth/refresh` and retry → hard logout if refresh fails. Multi-store accounts use `POST /api/auth/switch-store`.
 - **Queries:** TanStack Query; pull-to-refresh on every screen; stale-while-revalidate. Polling only where live-ness matters (Live screen, detail of a running test).
 - **Mutations:** ship, rollback, toggles, invites, settings — invalidate affected queries on success. Shipping is **not optimistic**: the confirm sheet waits for the server, then shows the toast and flipped state. Cheap toggles (alert settings, flow pause) are optimistic with rollback on error.
 - **Errors:** Skeleton loaders (pulse) while fetching; inline retry card on query failure; toast on mutation failure; offline banner via NetInfo.
