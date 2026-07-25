@@ -23,16 +23,20 @@ async function refreshTokens(): Promise<boolean> {
     refreshing = (async () => {
       const tokens = await getTokens()
       if (!tokens) return false
-      const res = await fetch(`${API_URL}/api/auth/refresh`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ refreshToken: tokens.refresh }),
-      })
-      if (!res.ok) return false
-      const body = (await res.json()) as { tokens?: { accessToken: string; refreshToken: string } }
-      if (!body.tokens) return false
-      await setTokens({ access: body.tokens.accessToken, refresh: body.tokens.refreshToken })
-      return true
+      try {
+        const res = await fetch(`${API_URL}/api/auth/refresh`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ refreshToken: tokens.refresh }),
+        })
+        if (!res.ok) return false
+        const body = (await res.json()) as { tokens?: { accessToken: string; refreshToken: string } }
+        if (!body.tokens) return false
+        await setTokens({ access: body.tokens.accessToken, refresh: body.tokens.refreshToken })
+        return true
+      } catch {
+        return false
+      }
     })().finally(() => { refreshing = null })
   }
   return refreshing
@@ -42,17 +46,28 @@ export async function apiFetch<T>(path: string, init: RequestInit & { auth?: boo
   const { auth = true, headers, ...rest } = init
   const doFetch = async (): Promise<Response> => {
     const tokens = auth ? await getTokens() : null
-    return fetch(`${API_URL}${path}`, {
-      ...rest,
-      headers: {
-        'Content-Type': 'application/json',
-        ...(tokens ? { Authorization: `Bearer ${tokens.access}` } : {}),
-        ...(headers as Record<string, string>),
-      },
-    })
+    try {
+      return await fetch(`${API_URL}${path}`, {
+        ...rest,
+        headers: {
+          'Content-Type': 'application/json',
+          ...(tokens ? { Authorization: `Bearer ${tokens.access}` } : {}),
+          ...(headers as Record<string, string>),
+        },
+      })
+    } catch (err) {
+      throw new ApiError(0, { error: 'Network error — check your connection.' })
+    }
   }
 
-  let res = await doFetch()
+  let res: Response
+  try {
+    res = await doFetch()
+  } catch (err) {
+    if (err instanceof ApiError) throw err
+    throw new ApiError(0, { error: 'Network error — check your connection.' })
+  }
+
   if (res.status === 401 && auth) {
     const refreshed = await refreshTokens()
     if (!refreshed) {
@@ -60,8 +75,20 @@ export async function apiFetch<T>(path: string, init: RequestInit & { auth?: boo
       sessionExpiredCb?.()
       throw new ApiError(401, await res.json().catch(() => null))
     }
-    res = await doFetch()
+    try {
+      res = await doFetch()
+    } catch (err) {
+      if (err instanceof ApiError) throw err
+      throw new ApiError(0, { error: 'Network error — check your connection.' })
+    }
+    // Check if retried request is also 401
+    if (res.status === 401) {
+      await clearTokens()
+      sessionExpiredCb?.()
+      throw new ApiError(401, await res.json().catch(() => null))
+    }
   }
+
   const body = await res.json().catch(() => null)
   if (!res.ok) throw new ApiError(res.status, body)
   return body as T
