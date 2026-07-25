@@ -8,6 +8,7 @@ import { Stack } from 'expo-router'
 import { useAuth } from '../stores/auth'
 import { SheetHost } from '../components/SheetHost'
 import { ToastHost } from '../components/ToastHost'
+import { OfflineBanner } from '../components/OfflineBanner'
 
 const queryClient = new QueryClient({ defaultOptions: { queries: { retry: 1, staleTime: 30_000 } } })
 
@@ -25,6 +26,7 @@ export default function RootLayout() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <QueryClientProvider client={queryClient}>
         <BottomSheetModalProvider>
+          <OfflineBanner />
           <Stack screenOptions={{ headerShown: false }} />
           <SheetHost />
           <ToastHost />
