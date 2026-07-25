@@ -1,6 +1,6 @@
 import type { CampaignListItem } from '../api/campaigns'
 import { shipReady, rollbackUntil } from './testModel'
-import { pct, signedPct, relTime } from './format'
+import { pct, signedPct, relTime, dayKey, shortDate } from './format'
 
 export type AlertKind = 'ship_ready' | 'shipped' | 'concluded'
 
@@ -16,8 +16,6 @@ export type AlertItem = {
 
 export type AlertGroupLabel = 'Today' | 'This week' | 'Earlier'
 export type AlertGroup = { label: AlertGroupLabel; items: AlertItem[] }
-
-const dayKey = (d: Date) => d.toISOString().slice(0, 10)
 
 const daysAgo = (iso: string, now: Date) => Math.floor((now.getTime() - new Date(iso).getTime()) / 86_400_000)
 
@@ -35,7 +33,7 @@ function alertFor(c: CampaignListItem, now: Date): AlertItem | null {
   }
 
   if (c.status === 'rollout' && c.rollout) {
-    const rollback = rollbackUntil(c.rollout.promotedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' })
+    const rollback = shortDate(rollbackUntil(c.rollout.promotedAt))
     return {
       id: `shipped:${c.id}`,
       kind: 'shipped',

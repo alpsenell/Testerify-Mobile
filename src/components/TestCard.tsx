@@ -1,7 +1,7 @@
 import { Pressable, Text, View } from 'react-native'
 import type { CampaignListItem } from '../api/campaigns'
 import { statusLabel, statusTone, statusPulse, confColor } from '../utils/testModel'
-import { compact, pct } from '../utils/format'
+import { compact, pct, shortDate } from '../utils/format'
 import { StatusPill } from './StatusPill'
 import { ConfidenceBar } from './ConfidenceBar'
 import { colors, fonts } from '../theme'
@@ -10,7 +10,7 @@ export function TestCard({ campaign: c, onPress }: { campaign: CampaignListItem;
   const isDraft = c.status === 'draft'
   const goalLine = isDraft
     ? 'Draft · not launched'
-    : `${compact(c.visitors)} visitors · started ${new Date(c.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' })}`
+    : `${compact(c.visitors)} visitors · started ${shortDate(c.createdAt)}`
   const rate = c.challenger?.rate ?? c.conversionRate
 
   return (
@@ -28,7 +28,7 @@ export function TestCard({ campaign: c, onPress }: { campaign: CampaignListItem;
           {isDraft ? '—' : pct(c.confidence, 0)}
         </Text>
         <Text style={{ fontFamily: fonts.monoSemi, fontSize: 13, color: colors.ink, minWidth: 40, textAlign: 'right' }}>
-          {isDraft ? '—' : `${rate.toFixed(1)}%`}
+          {isDraft ? '—' : pct(rate)}
         </Text>
       </View>
     </Pressable>

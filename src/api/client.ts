@@ -21,9 +21,9 @@ let refreshing: Promise<boolean> | null = null
 async function refreshTokens(): Promise<boolean> {
   if (!refreshing) {
     refreshing = (async () => {
-      const tokens = await getTokens()
-      if (!tokens) return false
       try {
+        const tokens = await getTokens()
+        if (!tokens) return false
         const res = await fetch(`${API_URL}/api/auth/refresh`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

@@ -7,7 +7,7 @@ import type { CampaignDetailData, CampaignVariant } from '../api/campaigns'
 import { useSheets } from '../stores/sheets'
 import { useToast } from '../stores/toast'
 import { statusLabel, statusTone, statusPulse, rollbackUntil } from '../utils/testModel'
-import { compact, pct, signedPct, money, daysBetween } from '../utils/format'
+import { compact, pct, signedPct, money, daysBetween, shortDate } from '../utils/format'
 import { StatusPill } from '../components/StatusPill'
 import { Card } from '../components/Card'
 import { Skeleton } from '../components/Skeleton'
@@ -17,9 +17,6 @@ import { Icon } from '../components/Icon'
 import { VariantCard } from '../components/VariantCard'
 import { DetailChart } from '../components/charts/DetailChart'
 import { colors, fonts, type } from '../theme'
-
-const monD = (d: Date | string) => (typeof d === 'string' ? new Date(d) : d)
-  .toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' })
 
 // Best-effort "path" extraction from a target URL for the subtitle line. RN/Hermes
 // doesn't guarantee a global URL parser, so this is a plain regex rather than `new URL()`.
@@ -41,7 +38,7 @@ function verdictContent(c: CampaignDetailData): { kicker: string; headline: stri
     return {
       kicker,
       headline: `${winner?.name ?? 'Winner'} is live for 100% of traffic`,
-      body: `Shipped ${monD(c.rollout.promotedAt)} · rollback until ${monD(until)}`,
+      body: `Shipped ${shortDate(c.rollout.promotedAt)} · rollback until ${shortDate(until)}`,
     }
   }
   if (c.status === 'running' && sig?.status === 'winning') {
@@ -174,7 +171,7 @@ export function TestDetailScreen() {
 
         <StatusPill label={statusLabel(c.status)} tone={statusTone(c.status)} pulse={statusPulse(c.status)} />
         <Text style={type.h1}>{c.name}</Text>
-        <Text style={type.small}>{targetPath(c.targetUrl)} · started {monD(c.createdAt)}</Text>
+        <Text style={type.small}>{targetPath(c.targetUrl)} · started {shortDate(c.createdAt)}</Text>
 
         {/* Verdict card */}
         <Card style={{ backgroundColor: colors.accentSoft, borderColor: colors.accentBorder, borderRadius: 18 }}>
@@ -265,7 +262,7 @@ export function TestDetailScreen() {
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, borderRadius: 14, padding: 14 }}>
             <View style={{ flex: 1 }}>
               <Text style={type.title}>Live for everyone</Text>
-              <Text style={[type.small, { marginTop: 2 }]}>rollback until {monD(rollbackDate!)}</Text>
+              <Text style={[type.small, { marginTop: 2 }]}>rollback until {shortDate(rollbackDate!)}</Text>
             </View>
             <Pressable onPress={confirmRollback} disabled={rollback.isPending}
               style={{ borderWidth: 1, borderColor: colors.border, borderRadius: 11, paddingHorizontal: 14, minHeight: 44, justifyContent: 'center', opacity: rollback.isPending ? 0.6 : 1 }}>

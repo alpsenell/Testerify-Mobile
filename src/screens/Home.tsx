@@ -6,7 +6,7 @@ import { fetchCampaigns } from '../api/campaigns'
 import { useAuth } from '../stores/auth'
 import { useSheets } from '../stores/sheets'
 import { shipReady, rollbackUntil } from '../utils/testModel'
-import { compact, pct, money, signedPct } from '../utils/format'
+import { compact, pct, money, signedPct, dayKey, shortDate } from '../utils/format'
 import { Card } from '../components/Card'
 import { StatTile } from '../components/StatTile'
 import { TestRow } from '../components/TestRow'
@@ -29,7 +29,7 @@ export function HomeScreen() {
   const ready = (camps.data ?? []).find(shipReady)
   const shippedToday = (camps.data ?? []).find(
     (c) => c.status === 'rollout' && c.rollout?.promotedAt &&
-      new Date(c.rollout.promotedAt).toDateString() === new Date().toDateString()
+      dayKey(c.rollout.promotedAt) === dayKey(new Date())
   )
   const winners = (camps.data ?? []).filter((c) => c.status === 'rollout' || (c.status === 'completed' && c.rollout)).length
 
@@ -100,7 +100,7 @@ export function HomeScreen() {
           <View style={{ flex: 1 }}>
             <Text style={type.title}>{shippedToday.name} is live for everyone</Text>
             <Text style={[type.small, { marginTop: 2 }]}>
-              Shipped today{shippedToday.rollout!.uplift !== undefined ? ` · ${signedPct(shippedToday.rollout!.uplift)}` : ''} · rollback until {rollbackUntil(shippedToday.rollout!.promotedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+              Shipped today{shippedToday.rollout!.uplift !== undefined ? ` · ${signedPct(shippedToday.rollout!.uplift)}` : ''} · rollback until {shortDate(rollbackUntil(shippedToday.rollout!.promotedAt))}
             </Text>
           </View>
           <Icon name="chevron" size={18} color={colors.muted} />

@@ -57,7 +57,7 @@ export function CopilotSheet() {
   const qc = useQueryClient()
   const [goal, setGoal] = useState('')
 
-  const { data } = useQuery({ queryKey: ['suggestions'], queryFn: fetchSuggestions })
+  const { data, isPending: suggestionsPending } = useQuery({ queryKey: ['suggestions'], queryFn: fetchSuggestions })
 
   // No client-side timeout: this scans the store + calls the AI and can
   // legitimately take 30-60s. Let it run.
@@ -150,7 +150,7 @@ export function CopilotSheet() {
 
       <Text style={{ fontFamily: fonts.sansSemi, fontSize: 13, color: colors.ink, marginBottom: 10 }}>{listHeader}</Text>
 
-      {generate.isPending ? (
+      {generate.isPending || suggestionsPending ? (
         <>
           <Skeleton height={128} borderRadius={radius.card} />
           <View style={{ height: 10 }} />

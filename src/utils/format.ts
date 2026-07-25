@@ -2,9 +2,10 @@ const SYMBOL: Record<string, string> = { USD: '$', EUR: '€', GBP: '£' }
 
 export function compact(n: number): string {
   const abs = Math.abs(n)
+  const sign = n < 0 ? '-' : ''
   if (abs >= 1_000_000) {
     const r = Math.round(abs / 1_000_000 * 10) / 10
-    if (r >= 1000) return String(Math.round(abs / 1_000_000_000)) + 'b'
+    if (r >= 1000) return sign + String(Math.round(abs / 1_000_000_000)) + 'b'
     return trim1(n / 1_000_000) + 'm'
   }
   if (abs >= 1_000) {
@@ -36,6 +37,20 @@ export function money(n: number, code?: string | null): string {
   return isNegative ? `−${formatted}` : formatted
 }
 
+// UTC calendar-day key (`YYYY-MM-DD`) — the shared basis for same-day / consecutive-day
+// comparisons so results don't drift with the device's local timezone.
+export function dayKey(d: Date | string): string {
+  const date = typeof d === 'string' ? new Date(d) : d
+  return date.toISOString().slice(0, 10)
+}
+
+// Short UTC date, e.g. "Jul 21" — the shared basis for any "started/shipped/rollback until"
+// date rendering so results don't drift with the device's local timezone.
+export function shortDate(d: Date | string): string {
+  const date = typeof d === 'string' ? new Date(d) : d
+  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' })
+}
+
 export function relTime(iso: string, now: Date = new Date()): string {
   const d = new Date(iso)
   const diffMs = now.getTime() - d.getTime()
@@ -43,10 +58,9 @@ export function relTime(iso: string, now: Date = new Date()): string {
   if (mins < 1) return 'just now'
   if (mins < 60) return `${mins} min${mins === 1 ? '' : 's'} ago`
   const hours = Math.floor(mins / 60)
-  const dayKey = (x: Date) => x.toISOString().slice(0, 10)
   if (dayKey(d) === dayKey(now)) return `${hours} hour${hours === 1 ? '' : 's'} ago`
   if (dayKey(d) === dayKey(new Date(now.getTime() - 86_400_000))) return 'Yesterday'
-  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' })
+  return shortDate(d)
 }
 
 export function daysBetween(aIso: string, b: Date = new Date()): number {

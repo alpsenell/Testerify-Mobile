@@ -1,7 +1,7 @@
 import { Pressable, Text, View } from 'react-native'
 import type { CampaignListItem } from '../api/campaigns'
 import { verdictFor } from '../utils/testModel'
-import { compact, signedPct, daysBetween } from '../utils/format'
+import { compact, pct, signedPct, daysBetween } from '../utils/format'
 import { StatusPill } from './StatusPill'
 import { colors, fonts } from '../theme'
 
@@ -20,7 +20,7 @@ export function TestRow({ campaign: c, onPress }: { campaign: CampaignListItem; 
         </View>
       </View>
       <View style={{ alignItems: 'flex-end' }}>
-        <Text style={{ fontFamily: fonts.monoSemi, fontSize: 16, color: colors.ink }}>{rate.toFixed(1)}%</Text>
+        <Text style={{ fontFamily: fonts.monoSemi, fontSize: 16, color: colors.ink }}>{pct(rate)}</Text>
         {c.uplift !== 0 && (
           <Text style={{ fontFamily: fonts.monoSemi, fontSize: 12, color: c.uplift > 0 ? colors.pos : colors.neg }}>
             {signedPct(c.uplift)}

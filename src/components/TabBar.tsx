@@ -5,13 +5,15 @@ import { colors, fonts } from '../theme'
 import { useSheets } from '../stores/sheets'
 
 export function TabBar({ state, navigation, badgeCount = 0 }: BottomTabBarProps & { badgeCount?: number }) {
-  const { openMore, openCopilot } = useSheets()
+  const openMore = useSheets((s) => s.openMore)
+  const openCopilot = useSheets((s) => s.openCopilot)
   const current = state.routes[state.index]?.name
 
   const tab = (route: string, label: string, icon: IconName, extra?: React.ReactNode) => {
     const active = current === route
     return (
       <Pressable key={route} onPress={() => navigation.navigate(route)}
+        accessibilityRole="tab" accessibilityState={{ selected: active }}
         style={{ flex: 1, alignItems: 'center', gap: 4, paddingTop: 7, minHeight: 52 }}>
         <View>
           <Icon name={icon} size={23} color={active ? colors.accent : colors.muted} />
@@ -35,7 +37,7 @@ export function TabBar({ state, navigation, badgeCount = 0 }: BottomTabBarProps 
           <Text style={{ fontFamily: fonts.monoSemi, fontSize: 9.5, color: '#fff' }}>{badgeCount}</Text>
         </View>
       ) : undefined)}
-      <Pressable onPress={openMore} style={{ flex: 1, alignItems: 'center', gap: 4, paddingTop: 7, minHeight: 52 }}>
+      <Pressable onPress={openMore} accessibilityRole="button" style={{ flex: 1, alignItems: 'center', gap: 4, paddingTop: 7, minHeight: 52 }}>
         <Icon name="layers" size={23} color={colors.muted} />
         <Text style={{ fontFamily: fonts.sansSemi, fontSize: 10.5, color: colors.muted }}>More</Text>
       </Pressable>

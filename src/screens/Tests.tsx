@@ -47,7 +47,7 @@ export function TestsScreen() {
       {/* Header */}
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
         <Text style={type.h1}>Tests</Text>
-        <Pressable onPress={openCopilot} style={{ flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: colors.accent, borderRadius: 11, paddingHorizontal: 14, minHeight: 40, justifyContent: 'center' }}>
+        <Pressable onPress={openCopilot} style={{ flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: colors.accent, borderRadius: 11, paddingHorizontal: 14, minHeight: 44, justifyContent: 'center' }}>
           <Icon name="plus" size={15} color="#fff" />
           <Text style={{ fontFamily: fonts.sansSemi, fontSize: 13.5, color: '#fff' }}>New</Text>
         </Pressable>

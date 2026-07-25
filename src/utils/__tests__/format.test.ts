@@ -10,6 +10,9 @@ test('compact', () => {
   expect(compact(0)).toBe('0')
   expect(compact(999999)).toBe('1m')
   expect(compact(999949)).toBe('999.9k')
+  expect(compact(-48234)).toBe('-48.2k')
+  expect(compact(2_000_000_000)).toBe('2b')
+  expect(compact(-2_000_000_000)).toBe('-2b')
 })
 
 test('pct / signedPct', () => {
