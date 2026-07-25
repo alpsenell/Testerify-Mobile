@@ -27,6 +27,17 @@ const P = {
   mail: 'M3.5 7l8.5 6 8.5-6', // + rect special-case
   send: 'M21 3 10 14 M21 3l-7 18-3-8-8-3z',
   trash: 'M5 7h14 M9 7V5h6v2 M7 7l1 12.5h8L17 7',
+  bell: 'M18 15.5V11a6 6 0 1 0-12 0v4.5L4.5 18h15z M10 18.5a2 2 0 0 0 4 0',
+  megaphone: 'M3.5 10.5v3a1.5 1.5 0 0 0 1.5 1.5h2.5l8 4V5l-8 4H5a1.5 1.5 0 0 0-1.5 1.5z M18.5 9.5a3.6 3.6 0 0 1 0 5 M8.2 15.3l1.1 4.2h2.6l-1-4',
+  flow: 'M8.1 7.2 15.6 11M15.7 13.2 8.1 16.9', // + 3 circles special-case
+  link: 'M10 14a5 5 0 0 0 7 0l2.5-2.5a5 5 0 0 0-7-7L11 6 M14 10a5 5 0 0 0-7 0l-2.5 2.5a5 5 0 0 0 7 7L13 18',
+  globe: 'M3.5 12h17 M12 3.5c2.5 2.3 4 5.3 4 8.5s-1.5 6.2-4 8.5c-2.5-2.3-4-5.3-4-8.5s1.5-6.2 4-8.5z', // + circle special-case
+  settings: 'M19.4 13.5a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-1.8-.3 1.6 1.6 0 0 0-1 1.5V21a2 2 0 0 1-4 0v-.1a1.6 1.6 0 0 0-1-1.5 1.6 1.6 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.6 1.6 0 0 0 .3-1.8 1.6 1.6 0 0 0-1.5-1H3a2 2 0 0 1 0-4h.1a1.6 1.6 0 0 0 1.5-1 1.6 1.6 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.6 1.6 0 0 0 1.8.3H9a1.6 1.6 0 0 0 1-1.5V3a2 2 0 0 1 4 0v.1a1.6 1.6 0 0 0 1 1.5 1.6 1.6 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0-.3 1.8V9a1.6 1.6 0 0 0 1.5 1H21a2 2 0 0 1 0 4h-.1a1.6 1.6 0 0 0-1.5 1z', // + circle special-case
+  edit: 'M4 20h4L18.5 9.5a2 2 0 0 0-2.8-2.8L5 17.2z M14 8l2 2',
+  info: 'M12 11v5', // + 2 circles special-case
+  logout: 'M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4 M16 17l5-5-5-5 M21 12H9',
+  phone: 'M11 18.5h2', // + rect special-case
+  monitor: 'M9 21h6M12 17v4', // + rect special-case
 }
 
 export type IconName = keyof typeof P
@@ -44,6 +55,16 @@ export function Icon({ name, size = 16, color = '#211e1a', strokeWidth = 1.6, fi
       {name === 'search' && <Circle cx={11} cy={11} r={6} {...common} />}
       {name === 'warning' && <Circle cx={12} cy={16.8} r={0.7} fill={color} />}
       {name === 'mail' && <Rect x={3} y={6} width={18} height={12} rx={2} {...common} />}
+      {name === 'flow' && (<>
+        <Circle cx={6} cy={6} r={2.4} {...common} /><Circle cx={18} cy={12} r={2.4} {...common} /><Circle cx={6} cy={18} r={2.4} {...common} />
+      </>)}
+      {name === 'globe' && <Circle cx={12} cy={12} r={8.5} {...common} />}
+      {name === 'settings' && <Circle cx={12} cy={12} r={3.1} {...common} />}
+      {name === 'info' && (<>
+        <Circle cx={12} cy={12} r={8} {...common} /><Circle cx={12} cy={8} r={0.7} fill={color} />
+      </>)}
+      {name === 'phone' && <Rect x={7} y={3} width={10} height={18} rx={2.4} {...common} />}
+      {name === 'monitor' && <Rect x={3} y={5} width={18} height={12} rx={2} {...common} />}
       {P[name] ? <Path d={P[name]} {...common} fill={filled || name === 'play' ? color : 'none'} /> : null}
     </Svg>
   )

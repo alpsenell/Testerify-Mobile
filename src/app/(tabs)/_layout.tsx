@@ -1,10 +1,16 @@
-import { Redirect, Stack } from 'expo-router'
+import { Redirect, Tabs } from 'expo-router'
+import { TabBar } from '../../components/TabBar'
 import { useAuth } from '../../stores/auth'
 
-// Placeholder tabs group so post-login navigation resolves end-to-end.
-// Task 9 replaces this with the real tab bar.
 export default function TabsLayout() {
   const status = useAuth((s) => s.status)
+  if (status === 'restoring') return null
   if (status === 'signedOut') return <Redirect href="/login" />
-  return <Stack screenOptions={{ headerShown: false }} />
+  return (
+    <Tabs tabBar={(props) => <TabBar {...props} />} screenOptions={{ headerShown: false }}>
+      <Tabs.Screen name="index" />
+      <Tabs.Screen name="tests" />
+      <Tabs.Screen name="alerts" />
+    </Tabs>
+  )
 }
