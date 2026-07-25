@@ -1,0 +1,170 @@
+import { useState } from 'react'
+import { Pressable, ScrollView, Text, TextInput, View } from 'react-native'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { fetchSuggestions, generateSuggestions, generateTestDraft, type AiIdea } from '../../api/ai'
+import { useSheets } from '../../stores/sheets'
+import { useToast } from '../../stores/toast'
+import { draftRequestFor, ideaTag, impactColor } from '../../utils/copilot'
+import { Icon } from '../Icon'
+import { Skeleton } from '../Skeleton'
+import { colors, fonts, radius, type } from '../../theme'
+
+const GOAL_CHIPS = [
+  'Increase add-to-cart rate',
+  'Reduce mobile checkout drop-off',
+  'Raise average order value',
+  'Improve email signup',
+]
+
+const errMessage = (e: unknown, fallback: string) => (e instanceof Error ? e.message : fallback)
+
+function IdeaCard({ idea, building, onBuild }: { idea: AiIdea; building: boolean; onBuild: () => void }) {
+  return (
+    <View style={{ backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, borderRadius: radius.card, padding: 14, marginBottom: 10 }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+        <View style={{ backgroundColor: colors.accentSoft, borderRadius: radius.chip, paddingHorizontal: 10, paddingVertical: 4 }}>
+          <Text style={{ fontFamily: fonts.sansSemi, fontSize: 11.5, color: colors.accent }}>{ideaTag(idea)}</Text>
+        </View>
+        <Text style={{ fontFamily: fonts.mono, fontSize: 11, color: impactColor(idea.impact) }}>{idea.impact} impact</Text>
+      </View>
+      <Text style={{ fontFamily: fonts.sansSemi, fontSize: 14.5, color: colors.ink, marginBottom: 4 }}>{idea.title}</Text>
+      <Text style={[type.body, { marginBottom: 12 }]}>{idea.hypothesis}</Text>
+      <Pressable
+        disabled={building}
+        onPress={onBuild}
+        style={{
+          flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8,
+          backgroundColor: colors.accent, borderRadius: 12, minHeight: 44,
+          opacity: building ? 0.6 : 1,
+        }}
+      >
+        <Icon name="sparkle" size={16} color="#fff" />
+        <Text style={{ fontFamily: fonts.sansSemi, fontSize: 13.5, color: '#fff' }}>
+          {building ? 'Building…' : 'Build draft'}
+        </Text>
+      </Pressable>
+    </View>
+  )
+}
+
+export function CopilotSheet() {
+  const close = useSheets((s) => s.close)
+  const show = useToast((s) => s.show)
+  const qc = useQueryClient()
+  const [goal, setGoal] = useState('')
+
+  const { data } = useQuery({ queryKey: ['suggestions'], queryFn: fetchSuggestions })
+
+  // No client-side timeout: this scans the store + calls the AI and can
+  // legitimately take 30-60s. Let it run.
+  const generate = useMutation({ mutationFn: (g: string) => generateSuggestions(g) })
+
+  const build = useMutation({
+    mutationFn: (input: ReturnType<typeof draftRequestFor>) => generateTestDraft(input),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['campaigns'] })
+      close()
+      show('Draft created — find it under Tests. Edit variants on the desktop panel.')
+    },
+    onError: (e) => show(errMessage(e, 'Could not build the draft. Try again.')),
+  })
+
+  const submitGoal = () => {
+    const trimmed = goal.trim()
+    if (!trimmed || generate.isPending) return
+    generate.mutate(trimmed)
+  }
+
+  const ideas: AiIdea[] = generate.isSuccess ? generate.data.ideas : (data?.ideas ?? [])
+  const listHeader = generate.isSuccess ? 'Generated ideas' : 'Suggested for your store'
+  const status = generate.isPending ? 'thinking…' : generate.isSuccess ? 'ready' : 'online'
+
+  const isBuilding = (idea: AiIdea) => build.isPending && build.variables?.name === idea.title
+
+  return (
+    <View>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 14 }}>
+        <View style={{ width: 34, height: 34, borderRadius: 17, backgroundColor: colors.accentSoft, alignItems: 'center', justifyContent: 'center' }}>
+          <Icon name="sparkle" size={17} color={colors.accent} />
+        </View>
+        <Text style={{ fontFamily: fonts.sansSemi, fontSize: 17, color: colors.ink, flex: 1 }}>Co-pilot</Text>
+        <Text style={{ fontFamily: fonts.mono, fontSize: 11, color: colors.muted }}>{status}</Text>
+      </View>
+
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+        <TextInput
+          testID="copilot-goal-input"
+          style={{
+            flex: 1, height: 44, borderWidth: 1, borderColor: colors.border, borderRadius: 12,
+            backgroundColor: colors.card, color: colors.ink, fontFamily: fonts.sans, fontSize: 13.5, paddingHorizontal: 13,
+          }}
+          placeholder="Describe a goal — e.g. increase add-to-cart rate"
+          placeholderTextColor={colors.muted}
+          value={goal}
+          onChangeText={setGoal}
+          onSubmitEditing={submitGoal}
+          returnKeyType="send"
+        />
+        <Pressable
+          testID="copilot-send"
+          onPress={submitGoal}
+          disabled={generate.isPending || !goal.trim()}
+          style={{
+            width: 40, height: 40, borderRadius: 20, backgroundColor: colors.accent,
+            alignItems: 'center', justifyContent: 'center',
+            opacity: generate.isPending || !goal.trim() ? 0.6 : 1,
+          }}
+        >
+          <Icon name="send" size={17} color="#fff" />
+        </Pressable>
+      </View>
+
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }} style={{ marginBottom: 14 }}>
+        {GOAL_CHIPS.map((chip) => (
+          <Pressable
+            key={chip}
+            onPress={() => !generate.isPending && generate.mutate(chip)}
+            style={{
+              flexDirection: 'row', alignItems: 'center', gap: 6, minHeight: 38, borderRadius: radius.chip,
+              paddingHorizontal: 13, backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border,
+            }}
+          >
+            <Icon name="bolt" size={13} color={colors.accent} />
+            <Text style={{ fontFamily: fonts.sansSemi, fontSize: 12.5, color: colors.secondary }}>{chip}</Text>
+          </Pressable>
+        ))}
+      </ScrollView>
+
+      {generate.isError && (
+        <Text style={{ fontFamily: fonts.sans, fontSize: 13, color: colors.neg, marginBottom: 12 }}>
+          {errMessage(generate.error, 'Could not generate ideas. Try again.')}
+        </Text>
+      )}
+
+      <Text style={{ fontFamily: fonts.sansSemi, fontSize: 13, color: colors.ink, marginBottom: 10 }}>{listHeader}</Text>
+
+      {generate.isPending ? (
+        <>
+          <Skeleton height={128} borderRadius={radius.card} />
+          <View style={{ height: 10 }} />
+          <Skeleton height={128} borderRadius={radius.card} />
+          <View style={{ height: 10 }} />
+          <Skeleton height={128} borderRadius={radius.card} />
+        </>
+      ) : ideas.length === 0 ? (
+        <Text style={type.body}>
+          No suggestions yet. Describe a goal above or tap a chip to get one.
+        </Text>
+      ) : (
+        ideas.map((idea, i) => (
+          <IdeaCard
+            key={`${idea.title}-${i}`}
+            idea={idea}
+            building={isBuilding(idea)}
+            onBuild={() => build.mutate(draftRequestFor(idea))}
+          />
+        ))
+      )}
+    </View>
+  )
+}
