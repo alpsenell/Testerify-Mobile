@@ -100,7 +100,7 @@ export function HomeScreen() {
           <View style={{ flex: 1 }}>
             <Text style={type.title}>{shippedToday.name} is live for everyone</Text>
             <Text style={[type.small, { marginTop: 2 }]}>
-              Shipped today · rollback until {rollbackUntil(shippedToday.rollout!.promotedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+              Shipped today{shippedToday.rollout!.uplift !== undefined ? ` · ${signedPct(shippedToday.rollout!.uplift)}` : ''} · rollback until {rollbackUntil(shippedToday.rollout!.promotedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
             </Text>
           </View>
           <Icon name="chevron" size={18} color={colors.muted} />

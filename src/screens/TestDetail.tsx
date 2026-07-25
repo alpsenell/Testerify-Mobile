@@ -1,10 +1,11 @@
 import { useState } from 'react'
-import { Platform, Pressable, ScrollView, Text, View } from 'react-native'
-import { useQuery } from '@tanstack/react-query'
+import { Alert, Platform, Pressable, ScrollView, Text, View } from 'react-native'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { router, useLocalSearchParams } from 'expo-router'
-import { fetchCampaign } from '../api/campaigns'
+import { fetchCampaign, rollbackCampaign } from '../api/campaigns'
 import type { CampaignDetailData, CampaignVariant } from '../api/campaigns'
 import { useSheets } from '../stores/sheets'
+import { useToast } from '../stores/toast'
 import { statusLabel, statusTone, statusPulse, rollbackUntil } from '../utils/testModel'
 import { compact, pct, signedPct, money, daysBetween } from '../utils/format'
 import { StatusPill } from '../components/StatusPill'
@@ -88,7 +89,18 @@ export function TestDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>()
   const [chartOpen, setChartOpen] = useState(false)
   const openShip = useSheets((s) => s.openShip)
+  const show = useToast((s) => s.show)
+  const qc = useQueryClient()
   const detail = useQuery({ queryKey: ['campaign', id], queryFn: () => fetchCampaign(id as string) })
+  const rollback = useMutation({
+    mutationFn: () => rollbackCampaign(id as string),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['campaign', id] })
+      qc.invalidateQueries({ queryKey: ['campaigns'] })
+      show('Rolled back — the test is collecting again.')
+    },
+    onError: (e) => show(e instanceof Error ? e.message : 'Could not roll back.'),
+  })
 
   if (detail.isPending) {
     return (
@@ -135,7 +147,11 @@ export function TestDetailScreen() {
   const showRollbackBar = c.status === 'rollout' && !!c.rollout
   const rollbackDate = showRollbackBar ? rollbackUntil(c.rollout!.promotedAt) : null
   const challengerForShip = c.variants.find((v) => v.id === c.challengerId)
-  const onRollback = () => {} // no-op — Task 13 wires the rollback mutation
+  const confirmRollback = () =>
+    Alert.alert('Roll back?', 'Every visitor returns to the A/B split and the test resumes collecting.', [
+      { text: 'Keep it live', style: 'cancel' },
+      { text: 'Roll back', style: 'destructive', onPress: () => rollback.mutate() },
+    ])
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.paper }}>
@@ -243,8 +259,8 @@ export function TestDetailScreen() {
               <Text style={type.title}>Live for everyone</Text>
               <Text style={[type.small, { marginTop: 2 }]}>rollback until {monD(rollbackDate!)}</Text>
             </View>
-            <Pressable onPress={onRollback}
-              style={{ borderWidth: 1, borderColor: colors.border, borderRadius: 11, paddingHorizontal: 14, minHeight: 44, justifyContent: 'center' }}>
+            <Pressable onPress={confirmRollback} disabled={rollback.isPending}
+              style={{ borderWidth: 1, borderColor: colors.border, borderRadius: 11, paddingHorizontal: 14, minHeight: 44, justifyContent: 'center', opacity: rollback.isPending ? 0.6 : 1 }}>
               <Text style={{ fontFamily: fonts.sansSemi, fontSize: 13.5, color: colors.ink }}>Roll back</Text>
             </Pressable>
           </View>

@@ -4,7 +4,8 @@ import { BottomSheetModal, BottomSheetBackdrop, BottomSheetView } from '@gorhom/
 import { useSheets } from '../stores/sheets'
 import { colors, radius } from '../theme'
 import { MoreSheet } from './sheets/MoreSheet'
-// CopilotSheet (Task 15) and ShipSheet (Task 13) are added to CONTENT when built.
+import { ShipSheet } from './sheets/ShipSheet'
+// CopilotSheet (Task 15) is added to CONTENT when built.
 
 export function SheetHost() {
   const sheet = useSheets((s) => s.sheet)
@@ -27,6 +28,7 @@ export function SheetHost() {
     >
       <BottomSheetView style={{ padding: 16, paddingBottom: 34 }}>
         {sheet?.kind === 'more' && <MoreSheet />}
+        {sheet?.kind === 'ship' && <ShipSheet />}
       </BottomSheetView>
     </BottomSheetModal>
   )
