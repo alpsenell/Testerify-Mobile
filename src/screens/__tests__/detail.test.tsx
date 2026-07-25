@@ -40,6 +40,12 @@ const BELOW_THRESHOLD: CampaignDetailData = {
   significance: { ...WINNING.significance!, confidence: 84 },
 }
 
+// Paused while the challenger was ahead — collection stopped, but the lead
+// still gets called out (verdictContent's paused+winning branch).
+const PAUSED: CampaignDetailData = {
+  ...WINNING, id: 't5', status: 'paused',
+}
+
 const renderDetail = async () => {
   const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } })
   return await render(<QueryClientProvider client={qc}><TestDetailScreen /></QueryClientProvider>)
@@ -77,4 +83,10 @@ test('winning campaign below the confidence threshold does not render the ship b
   const { getByText, queryByText } = await renderDetail()
   await waitFor(() => expect(getByText(/is winning by/)).toBeTruthy())
   expect(queryByText(/Ship /)).toBeNull()
+})
+
+test('paused campaign that was winning renders the paused-verdict headline', async () => {
+  ;(campaigns.fetchCampaign as jest.Mock).mockResolvedValue(PAUSED)
+  const { getByText } = await renderDetail()
+  await waitFor(() => expect(getByText('Sticky bar was ahead by +14.2%')).toBeTruthy())
 })

@@ -104,6 +104,7 @@ export function TestDetailScreen() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['campaign', id] })
       qc.invalidateQueries({ queryKey: ['campaigns'] })
+      qc.invalidateQueries({ queryKey: ['dashboard'] })
       show('Rolled back — the test is collecting again.')
     },
     onError: (e) => show(e instanceof Error ? e.message : 'Could not roll back.'),
