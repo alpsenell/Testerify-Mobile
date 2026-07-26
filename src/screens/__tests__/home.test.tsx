@@ -54,7 +54,9 @@ const renderHome = async () => {
 test('renders store name, stats, ship-ready callout, and running test', async () => {
   const { getByText } = await renderHome()
   await waitFor(() => expect(getByText('Alder & Ash')).toBeTruthy())
-  expect(getByText('48.2k')).toBeTruthy()
+  // Query-derived value — must be awaited independently of the store-derived
+  // name above (they resolve on different ticks; racing them flakes in-band).
+  await waitFor(() => expect(getByText('48.2k')).toBeTruthy())
   expect(getByText('1 test is ready to ship')).toBeTruthy()
   expect(getByText('PDP: sticky add-to-cart on mobile')).toBeTruthy()
 })
