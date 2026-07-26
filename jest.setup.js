@@ -31,3 +31,13 @@ jest.mock('@react-native-community/netinfo', () => require('@react-native-commun
 // surfaces the plain CJS `{ default: {...} }` shape here instead of the
 // production build's proper named exports.
 jest.mock('react-native-safe-area-context', () => require('react-native-safe-area-context/jest/mock').default)
+
+// @react-native-async-storage/async-storage's real native module isn't
+// available under Jest (used by Task 3's persisted zustand stores —
+// src/stores/favorites.ts and src/stores/alertsRead.ts, via
+// zustand/middleware's persist + createJSONStorage). The package ships an
+// official jest mock for exactly this — an in-memory key/value store backed
+// by jest.fn()s, so persistence round-trips (setItem/getItem) work the same
+// way under Jest as they do on-device, without touching real native storage.
+jest.mock('@react-native-async-storage/async-storage', () =>
+  require('@react-native-async-storage/async-storage/jest/async-storage-mock'))
