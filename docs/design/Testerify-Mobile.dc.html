@@ -1,0 +1,2014 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{min-height:100vh;background:#ece6da;color:#211e1a;font-family:'Instrument Sans',system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;line-height:1.5}
+  a{color:#5b54e0;text-decoration:none}
+  a:hover{color:#4a44c8}
+  button{cursor:pointer;border:none;background:none;font:inherit;color:inherit;text-align:left}
+  input{font:inherit}
+  svg{display:block}
+  @keyframes tf-pulse{0%,100%{opacity:1}50%{opacity:.35}}
+  @keyframes tf-sheet{from{transform:translateY(100%)}to{transform:none}}
+  @keyframes tf-fade{from{opacity:0}to{opacity:1}}
+  @keyframes tf-slide{from{transform:translateX(26px);opacity:.4}to{transform:none;opacity:1}}
+  @keyframes tf-drawer{from{transform:translateX(-100%)}to{transform:none}}
+  ::-webkit-scrollbar{width:0;height:0}
+</style>
+</helmet>
+
+<div style="padding:40px 44px 64px;display:flex;flex-direction:column;gap:26px">
+
+  <header style="display:flex;flex-direction:column;gap:9px;max-width:860px">
+    <div style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:#7a7264">Testerify · mobile companion · v1</div>
+    <h1 style="font-size:30px;font-weight:400;line-height:1.1;color:#211e1a">A phone app for the part of the panel you can't do at your desk: <em style="font-style:italic;color:#5b54e0">watching tests and shipping winners</em>.</h1>
+    <p style="font-size:14px;color:#5d564b;max-width:70ch">Same warm-paper system as the desktop panel — Instrument Sans, indigo #5b54e0, 16px cards on #f4f1ea. Tap through the phone: the co-pilot generates ideas, tests open to results, and a winner can be shipped end-to-end. Charts stay collapsed until you ask for them. Navigation is four tabs with the co-pilot raised in the centre. iOS shown; on Android the tab bar becomes a Material bottom nav with the co-pilot as a centre-docked FAB.</p>
+  </header>
+
+  <div style="display:flex;align-items:flex-start;gap:44px;flex-wrap:wrap">
+
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div style="display:flex;flex-direction:column;gap:5px;max-width:402px">
+        <span style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:#7a7264">Navigation — 4 tabs + centre co-pilot</span>
+        <span style="font-size:12.5px;color:#5d564b;line-height:1.5">Home · Tests · <strong style="font-weight:600;color:#211e1a">Co-pilot</strong> · Alerts · More. The AI sits in the middle as a raised action, so asking for a test is always one thumb-reach away; the remaining 16 sidebar pages live in the More sheet.</span>
+      </div>
+
+      <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" width="{{ 402 }}" height="{{ 874 }}" hint-size="402px,874px">
+        <div style="position:relative;height:100%;overflow:hidden;background:#f4f1ea;font-family:'Instrument Sans',system-ui,sans-serif">
+
+          <div style="height:100%;display:flex;flex-direction:column">
+            <div style="flex:1;min-height:0;overflow-y:auto;padding:62px 0 0">
+
+              <sc-if value="{{ onHome }}" hint-placeholder-val="{{ true }}">
+                <div style="display:flex;flex-direction:column;gap:14px;padding:0 16px 30px;animation:tf-fade .28s ease">
+                  <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+                    <div>
+                      <div style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#968d7e">Saturday, July 25</div>
+                      <div style="font-size:22px;font-weight:400;color:#211e1a;margin-top:2px">Alder &amp; Ash</div>
+                    </div>
+                    <div style="width:38px;height:38px;border-radius:50%;background:#5b54e0;color:#fff;display:flex;align-items:center;justify-content:center;font-size:17px">A</div>
+                  </div>
+
+                  <section style="position:relative;overflow:hidden;background:#fcfbf7;border:1px solid #e7e0d3;border-radius:20px;padding:18px;box-shadow:0 1px 2px rgba(40,34,20,.04),0 10px 26px -14px rgba(40,34,20,.12)">
+                    <div style="position:absolute;top:-110px;right:-70px;width:280px;height:280px;border-radius:50%;background:radial-gradient(circle,color-mix(in oklab,#5b54e0 14%,transparent),transparent 70%);pointer-events:none"></div>
+                    <div style="display:flex;align-items:center;gap:9px;margin-bottom:12px;position:relative">
+                      <span style="width:34px;height:34px;border-radius:50%;background:linear-gradient(150deg,#5b54e0,color-mix(in oklab,#5b54e0 55%,#aab0ff));color:#fff;display:inline-flex;align-items:center;justify-content:center;box-shadow:0 5px 14px -4px color-mix(in oklab,#5b54e0 26%,transparent);flex:0 0 auto">{{ icons.sparkle17 }}</span>
+                      <span style="font-size:13px;font-weight:600;color:#211e1a">Testerify Co-pilot</span>
+                      <span style="display:inline-flex;align-items:center;gap:5px;font-size:10.5px;font-family:'IBM Plex Mono',ui-monospace,monospace;color:#968d7e"><span style="width:6px;height:6px;border-radius:50%;background:#2f8f5b;animation:tf-pulse 2.2s infinite"></span>ONLINE</span>
+                    </div>
+                    <h2 style="font-size:27px;font-weight:400;line-height:1.12;color:#211e1a;letter-spacing:-.01em;position:relative">What should we test next, <em style="font-style:italic;color:#5b54e0">Alp</em>?</h2>
+                    <p style="font-size:13.5px;color:#5d564b;margin-top:8px;line-height:1.45">7 winning tests found so far. Describe a goal and I'll draft the test.</p>
+                    <button onClick="{{ openCopilot }}" style="display:flex;align-items:center;gap:10px;width:100%;background:#f4f1ea;border:1px solid #e7e0d3;border-radius:14px;padding:13px 14px;margin-top:15px;min-height:48px">
+                      <span style="color:#5b54e0;display:flex">{{ icons.sparkle17 }}</span>
+                      <span style="flex:1;font-size:14px;color:#968d7e">Describe a goal…</span>
+                      <span style="display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:9px;background:#5b54e0;color:#fff">{{ icons.send16 }}</span>
+                    </button>
+                  </section>
+
+                  <sc-if value="{{ shipReady }}" hint-placeholder-val="{{ true }}">
+                    <button onClick="{{ openWinner }}" style="display:flex;align-items:center;gap:13px;background:linear-gradient(165deg,color-mix(in oklab,#2f8f5b 14%,#fcfbf7),#fcfbf7 75%);border:1px solid color-mix(in oklab,#2f8f5b 32%,#e7e0d3);border-radius:16px;padding:16px;min-height:48px;width:100%">
+                      <span style="width:38px;height:38px;flex:0 0 auto;border-radius:11px;background:color-mix(in oklab,#2f8f5b 15%,#fcfbf7);color:#2f8f5b;display:flex;align-items:center;justify-content:center">{{ icons.flag20 }}</span>
+                      <span style="flex:1;min-width:0">
+                        <span style="display:block;font-size:15px;font-weight:600;color:#211e1a">1 test is ready to ship</span>
+                        <span style="display:block;font-size:12.5px;color:#5d564b;margin-top:2px">Sticky add-to-cart · +14.2% · 97% confident</span>
+                      </span>
+                      <span style="color:#968d7e;display:flex">{{ icons.chevron18 }}</span>
+                    </button>
+                  </sc-if>
+                  <sc-if value="{{ hasShipped }}" hint-placeholder-val="{{ false }}">
+                    <button onClick="{{ openWinner }}" style="display:flex;align-items:center;gap:13px;background:linear-gradient(165deg,color-mix(in oklab,#5b54e0 12%,#fcfbf7),#fcfbf7 75%);border:1px solid color-mix(in oklab,#5b54e0 30%,#e7e0d3);border-radius:16px;padding:16px;min-height:48px;width:100%">
+                      <span style="width:38px;height:38px;flex:0 0 auto;border-radius:11px;background:color-mix(in oklab,#5b54e0 13%,#fcfbf7);color:#5b54e0;display:flex;align-items:center;justify-content:center">{{ icons.check18 }}</span>
+                      <span style="flex:1;min-width:0">
+                        <span style="display:block;font-size:15px;font-weight:600;color:#211e1a">Sticky add-to-cart is live for everyone</span>
+                        <span style="display:block;font-size:12.5px;color:#5d564b;margin-top:2px">Shipped today · +14.2% · rollback until Aug 24</span>
+                      </span>
+                      <span style="color:#968d7e;display:flex">{{ icons.chevron18 }}</span>
+                    </button>
+                  </sc-if>
+
+                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:11px">
+                    <sc-for list="{{ stats }}" as="s" hint-placeholder-count="4">
+                      <button onClick="{{ s.tap }}" style="background:#fcfbf7;border:1px solid #e7e0d3;border-radius:15px;padding:14px;display:flex;flex-direction:column;gap:8px;min-height:96px;box-shadow:0 1px 2px rgba(40,34,20,.04)">
+                        <span style="display:flex;align-items:center;justify-content:space-between">
+                          <span style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;color:#968d7e">{{ s.label }}</span>
+                          <span style="color:#b3aa99;display:flex">{{ s.icon }}</span>
+                        </span>
+                        <span style="font-size:30px;line-height:1;color:#211e1a">{{ s.value }}</span>
+                        <span style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:11.5px;font-weight:600;color:{{ s.deltaColor }}">{{ s.delta }}</span>
+                      </button>
+                    </sc-for>
+                  </div>
+
+                  <div style="display:flex;align-items:baseline;justify-content:space-between;margin-top:4px">
+                    <h3 style="font-size:15px;font-weight:600;color:#211e1a">Running now</h3>
+                    <button onClick="{{ goTests }}" style="font-size:13px;font-weight:600;color:#5b54e0">All tests</button>
+                  </div>
+                  <div style="display:flex;flex-direction:column;gap:10px">
+                    <sc-for list="{{ runningTests }}" as="t" hint-placeholder-count="4">
+                      <button onClick="{{ t.open }}" style="display:flex;align-items:center;gap:12px;background:#fcfbf7;border:1px solid #e7e0d3;border-radius:15px;padding:14px;min-height:72px;box-shadow:0 1px 2px rgba(40,34,20,.04)">
+                        <span style="flex:1;min-width:0">
+                          <span style="display:block;font-size:14px;font-weight:600;color:#211e1a;line-height:1.3">{{ t.name }}</span>
+                          <span style="display:flex;align-items:center;gap:7px;margin-top:6px">
+                            <span style="display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:3px 8px;border-radius:20px;color:{{ t.verdictFg }};background:{{ t.verdictBg }}">{{ t.verdictIcon }}{{ t.verdict }}</span>
+                            <span style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:11px;color:#968d7e">{{ t.meta }}</span>
+                          </span>
+                        </span>
+                        <span style="text-align:right;flex:0 0 auto">
+                          <span style="display:block;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:16px;font-weight:600;color:#211e1a">{{ t.rate }}%</span>
+                          <span style="display:inline-flex;align-items:center;gap:2px;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:12px;font-weight:600;color:{{ t.upliftColor }}">{{ t.upliftIcon }}{{ t.uplift }}</span>
+                        </span>
+                      </button>
+                    </sc-for>
+                  </div>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ onTests }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;flex-direction:column;gap:14px;padding:0 16px 30px;animation:tf-fade .28s ease">
+                  <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:10px">
+                    <h2 style="font-size:26px;font-weight:400;color:#211e1a">Tests</h2>
+                    <button onClick="{{ openCopilot }}" style="display:inline-flex;align-items:center;gap:7px;background:#5b54e0;color:#fff;border-radius:11px;padding:11px 14px;font-size:13.5px;font-weight:600;min-height:44px">{{ icons.plus16 }}New</button>
+                  </div>
+                  <div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:2px">
+                    <sc-for list="{{ filters }}" as="f" hint-placeholder-count="4">
+                      <button onClick="{{ f.pick }}" style="display:inline-flex;align-items:center;gap:6px;flex:0 0 auto;padding:9px 13px;border-radius:11px;border:1px solid {{ f.border }};background:{{ f.bg }};color:{{ f.fg }};font-size:13px;font-weight:600;min-height:40px">{{ f.label }}<span style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:11px;opacity:.65">{{ f.count }}</span></button>
+                    </sc-for>
+                  </div>
+                  <div style="display:flex;flex-direction:column;gap:10px">
+                    <sc-for list="{{ filteredTests }}" as="t" hint-placeholder-count="5">
+                      <button onClick="{{ t.open }}" style="display:flex;flex-direction:column;gap:10px;background:#fcfbf7;border:1px solid #e7e0d3;border-radius:15px;padding:15px;box-shadow:0 1px 2px rgba(40,34,20,.04)">
+                        <span style="display:flex;align-items:flex-start;gap:10px">
+                          <span style="flex:1;min-width:0">
+                            <span style="display:block;font-size:14.5px;font-weight:600;color:#211e1a;line-height:1.3">{{ t.name }}</span>
+                            <span style="display:block;font-size:12px;color:#968d7e;margin-top:3px">{{ t.goal }}</span>
+                          </span>
+                          <span style="display:inline-flex;align-items:center;gap:6px;flex:0 0 auto;font-size:11.5px;font-weight:600;padding:4px 10px;border-radius:20px;color:{{ t.statusFg }};background:{{ t.statusBg }}">{{ t.statusDot }}{{ t.status }}</span>
+                        </span>
+                        <span style="display:flex;align-items:center;gap:12px">
+                          <span style="flex:1;height:6px;border-radius:3px;background:#ece6da;overflow:hidden"><span style="display:block;height:100%;border-radius:3px;background:{{ t.confColor }};width:{{ t.confWidth }}"></span></span>
+                          <span style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:11.5px;font-weight:600;color:{{ t.confColor }};min-width:34px;text-align:right">{{ t.conf }}</span>
+                          <span style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:13.5px;font-weight:600;color:#211e1a">{{ t.rate }}%</span>
+                        </span>
+                      </button>
+                    </sc-for>
+                  </div>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ onDetail }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;flex-direction:column;gap:14px;padding:0 16px {{ detailPadBottom }};animation:tf-slide .26s ease">
+                  <button onClick="{{ back }}" style="display:inline-flex;align-items:center;gap:6px;color:#968d7e;font-size:13px;font-weight:500;min-height:44px;margin-left:-4px">{{ icons.arrowLeft16 }}Tests</button>
+                  <div>
+                    <span style="display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:600;padding:4px 10px;border-radius:20px;color:{{ sel.statusFg }};background:{{ sel.statusBg }}">{{ sel.statusDot }}{{ sel.status }}</span>
+                    <h2 style="font-size:26px;font-weight:400;line-height:1.14;color:#211e1a;margin-top:10px">{{ sel.name }}</h2>
+                    <p style="font-size:13px;color:#5d564b;margin-top:6px">{{ sel.subtitle }}</p>
+                  </div>
+
+                  <section style="background:linear-gradient(165deg,color-mix(in oklab,#5b54e0 11%,#fcfbf7),#fcfbf7 70%);border:1px solid color-mix(in oklab,#5b54e0 24%,#e7e0d3);border-radius:18px;padding:18px">
+                    <div style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#968d7e">{{ verdictKicker }}</div>
+                    <sc-if value="{{ detailLive }}" hint-placeholder-val="{{ true }}">
+                      <h3 style="font-size:22px;font-weight:400;line-height:1.2;color:#211e1a;margin-top:8px">Variant B is winning by <em style="font-style:italic;color:#5b54e0">+14.2%</em></h3>
+                      <p style="font-size:13px;color:#5d564b;margin-top:8px;line-height:1.5">12.5k visitors over 9 days, 97% confidence. The lift holds on mobile and desktop, so this is safe to ship.</p>
+                    </sc-if>
+                    <sc-if value="{{ detailShipped }}" hint-placeholder-val="{{ false }}">
+                      <h3 style="font-size:22px;font-weight:400;line-height:1.2;color:#211e1a;margin-top:8px">Variant B is live for <em style="font-style:italic;color:#5b54e0">100% of traffic</em></h3>
+                      <p style="font-size:13px;color:#5d564b;margin-top:8px;line-height:1.5">Shipped today at +14.2% with 97% confidence. The test stopped collecting and moved to Learnings — rollback stays available until Aug 24.</p>
+                    </sc-if>
+                  </section>
+
+                  <div style="display:flex;flex-direction:column;gap:11px">
+                    <sc-for list="{{ variants }}" as="v" hint-placeholder-count="2">
+                      <div style="position:relative;border-radius:15px;padding:16px;background:{{ v.bg }};border:1px solid {{ v.border }};display:flex;flex-direction:column;gap:13px">
+                        <span style="display:flex;align-items:center;gap:11px">
+                          <span style="width:30px;height:30px;flex:0 0 auto;border-radius:8px;background:{{ v.keyBg }};color:{{ v.keyFg }};display:flex;align-items:center;justify-content:center;font-size:16px">{{ v.key }}</span>
+                          <span style="flex:1;min-width:0">
+                            <span style="display:block;font-size:14px;font-weight:600;color:#211e1a">{{ v.label }}</span>
+                            <span style="display:block;font-size:12px;color:#968d7e;margin-top:1px">{{ v.blurb }}</span>
+                          </span>
+                          <span style="font-size:11px;font-weight:600;color:{{ v.tagFg }}">{{ v.tag }}</span>
+                        </span>
+                        <span style="display:flex;align-items:baseline;gap:8px">
+                          <span style="font-size:40px;line-height:.9;color:#211e1a">{{ v.rate }}%</span>
+                          <span style="font-size:12px;color:#968d7e">conversion</span>
+                        </span>
+                        <span style="height:7px;border-radius:4px;background:#ece6da;overflow:hidden;display:block"><span style="display:block;height:100%;border-radius:4px;background:{{ v.barColor }};width:{{ v.barWidth }}"></span></span>
+                        <span style="display:flex;gap:26px">
+                          <span><span style="display:block;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:15px;font-weight:600;color:#211e1a">{{ v.visitors }}</span><span style="display:block;font-size:11.5px;color:#968d7e;margin-top:1px">visitors</span></span>
+                          <span><span style="display:block;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:15px;font-weight:600;color:#211e1a">{{ v.conversions }}</span><span style="display:block;font-size:11.5px;color:#968d7e;margin-top:1px">conversions</span></span>
+                          <span><span style="display:block;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:15px;font-weight:600;color:#211e1a">{{ v.rpv }}</span><span style="display:block;font-size:11.5px;color:#968d7e;margin-top:1px">rev/visitor</span></span>
+                        </span>
+                      </div>
+                    </sc-for>
+                  </div>
+
+                  <section style="background:#fcfbf7;border:1px solid #e7e0d3;border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:14px">
+                    <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+                      <div>
+                        <div style="font-size:14.5px;font-weight:600;color:#211e1a">Significance</div>
+                        <div style="font-size:12px;color:#968d7e;margin-top:2px">Enough traffic to call it</div>
+                      </div>
+                      <span style="display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;padding:5px 12px;border-radius:20px;color:#2f8f5b;background:color-mix(in oklab,#2f8f5b 13%,#fcfbf7)">{{ icons.check14 }}Significant</span>
+                    </div>
+                    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;border-top:1px solid #efe9de;padding-top:14px">
+                      <sc-for list="{{ sigStats }}" as="k" hint-placeholder-count="3">
+                        <div style="display:flex;flex-direction:column;gap:4px;align-items:center">
+                          <span style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.05em;text-transform:uppercase;color:#968d7e">{{ k.label }}</span>
+                          <span style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:16px;font-weight:600;color:#211e1a">{{ k.value }}</span>
+                        </div>
+                      </sc-for>
+                    </div>
+                    <button onClick="{{ toggleChart }}" style="display:flex;align-items:center;justify-content:center;gap:7px;border:1px solid #e7e0d3;border-radius:11px;padding:11px;font-size:13.5px;font-weight:600;color:#5d564b;min-height:44px">{{ chartToggleIcon }}{{ chartToggleLabel }}</button>
+                    <sc-if value="{{ chartOpen }}" hint-placeholder-val="{{ false }}">
+                      <div style="animation:tf-fade .3s ease">
+                        <div style="display:flex;gap:14px;margin-bottom:8px">
+                          <span style="display:flex;align-items:center;gap:6px;font-size:11.5px;color:#5d564b"><span style="width:9px;height:9px;border-radius:3px;background:#968d7e"></span>A control</span>
+                          <span style="display:flex;align-items:center;gap:6px;font-size:11.5px;color:#5d564b"><span style="width:9px;height:9px;border-radius:3px;background:#5b54e0"></span>B sticky bar</span>
+                        </div>
+                        {{ detailChart }}
+                      </div>
+                    </sc-if>
+                  </section>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ onAlerts }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;flex-direction:column;gap:14px;padding:0 16px 30px;animation:tf-fade .28s ease">
+                  <div style="display:flex;align-items:flex-end;justify-content:space-between">
+                    <h2 style="font-size:26px;font-weight:400;color:#211e1a">Alerts</h2>
+                    <button style="font-size:13px;font-weight:600;color:#5b54e0;min-height:44px">Mark all read</button>
+                  </div>
+                  <sc-for list="{{ alertGroups }}" as="g" hint-placeholder-count="2">
+                    <div style="display:flex;flex-direction:column;gap:10px">
+                      <div style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#968d7e">{{ g.label }}</div>
+                      <sc-for list="{{ g.items }}" as="a" hint-placeholder-count="3">
+                        <button onClick="{{ a.open }}" style="display:flex;gap:12px;background:{{ a.bg }};border:1px solid {{ a.border }};border-radius:15px;padding:14px;min-height:64px">
+                          <span style="width:34px;height:34px;flex:0 0 auto;border-radius:10px;background:{{ a.icoBg }};color:{{ a.icoFg }};display:flex;align-items:center;justify-content:center">{{ a.icon }}</span>
+                          <span style="flex:1;min-width:0">
+                            <span style="display:block;font-size:14px;font-weight:600;color:#211e1a;line-height:1.3">{{ a.title }}</span>
+                            <span style="display:block;font-size:12.5px;color:#5d564b;margin-top:3px;line-height:1.4">{{ a.body }}</span>
+                            <span style="display:block;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10.5px;color:#968d7e;margin-top:6px">{{ a.time }}</span>
+                          </span>
+                        </button>
+                      </sc-for>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ onLive }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;flex-direction:column;gap:14px;padding:0 16px 30px;animation:tf-fade .28s ease">
+                  <h2 style="font-size:26px;font-weight:400;color:#211e1a">Live</h2>
+                  <section style="background:#fcfbf7;border:1px solid #e7e0d3;border-radius:18px;padding:22px;display:flex;flex-direction:column;align-items:center;gap:6px">
+                    <span style="display:inline-flex;align-items:center;gap:6px;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:#968d7e"><span style="width:7px;height:7px;border-radius:50%;background:#2f8f5b;animation:tf-pulse 1.6s infinite"></span>On site now</span>
+                    <span style="font-size:64px;line-height:1;color:#5b54e0">184</span>
+                    <span style="font-size:13px;color:#5d564b">63 in a test · 41 on a product page</span>
+                  </section>
+                  <div style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#968d7e;margin-top:2px">Latest sessions</div>
+                  <div style="display:flex;flex-direction:column;gap:8px">
+                    <sc-for list="{{ sessions }}" as="s" hint-placeholder-count="5">
+                      <div style="display:flex;align-items:center;gap:12px;background:#fcfbf7;border:1px solid #e7e0d3;border-radius:14px;padding:13px">
+                        <span style="width:30px;height:30px;flex:0 0 auto;border-radius:9px;background:#ece6da;color:#5d564b;display:flex;align-items:center;justify-content:center">{{ s.icon }}</span>
+                        <span style="flex:1;min-width:0">
+                          <span style="display:block;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:12.5px;color:#211e1a;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ s.path }}</span>
+                          <span style="display:block;font-size:11.5px;color:#968d7e;margin-top:2px">{{ s.meta }}</span>
+                        </span>
+                        <span style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:11px;color:#968d7e;flex:0 0 auto">{{ s.time }}</span>
+                      </div>
+                    </sc-for>
+                  </div>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ onLearnings }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;flex-direction:column;gap:13px;padding:0 16px 30px;animation:tf-slide .26s ease">
+                  <button onClick="{{ back }}" style="display:inline-flex;align-items:center;gap:6px;color:#968d7e;font-size:13px;font-weight:500;min-height:44px;margin-left:-4px">{{ icons.arrowLeft16 }}Home</button>
+                  <div>
+                    <div style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#968d7e">Testing</div>
+                    <h2 style="font-size:26px;font-weight:400;color:#211e1a;margin-top:4px">Learnings</h2>
+                    <p style="font-size:13px;color:#5d564b;margin-top:6px;line-height:1.45">Every concluded test — what you tested, how it turned out, what you learned.</p>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:9px;background:#fcfbf7;border:1px solid #e7e0d3;border-radius:12px;padding:11px 13px;color:#968d7e;min-height:44px">
+                    {{ icons.search16 }}
+                    <input value="{{ learningQuery }}" onChange="{{ setLearningQuery }}" placeholder="Search name or note" aria-label="Search learnings" style="flex:1;min-width:0;border:none;background:none;outline:none;font-size:14px;color:#211e1a">
+                  </div>
+                  <sc-if value="{{ noLearnings }}" hint-placeholder-val="{{ false }}">
+                    <div style="padding:36px 16px;text-align:center;color:#968d7e;font-size:13.5px;background:#fcfbf7;border:1px dashed #e7e0d3;border-radius:15px">No learnings match.</div>
+                  </sc-if>
+                  <div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:2px">
+                    <sc-for list="{{ learningFilters }}" as="f" hint-placeholder-count="3">
+                      <button onClick="{{ f.pick }}" style="display:inline-flex;align-items:center;gap:6px;flex:0 0 auto;padding:9px 13px;border-radius:11px;border:1px solid {{ f.border }};background:{{ f.bg }};color:{{ f.fg }};font-size:13px;font-weight:600;min-height:40px">{{ f.label }}<span style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:11px;opacity:.65">{{ f.count }}</span></button>
+                    </sc-for>
+                  </div>
+                  <sc-for list="{{ learnings }}" as="l" hint-placeholder-count="3">
+                    <article style="background:#fcfbf7;border:1px solid #e7e0d3;border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:13px;box-shadow:0 1px 2px rgba(40,34,20,.04)">
+                      <div style="display:flex;flex-direction:column;gap:8px">
+                        <span style="font-size:15.5px;font-weight:600;color:#211e1a;line-height:1.3">{{ l.name }}</span>
+                        <span style="display:flex;align-items:center;gap:7px;flex-wrap:wrap">
+                          <span style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:#968d7e;padding:3px 8px;border:1px solid #e7e0d3;border-radius:7px">{{ l.kind }}</span>
+                          <span style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:650;color:{{ l.outcomeFg }};background:{{ l.outcomeBg }}">{{ l.outcomeIcon }}{{ l.outcome }}</span>
+                        </span>
+                      </div>
+                      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px 18px;border-top:1px solid #e7e0d3;padding-top:12px">
+                        <sc-for list="{{ l.meta }}" as="m" hint-placeholder-count="4">
+                          <div style="display:flex;flex-direction:column;gap:3px;min-width:0">
+                            <span style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:#968d7e">{{ m.k }}</span>
+                            <span style="font-size:12.5px;font-weight:600;color:#5d564b">{{ m.v }}</span>
+                          </div>
+                        </sc-for>
+                      </div>
+                      <div style="border-top:1px solid #e7e0d3;padding-top:12px;display:flex;flex-direction:column;gap:7px">
+                        <span style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:#968d7e">Learning</span>
+                        <div style="background:#ece6da;border:1px solid #e7e0d3;border-radius:10px;padding:11px 12px;font-size:13.5px;line-height:1.5;color:{{ l.noteColor }};min-height:44px">{{ l.note }}</div>
+                      </div>
+                    </article>
+                  </sc-for>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ onAnalytics }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;flex-direction:column;gap:13px;padding:0 16px 30px;animation:tf-slide .26s ease">
+                  <button onClick="{{ back }}" style="display:inline-flex;align-items:center;gap:6px;color:#968d7e;font-size:13px;font-weight:500;min-height:44px;margin-left:-4px">{{ icons.arrowLeft16 }}Home</button>
+                  <div>
+                    <div style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#968d7e">Insights</div>
+                    <h2 style="font-size:26px;font-weight:400;color:#211e1a;margin-top:4px">Analytics</h2>
+                    <p style="font-size:13px;color:#5d564b;margin-top:6px">Program-wide test performance.</p>
+                  </div>
+                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:11px">
+                    <sc-for list="{{ analyticsStats }}" as="a" hint-placeholder-count="4">
+                      <div style="background:#fcfbf7;border:1px solid #e7e0d3;border-radius:15px;padding:14px;display:flex;flex-direction:column;gap:8px;min-height:92px">
+                        <span style="display:flex;align-items:center;justify-content:space-between">
+                          <span style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;color:#968d7e">{{ a.label }}</span>
+                          <span style="color:#b3aa99;display:flex">{{ a.icon }}</span>
+                        </span>
+                        <span style="font-size:28px;line-height:1;color:#211e1a">{{ a.value }}</span>
+                        <span style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:11px;color:#968d7e">{{ a.sub }}</span>
+                      </div>
+                    </sc-for>
+                  </div>
+                  <div style="display:flex;gap:11px;align-items:flex-start;background:color-mix(in oklab,#5b54e0 8%,#fcfbf7);border:1px solid color-mix(in oklab,#5b54e0 22%,#e7e0d3);border-radius:14px;padding:14px">
+                    <span style="color:#5b54e0;display:flex;flex:0 0 auto">{{ icons.sparkle17 }}</span>
+                    <p style="font-size:13px;color:#5d564b;line-height:1.5">You've launched 12 tests and shipped 4 winners. Your best result so far is <strong style="font-weight:600;color:#211e1a">sticky add-to-cart at +14.2%</strong>.</p>
+                  </div>
+                  <section style="background:#fcfbf7;border:1px solid #e7e0d3;border-radius:16px;padding:16px;display:flex;align-items:center;gap:18px">
+                    {{ winRateRing }}
+                    <div style="display:flex;flex-direction:column;gap:8px;min-width:0">
+                      <span style="display:flex;align-items:center;gap:8px;font-size:13px;color:#5d564b"><span style="width:10px;height:10px;border-radius:3px;background:#5b54e0"></span>4 winners</span>
+                      <span style="display:flex;align-items:center;gap:8px;font-size:13px;color:#5d564b"><span style="width:10px;height:10px;border-radius:3px;background:#e7e0d3"></span>8 inconclusive</span>
+                      <p style="font-size:12px;color:#968d7e;line-height:1.45">Top-quartile teams ship a winner on ~1 in 3 tests.</p>
+                    </div>
+                  </section>
+                  <section style="background:#fcfbf7;border:1px solid #e7e0d3;border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:13px">
+                    <div>
+                      <div style="font-size:14.5px;font-weight:600;color:#211e1a">Uplift leaderboard</div>
+                      <div style="font-size:12px;color:#968d7e;margin-top:2px">Challenger vs control, by test</div>
+                    </div>
+                    <sc-for list="{{ upliftRows }}" as="u" hint-placeholder-count="5">
+                      <div style="display:flex;flex-direction:column;gap:6px">
+                        <div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px">
+                          <span style="font-size:13px;color:#211e1a;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ u.name }}</span>
+                          <span style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:13px;font-weight:600;color:{{ u.color }};flex:0 0 auto">{{ u.value }}</span>
+                        </div>
+                        <span style="height:9px;border-radius:5px;background:#ece6da;overflow:hidden;display:block"><span style="display:block;height:100%;border-radius:5px;background:{{ u.color }};width:{{ u.width }}"></span></span>
+                      </div>
+                    </sc-for>
+                  </section>
+                  <section style="background:#fcfbf7;border:1px solid #e7e0d3;border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:12px">
+                    <div>
+                      <div style="font-size:14.5px;font-weight:600;color:#211e1a">Testing velocity</div>
+                      <div style="font-size:12px;color:#968d7e;margin-top:2px">Tests started per week</div>
+                    </div>
+                    <div style="display:flex;align-items:flex-end;gap:8px;height:150px;padding-top:6px">
+                      <sc-for list="{{ velocity }}" as="w" hint-placeholder-count="8">
+                        <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:8px;height:100%;justify-content:flex-end">
+                          <span style="width:100%;max-width:30px;background:linear-gradient(180deg,#5b54e0,color-mix(in oklab,#5b54e0 42%,#ffffff));border-radius:7px 7px 0 0;min-height:6px;height:{{ w.height }}"></span>
+                          <span style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;color:#968d7e">{{ w.label }}</span>
+                        </div>
+                      </sc-for>
+                    </div>
+                  </section>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ onFunnel }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;flex-direction:column;gap:13px;padding:0 16px 30px;animation:tf-slide .26s ease">
+                  <button onClick="{{ back }}" style="display:inline-flex;align-items:center;gap:6px;color:#968d7e;font-size:13px;font-weight:500;min-height:44px;margin-left:-4px">{{ icons.arrowLeft16 }}Home</button>
+                  <div>
+                    <div style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#968d7e">Conversion</div>
+                    <h2 style="font-size:26px;font-weight:400;color:#211e1a;margin-top:4px">Funnel</h2>
+                    <p style="font-size:13px;color:#5d564b;margin-top:6px;line-height:1.45">Where shoppers drop off between landing and purchase. Last 7 days, all traffic.</p>
+                  </div>
+                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:11px">
+                    <sc-for list="{{ funnelStats }}" as="f" hint-placeholder-count="4">
+                      <div style="background:#fcfbf7;border:1px solid #e7e0d3;border-radius:15px;padding:14px;display:flex;flex-direction:column;gap:7px;min-height:88px">
+                        <span style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;color:#968d7e">{{ f.label }}</span>
+                        <span style="font-size:{{ f.size }};line-height:1.05;color:#211e1a">{{ f.value }}</span>
+                        <span style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:11px;color:{{ f.subColor }}">{{ f.sub }}</span>
+                      </div>
+                    </sc-for>
+                  </div>
+                  <section style="background:#fcfbf7;border:1px solid #e7e0d3;border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:12px">
+                    <div>
+                      <div style="font-size:14.5px;font-weight:600;color:#211e1a">Conversion funnel</div>
+                      <div style="font-size:12px;color:#968d7e;margin-top:2px">Distinct visitors reaching each step</div>
+                    </div>
+                    <sc-for list="{{ funnelSteps }}" as="st" hint-placeholder-count="5">
+                      <div style="display:flex;flex-direction:column;gap:8px;border-top:1px solid #efe9de;padding-top:12px">
+                        <div style="display:flex;align-items:center;gap:10px">
+                          <span style="flex:0 0 auto;width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;border-radius:99px;background:#ece6da;border:1px solid #e7e0d3;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:11px;color:#5d564b">{{ st.idx }}</span>
+                          <span style="flex:1;min-width:0">
+                            <span style="display:block;font-weight:600;color:#211e1a;font-size:13.5px">{{ st.name }}</span>
+                            <span style="display:block;font-size:11px;color:#968d7e">{{ st.source }}</span>
+                          </span>
+                          <span style="text-align:right;flex:0 0 auto">
+                            <span style="display:block;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:13.5px;font-weight:600;color:#211e1a">{{ st.visitors }}</span>
+                            <span style="display:block;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:11px;color:{{ st.dropColor }}">{{ st.drop }}</span>
+                          </span>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:10px">
+                          <span style="flex:1;height:10px;border-radius:99px;background:#e7e0d3;overflow:hidden;display:block"><span style="display:block;height:100%;background:#5b54e0;border-radius:99px;width:{{ st.reach }}"></span></span>
+                          <span style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:11.5px;font-weight:600;color:#5d564b;min-width:38px;text-align:right">{{ st.reach }}</span>
+                        </div>
+                      </div>
+                    </sc-for>
+                  </section>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ onHeatmaps }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;flex-direction:column;gap:13px;padding:0 16px 30px;animation:tf-slide .26s ease">
+                  <button onClick="{{ back }}" style="display:inline-flex;align-items:center;gap:6px;color:#968d7e;font-size:13px;font-weight:500;min-height:44px;margin-left:-4px">{{ icons.arrowLeft16 }}Home</button>
+                  <div>
+                    <div style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#968d7e">Behavior</div>
+                    <h2 style="font-size:26px;font-weight:400;color:#211e1a;margin-top:4px">Heatmaps</h2>
+                    <p style="font-size:13px;color:#5d564b;margin-top:6px;line-height:1.45">Where visitors click on each page. The overlay itself opens on desktop — here you get the ranking and the frustration signals.</p>
+                  </div>
+                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:11px">
+                    <sc-for list="{{ heatStats }}" as="h" hint-placeholder-count="2">
+                      <div style="background:#fcfbf7;border:1px solid #e7e0d3;border-radius:15px;padding:14px;display:flex;flex-direction:column;gap:7px">
+                        <span style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;color:#968d7e">{{ h.label }}</span>
+                        <span style="font-size:28px;line-height:1;color:#211e1a">{{ h.value }}</span>
+                      </div>
+                    </sc-for>
+                  </div>
+                  <section style="background:#fcfbf7;border:1px solid #e7e0d3;border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:4px">
+                    <div style="font-size:14.5px;font-weight:600;color:#211e1a">Pages</div>
+                    <div style="font-size:12px;color:#968d7e;margin-bottom:6px">Pages with enough clicks to read a heatmap</div>
+                    <sc-for list="{{ heatPages }}" as="p" hint-placeholder-count="5">
+                      <div style="display:flex;align-items:center;gap:11px;border-top:1px solid #efe9de;padding:12px 0;min-height:60px">
+                        <span style="flex:1;min-width:0">
+                          <span style="display:block;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:13px;color:#211e1a;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ p.path }}</span>
+                          <span style="display:flex;align-items:center;gap:7px;margin-top:5px;flex-wrap:wrap">
+                            <span style="font-size:11.5px;color:#968d7e">{{ p.devices }}</span>
+                            <sc-if value="{{ p.hasFrustration }}" hint-placeholder-val="{{ false }}">
+                              <span style="display:inline-flex;align-items:center;gap:4px;font-size:11px;color:#b9842a;background:color-mix(in oklab,#b9842a 15%,#fcfbf7);border-radius:999px;padding:2px 8px">{{ icons.warning13 }}{{ p.frustration }}</span>
+                            </sc-if>
+                          </span>
+                        </span>
+                        <span style="text-align:right;flex:0 0 auto">
+                          <span style="display:block;font-size:12px;font-weight:600;color:#211e1a;background:#ece6da;border-radius:999px;padding:2px 9px">{{ p.share }}</span>
+                          <span style="display:block;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:11.5px;color:#5d564b;margin-top:5px">{{ p.clicks }}</span>
+                        </span>
+                      </div>
+                    </sc-for>
+                    <p style="margin-top:10px;font-size:12px;color:#968d7e">7 pages hidden for having fewer than 50 clicks.</p>
+                  </section>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ onFlows }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;flex-direction:column;gap:13px;padding:0 16px 30px;animation:tf-slide .26s ease">
+                  <button onClick="{{ back }}" style="display:inline-flex;align-items:center;gap:6px;color:#968d7e;font-size:13px;font-weight:500;min-height:44px;margin-left:-4px">{{ icons.arrowLeft16 }}Home</button>
+                  <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:10px">
+                    <div>
+                      <div style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#968d7e">Automation</div>
+                      <h2 style="font-size:26px;font-weight:400;color:#211e1a;margin-top:4px">Flows</h2>
+                    </div>
+                    <button style="display:inline-flex;align-items:center;gap:7px;background:#5b54e0;color:#fff;border-radius:11px;padding:11px 14px;font-size:13.5px;font-weight:600;min-height:44px">{{ icons.plus16 }}New</button>
+                  </div>
+                  <p style="font-size:13px;color:#5d564b;line-height:1.45">Trigger an A/B test when a visitor follows a journey.</p>
+                  <sc-for list="{{ flows }}" as="f" hint-placeholder-count="3">
+                    <article style="display:flex;flex-direction:column;gap:12px;padding:15px;background:#fcfbf7;border:1.5px solid #e7e0d3;border-radius:14px">
+                      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+                        <span style="display:flex;align-items:center;gap:8px;font-size:15px;font-weight:600;color:#211e1a;min-width:0">{{ icons.flow18 }}<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ f.name }}</span></span>
+                        <span style="display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:4px 10px;border-radius:20px;color:{{ f.statusFg }};background:{{ f.statusBg }}">{{ f.statusDot }}{{ f.status }}</span>
+                      </div>
+                      <p style="font-size:12.5px;color:#5d564b;font-family:'IBM Plex Mono',ui-monospace,monospace;line-height:1.5">{{ f.steps }}</p>
+                      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding-top:10px;border-top:1px solid #e7e0d3">
+                        <span style="display:flex;align-items:center;gap:6px;font-size:12.5px;color:#968d7e;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ icons.beaker14 }}{{ f.campaign }}</span>
+                        <span style="display:flex;gap:4px;flex:none">
+                          <button style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:8px;color:#968d7e">{{ f.toggleIcon }}</button>
+                          <button style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:8px;color:#968d7e">{{ icons.trash16 }}</button>
+                        </span>
+                      </div>
+                    </article>
+                  </sc-for>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ onFavorites }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;flex-direction:column;gap:13px;padding:0 16px 30px;animation:tf-slide .26s ease">
+                  <button onClick="{{ back }}" style="display:inline-flex;align-items:center;gap:6px;color:#968d7e;font-size:13px;font-weight:500;min-height:44px;margin-left:-4px">{{ icons.arrowLeft16 }}Home</button>
+                  <div>
+                    <div style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#968d7e">Saved</div>
+                    <h2 style="font-size:26px;font-weight:400;color:#211e1a;margin-top:4px">Favorites</h2>
+                    <p style="font-size:13px;color:#5d564b;margin-top:6px">Pinned tests and saved AI ideas.</p>
+                  </div>
+                  <div style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#968d7e;margin-top:4px">Pinned tests</div>
+                  <sc-for list="{{ pinned }}" as="p" hint-placeholder-count="2">
+                    <button onClick="{{ p.open }}" style="text-align:left;background:#fcfbf7;border:1px solid #e7e0d3;border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:12px;box-shadow:0 1px 2px rgba(40,34,20,.04)">
+                      <span style="display:flex;justify-content:space-between;align-items:center">
+                        <span style="display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:4px 10px;border-radius:20px;color:{{ p.statusFg }};background:{{ p.statusBg }}">{{ p.statusDot }}{{ p.status }}</span>
+                        <span style="color:#b9842a;display:flex">{{ icons.starFill16 }}</span>
+                      </span>
+                      <span style="font-size:22px;color:#211e1a;line-height:1.15">{{ p.name }}</span>
+                      <span style="font-size:13px;color:#5d564b">{{ p.goal }}</span>
+                      <span style="display:block;margin:2px 0">{{ p.spark }}</span>
+                      <span style="display:flex;gap:26px;border-top:1px solid #efe9de;padding-top:13px">
+                        <span><span style="display:block;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:17px;font-weight:600;color:#211e1a">{{ p.rate }}%</span><span style="display:block;font-size:11px;color:#968d7e;margin-top:1px">conv. rate</span></span>
+                        <span><span style="display:block;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:17px;font-weight:600;color:{{ p.upliftColor }}">{{ p.uplift }}</span><span style="display:block;font-size:11px;color:#968d7e;margin-top:1px">uplift</span></span>
+                        <span><span style="display:block;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:17px;font-weight:600;color:#211e1a">{{ p.conf }}</span><span style="display:block;font-size:11px;color:#968d7e;margin-top:1px">confidence</span></span>
+                      </span>
+                    </button>
+                  </sc-for>
+                  <div style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#968d7e;margin-top:8px">Saved AI ideas</div>
+                  <sc-for list="{{ savedIdeas }}" as="i" hint-placeholder-count="2">
+                    <div style="display:flex;gap:13px;background:#fcfbf7;border:1px solid #e7e0d3;border-radius:14px;padding:15px;box-shadow:0 1px 2px rgba(40,34,20,.04)">
+                      <span style="width:34px;height:34px;flex:0 0 auto;border-radius:50%;background:linear-gradient(150deg,#5b54e0,color-mix(in oklab,#5b54e0 55%,#aab0ff));color:#fff;display:flex;align-items:center;justify-content:center">{{ icons.sparkle16 }}</span>
+                      <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:7px">
+                        <span style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                          <span style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.05em;text-transform:uppercase;color:#5b54e0;background:color-mix(in oklab,#5b54e0 11%,#fcfbf7);padding:3px 8px;border-radius:6px">{{ i.tag }}</span>
+                          <span style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10.5px;color:{{ i.impactColor }}">{{ i.impact }} impact</span>
+                        </span>
+                        <span style="font-size:14.5px;font-weight:600;color:#211e1a;line-height:1.3">{{ i.title }}</span>
+                        <span style="font-size:12.5px;color:#5d564b;line-height:1.45">{{ i.hypothesis }}</span>
+                        <button style="align-self:flex-start;display:inline-flex;align-items:center;gap:6px;background:color-mix(in oklab,#5b54e0 11%,#fcfbf7);color:#5b54e0;border-radius:10px;padding:10px 13px;font-size:13px;font-weight:600;min-height:44px;margin-top:2px">{{ icons.plus16 }}Build</button>
+                      </span>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ onTracking }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;flex-direction:column;gap:13px;padding:0 16px 30px;animation:tf-slide .26s ease">
+                  <button onClick="{{ back }}" style="display:inline-flex;align-items:center;gap:6px;color:#968d7e;font-size:13px;font-weight:500;min-height:44px;margin-left:-4px">{{ icons.arrowLeft16 }}Home</button>
+                  <div>
+                    <div style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#968d7e">Acquisition</div>
+                    <h2 style="font-size:26px;font-weight:400;color:#211e1a;margin-top:4px">Tracking</h2>
+                    <p style="font-size:13px;color:#5d564b;margin-top:6px">Where your UTM-tagged traffic comes from. Last 7 days.</p>
+                  </div>
+                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:11px">
+                    <sc-for list="{{ trackingStats }}" as="t" hint-placeholder-count="4">
+                      <div style="background:#fcfbf7;border:1px solid #e7e0d3;border-radius:15px;padding:14px;display:flex;flex-direction:column;gap:7px;min-height:88px">
+                        <span style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;color:#968d7e">{{ t.label }}</span>
+                        <span style="font-size:{{ t.size }};line-height:1.05;color:#211e1a">{{ t.value }}</span>
+                        <span style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:11px;color:{{ t.subColor }}">{{ t.sub }}</span>
+                      </div>
+                    </sc-for>
+                  </div>
+                  <div style="display:flex;gap:11px;align-items:flex-start;background:color-mix(in oklab,#5b54e0 8%,#fcfbf7);border:1px solid color-mix(in oklab,#5b54e0 22%,#e7e0d3);border-radius:14px;padding:14px">
+                    <span style="color:#5b54e0;display:flex;flex:0 0 auto">{{ icons.sparkle17 }}</span>
+                    <p style="font-size:13px;color:#5d564b;line-height:1.5">Tagged visits are up 18% on the previous 7 days. <strong style="font-weight:600;color:#211e1a">instagram</strong> drove 41% of tagged visits, peaking Wednesday.</p>
+                  </div>
+                  <section style="background:#fcfbf7;border:1px solid #e7e0d3;border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:13px">
+                    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap">
+                      <div>
+                        <div style="font-size:14.5px;font-weight:600;color:#211e1a">Breakdown</div>
+                        <div style="font-size:12px;color:#968d7e;margin-top:2px">UTM-tagged traffic by dimension</div>
+                      </div>
+                      <div style="display:inline-flex;gap:2px;padding:2px;background:#ece6da;border:1px solid #e7e0d3;border-radius:8px">
+                        <sc-for list="{{ dimensions }}" as="d" hint-placeholder-count="3">
+                          <button onClick="{{ d.pick }}" style="display:inline-flex;align-items:center;padding:8px 12px;font-size:13px;border-radius:6px;color:{{ d.fg }};background:{{ d.bg }};box-shadow:{{ d.shadow }};min-height:38px">{{ d.label }}</button>
+                        </sc-for>
+                      </div>
+                    </div>
+                    <sc-for list="{{ trackingRows }}" as="r" hint-placeholder-count="5">
+                      <div style="display:flex;flex-direction:column;gap:7px;border-top:1px solid #efe9de;padding-top:11px">
+                        <div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px">
+                          <span style="font-size:13.5px;font-weight:600;color:#211e1a;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ r.value }}</span>
+                          <span style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:12.5px;color:#5d564b;flex:0 0 auto">{{ r.visits }} · {{ r.share }}</span>
+                        </div>
+                        <span style="height:8px;border-radius:99px;background:#ece6da;overflow:hidden;display:block"><span style="display:block;height:100%;background:#5b54e0;border-radius:99px;width:{{ r.share }}"></span></span>
+                      </div>
+                    </sc-for>
+                  </section>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ onProducts }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;flex-direction:column;gap:13px;padding:0 16px 30px;animation:tf-slide .26s ease">
+                  <button onClick="{{ back }}" style="display:inline-flex;align-items:center;gap:6px;color:#968d7e;font-size:13px;font-weight:500;min-height:44px;margin-left:-4px">{{ icons.arrowLeft16 }}Home</button>
+                  <div>
+                    <h2 style="font-size:26px;font-weight:400;color:#211e1a">Products</h2>
+                    <p style="font-size:13px;color:#5d564b;margin-top:6px;line-height:1.45">Which products get seen, get added, and actually sell. Last 7 days.</p>
+                  </div>
+                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:11px">
+                    <sc-for list="{{ productStats }}" as="p" hint-placeholder-count="4">
+                      <div style="background:#fcfbf7;border:1px solid #e7e0d3;border-radius:15px;padding:14px;display:flex;flex-direction:column;gap:7px">
+                        <span style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;color:#968d7e">{{ p.label }}</span>
+                        <span style="font-size:26px;line-height:1;color:#211e1a">{{ p.value }}</span>
+                      </div>
+                    </sc-for>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:9px;background:#fcfbf7;border:1px solid #e7e0d3;border-radius:12px;padding:11px 13px;color:#968d7e;min-height:44px">
+                    {{ icons.search16 }}
+                    <input value="{{ productQuery }}" onChange="{{ setProductQuery }}" placeholder="Search products…" aria-label="Search products" style="flex:1;min-width:0;border:none;background:none;outline:none;font-size:14px;color:#211e1a">
+                  </div>
+                  <sc-for list="{{ products }}" as="p" hint-placeholder-count="5">
+                    <div style="background:#fcfbf7;border:1px solid #e7e0d3;border-radius:15px;padding:15px;display:flex;flex-direction:column;gap:12px;box-shadow:0 1px 2px rgba(40,34,20,.04)">
+                      <div style="display:flex;align-items:center;gap:11px">
+                        <span style="width:40px;height:40px;flex:0 0 auto;border-radius:8px;border:1px solid #e7e0d3;background:repeating-linear-gradient(135deg,#ece6da,#ece6da 4px,#f4f1ea 4px,#f4f1ea 8px);display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;color:#968d7e">IMG</span>
+                        <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:4px">
+                          <span style="font-size:14px;font-weight:500;color:#211e1a;line-height:1.3">{{ p.title }}</span>
+                          <sc-if value="{{ p.leaky }}" hint-placeholder-val="{{ false }}">
+                            <span style="align-self:flex-start;font-size:11px;font-weight:600;color:#b9842a;border:1px solid #b9842a;border-radius:99px;padding:1px 8px">High traffic · low conversion</span>
+                          </sc-if>
+                        </span>
+                      </div>
+                      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;border-top:1px solid #efe9de;padding-top:11px">
+                        <sc-for list="{{ p.cells }}" as="c" hint-placeholder-count="4">
+                          <div style="display:flex;flex-direction:column;gap:3px">
+                            <span style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:#968d7e">{{ c.k }}</span>
+                            <span style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:13px;font-weight:600;color:#211e1a">{{ c.v }}</span>
+                          </div>
+                        </sc-for>
+                      </div>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ onReplays }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;flex-direction:column;gap:13px;padding:0 16px 30px;animation:tf-slide .26s ease">
+                  <button onClick="{{ back }}" style="display:inline-flex;align-items:center;gap:6px;color:#968d7e;font-size:13px;font-weight:500;min-height:44px;margin-left:-4px">{{ icons.arrowLeft16 }}Home</button>
+                  <div>
+                    <div style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#968d7e">Behavior</div>
+                    <h2 style="font-size:26px;font-weight:400;color:#211e1a;margin-top:4px">Session replays</h2>
+                    <p style="font-size:13px;color:#5d564b;margin-top:6px;line-height:1.45">Sessions where something went wrong — rage clicks and dead clicks, with the lead-up included.</p>
+                  </div>
+                  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:9px">
+                    <sc-for list="{{ replayKpis }}" as="k" hint-placeholder-count="3">
+                      <div style="background:#fcfbf7;border:1px solid #e7e0d3;border-radius:14px;padding:13px 12px;display:flex;flex-direction:column;gap:6px">
+                        <span style="color:#b3aa99;display:flex">{{ k.icon }}</span>
+                        <span style="font-size:21px;line-height:1;color:#211e1a">{{ k.value }}</span>
+                        <span style="font-size:10.5px;color:#968d7e;line-height:1.3">{{ k.label }}</span>
+                      </div>
+                    </sc-for>
+                  </div>
+                  <div style="display:inline-flex;gap:2px;padding:2px;background:#ece6da;border:1px solid #e7e0d3;border-radius:8px;align-self:flex-start">
+                    <sc-for list="{{ triggers }}" as="t" hint-placeholder-count="3">
+                      <button onClick="{{ t.pick }}" style="display:inline-flex;align-items:center;padding:8px 13px;font-size:13px;border-radius:6px;color:{{ t.fg }};background:{{ t.bg }};box-shadow:{{ t.shadow }};min-height:38px">{{ t.label }}</button>
+                    </sc-for>
+                  </div>
+                  <section style="background:#fcfbf7;border:1px solid #e7e0d3;border-radius:16px;padding:16px;display:flex;flex-direction:column">
+                    <div style="font-size:14.5px;font-weight:600;color:#211e1a">Recent sessions</div>
+                    <div style="font-size:12px;color:#968d7e;margin-top:2px;margin-bottom:6px">{{ replaySub }}</div>
+                    <sc-for list="{{ replaySessions }}" as="r" hint-placeholder-count="5">
+                      <div style="display:flex;align-items:center;gap:12px;border-top:1px solid #efe9de;padding:13px 0;min-height:64px">
+                        <span style="flex:1;min-width:0">
+                          <span style="display:block;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:13px;color:#211e1a;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ r.path }}</span>
+                          <span style="display:flex;align-items:center;gap:7px;margin-top:5px;flex-wrap:wrap">
+                            <span style="font-size:11.5px;color:#968d7e">{{ r.meta }}</span>
+                            <span style="font-size:11px;font-weight:600;border-radius:999px;padding:2px 8px;color:{{ r.trigFg }};background:{{ r.trigBg }}">{{ r.trigger }}</span>
+                          </span>
+                        </span>
+                        <span style="text-align:right;flex:0 0 auto">
+                          <span style="display:block;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:13px;color:#211e1a">{{ r.duration }}</span>
+                          <span style="display:block;font-size:11px;color:#968d7e;margin-top:3px">{{ r.when }}</span>
+                        </span>
+                        <span style="width:34px;height:34px;flex:0 0 auto;border-radius:50%;border:1px solid #e7e0d3;color:#968d7e;display:flex;align-items:center;justify-content:center">{{ icons.play15 }}</span>
+                      </div>
+                    </sc-for>
+                    <button style="margin-top:10px;padding:11px 12px;border:1px dashed #e7e0d3;border-radius:8px;color:#968d7e;font-size:12.5px;text-align:center;min-height:44px">Show 3 brief sessions with ≤2 interactions — too short to have much to watch</button>
+                  </section>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ onNudges }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;flex-direction:column;gap:13px;padding:0 16px 30px;animation:tf-slide .26s ease">
+                  <button onClick="{{ back }}" style="display:inline-flex;align-items:center;gap:6px;color:#968d7e;font-size:13px;font-weight:500;min-height:44px;margin-left:-4px">{{ icons.arrowLeft16 }}Home</button>
+                  <div>
+                    <div style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#968d7e">Widget library</div>
+                    <h2 style="font-size:26px;font-weight:400;color:#211e1a;margin-top:4px">Nudges</h2>
+                    <p style="font-size:13px;color:#5d564b;margin-top:6px;line-height:1.45">Every nudge runs against a holdout that proves it pays for itself.</p>
+                  </div>
+                  <h3 style="font-size:15px;font-weight:700;color:#211e1a;margin-top:4px">Your nudges</h3>
+                  <sc-for list="{{ nudges }}" as="n" hint-placeholder-count="2">
+                    <article style="display:flex;flex-direction:column;gap:12px;padding:15px;background:#fcfbf7;border:1.5px solid #e7e0d3;border-radius:14px">
+                      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px">
+                        <span style="display:flex;flex-direction:column;gap:2px;min-width:0">
+                          <span style="font-size:15px;font-weight:600;color:#211e1a;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ n.name }}</span>
+                          <span style="font-size:11.5px;font-weight:500;color:#968d7e">{{ n.where }}</span>
+                        </span>
+                        <span style="display:inline-flex;align-items:center;gap:6px;flex:0 0 auto;font-size:12px;font-weight:600;padding:4px 10px;border-radius:20px;color:{{ n.statusFg }};background:{{ n.statusBg }}">{{ n.statusDot }}{{ n.status }}</span>
+                      </div>
+                      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+                        <sc-for list="{{ n.stats }}" as="st" hint-placeholder-count="4">
+                          <span style="display:flex;flex-direction:column;gap:2px">
+                            <span style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:#968d7e">{{ st.k }}</span>
+                            <span style="font-size:15px;font-weight:700;color:{{ st.color }};font-variant-numeric:tabular-nums">{{ st.v }}</span>
+                          </span>
+                        </sc-for>
+                      </div>
+                      <p style="font-size:12px;color:#968d7e">{{ n.note }}</p>
+                      <div style="display:flex;align-items:center;gap:8px;padding-top:10px;border-top:1px solid #e7e0d3">
+                        <button style="display:inline-flex;align-items:center;gap:6px;padding:9px 12px;border-radius:10px;font-size:13px;font-weight:600;background:{{ n.ctaBg }};color:{{ n.ctaFg }};min-height:44px">{{ n.ctaIcon }}{{ n.cta }}</button>
+                        <button style="display:inline-flex;align-items:center;padding:9px 12px;border-radius:10px;border:1px solid #e7e0d3;font-size:13px;font-weight:600;color:#5d564b;min-height:44px">Results</button>
+                        <button style="margin-left:auto;width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:8px;color:#968d7e">{{ icons.trash16 }}</button>
+                      </div>
+                    </article>
+                  </sc-for>
+                  <h3 style="font-size:15px;font-weight:700;color:#211e1a;margin-top:12px">Add another widget</h3>
+                  <sc-for list="{{ widgets }}" as="w" hint-placeholder-count="4">
+                    <article style="display:flex;flex-direction:column;gap:10px;padding:15px;background:#fcfbf7;border:1.5px solid #e7e0d3;border-radius:14px">
+                      <div style="display:flex;align-items:center;gap:10px">
+                        <span style="flex:0 0 auto;width:34px;height:34px;border-radius:10px;background:color-mix(in oklab,#5b54e0 11%,#fcfbf7);color:#5b54e0;display:flex;align-items:center;justify-content:center">{{ w.icon }}</span>
+                        <span style="display:flex;flex-direction:column;gap:1px;min-width:0">
+                          <span style="font-size:14.5px;font-weight:600;color:#211e1a">{{ w.name }}</span>
+                          <span style="font-size:11.5px;font-weight:500;color:#968d7e">{{ w.where }}</span>
+                        </span>
+                      </div>
+                      <p style="font-size:13px;line-height:1.5;color:#5d564b">{{ w.description }}</p>
+                      <p style="display:flex;align-items:flex-start;gap:6px;font-size:12px;line-height:1.45;color:#968d7e">{{ icons.sparkle13 }}{{ w.impact }}</p>
+                      <button style="align-self:flex-start;display:inline-flex;align-items:center;gap:6px;background:color-mix(in oklab,#5b54e0 11%,#fcfbf7);color:#5b54e0;border-radius:10px;padding:10px 13px;font-size:13px;font-weight:600;min-height:44px">{{ icons.plus16 }}Set up</button>
+                    </article>
+                  </sc-for>
+                  <p style="font-size:12.5px;color:#968d7e;line-height:1.5;margin-top:6px">Want a nudge to appear only after a journey — exit intent, or scrolling 75% of a product page? Create it here, then gate it with a <a href="#" style="color:#5b54e0">Flow</a>.</p>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ onAudiences }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;flex-direction:column;gap:13px;padding:0 16px 30px;animation:tf-slide .26s ease">
+                  <button onClick="{{ back }}" style="display:inline-flex;align-items:center;gap:6px;color:#968d7e;font-size:13px;font-weight:500;min-height:44px;margin-left:-4px">{{ icons.arrowLeft16 }}Home</button>
+                  <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:10px">
+                    <div>
+                      <div style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#968d7e">Targeting</div>
+                      <h2 style="font-size:26px;font-weight:400;color:#211e1a;margin-top:4px">Audiences</h2>
+                    </div>
+                    <button style="display:inline-flex;align-items:center;gap:7px;background:#5b54e0;color:#fff;border-radius:11px;padding:11px 14px;font-size:13.5px;font-weight:600;min-height:44px">{{ icons.plus16 }}New</button>
+                  </div>
+                  <p style="font-size:13px;color:#5d564b;line-height:1.45">Save who-sees-this definitions once, reuse them across tests and flows.</p>
+                  <sc-for list="{{ audiences }}" as="a" hint-placeholder-count="4">
+                    <article style="display:flex;flex-direction:column;gap:12px;padding:15px;background:#fcfbf7;border:1.5px solid #e7e0d3;border-radius:14px">
+                      <span style="display:flex;align-items:center;gap:8px;font-size:15px;font-weight:600;color:#211e1a;min-width:0">{{ icons.users18 }}<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ a.name }}</span></span>
+                      <p style="font-size:13px;color:#5d564b;line-height:1.45">{{ a.conditions }}</p>
+                      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding-top:10px;border-top:1px solid #e7e0d3">
+                        <button style="display:inline-flex;align-items:center;gap:6px;padding:10px 12px;font-size:12.5px;font-weight:600;color:#5b54e0;background:color-mix(in oklab,#5b54e0 11%,#fcfbf7);border-radius:9px;min-height:44px">{{ icons.sparkle14 }}Personalize</button>
+                        <span style="display:flex;gap:4px;flex:none">
+                          <button style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:8px;color:#968d7e">{{ icons.edit16 }}</button>
+                          <button style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:8px;color:#968d7e">{{ icons.trash16 }}</button>
+                        </span>
+                      </div>
+                    </article>
+                  </sc-for>
+                  <p style="font-size:12.5px;color:#968d7e;line-height:1.45;margin-top:4px">Conditions combine — a visitor must match every one. They use session-stable signals, so membership never flips mid-session.</p>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ onSettings }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;flex-direction:column;gap:13px;padding:0 16px 30px;animation:tf-slide .26s ease">
+                  <button onClick="{{ back }}" style="display:inline-flex;align-items:center;gap:6px;color:#968d7e;font-size:13px;font-weight:500;min-height:44px;margin-left:-4px">{{ icons.arrowLeft16 }}Home</button>
+                  <div>
+                    <div style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#968d7e">Workspace</div>
+                    <h2 style="font-size:26px;font-weight:400;color:#211e1a;margin-top:4px">Settings</h2>
+                    <p style="font-size:13px;color:#5d564b;margin-top:6px">Manage how Testerify integrates with your storefront.</p>
+                  </div>
+                  <section style="background:#fcfbf7;border:1px solid #e7e0d3;border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:12px">
+                    <div>
+                      <div style="font-size:15.5px;font-weight:600;color:#211e1a">Data collection</div>
+                      <div style="font-size:12.5px;color:#968d7e;margin-top:3px;line-height:1.45">Controls whether Testerify receives any data from your integrated storefront.</div>
+                    </div>
+                    <div style="display:flex;align-items:center;justify-content:space-between;gap:18px;padding-bottom:16px;border-bottom:1px solid #efe9de">
+                      <div style="flex:1;min-width:0">
+                        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+                          <span style="width:9px;height:9px;border-radius:50%;flex:0 0 auto;background:{{ collectDot }};box-shadow:0 0 0 3px {{ collectRing }}"></span>
+                          <span style="font-size:14.5px;font-weight:700;color:#211e1a">{{ collectLabel }}</span>
+                        </div>
+                        <p style="font-size:13px;line-height:1.55;color:#5d564b">{{ collectCopy }}</p>
+                      </div>
+                      <button onClick="{{ toggleCollect }}" role="switch" aria-label="Toggle data collection" style="position:relative;flex:0 0 auto;width:52px;height:32px;border-radius:999px;background:{{ switchBg }};transition:background .18s ease">
+                        <span style="position:absolute;top:3px;left:{{ knobLeft }};width:26px;height:26px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.28);transition:left .18s ease"></span>
+                      </button>
+                    </div>
+                    <p style="display:flex;align-items:center;gap:7px;font-size:12.5px;color:#968d7e">{{ icons.info14 }}Pausing takes effect within a minute for new page views. Only admins can change this.</p>
+                  </section>
+                  <section style="background:#fcfbf7;border:1px solid #e7e0d3;border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:12px">
+                    <div>
+                      <div style="font-size:15.5px;font-weight:600;color:#211e1a">Purchase tracking</div>
+                      <div style="font-size:12.5px;color:#968d7e;margin-top:3px;line-height:1.45">Whether a real order has been recorded end-to-end through the Shopify order webhook.</div>
+                    </div>
+                    <div style="padding-bottom:16px;border-bottom:1px solid #efe9de">
+                      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+                        <span style="width:9px;height:9px;border-radius:50%;background:#2f8f5b;box-shadow:0 0 0 3px rgba(47,143,91,.16)"></span>
+                        <span style="font-size:14.5px;font-weight:700;color:#211e1a">Verified</span>
+                      </div>
+                      <p style="font-size:13px;line-height:1.55;color:#5d564b">A live order has been recorded as a conversion (first seen Jun 18, 2026). Tests with a purchase goal are counting orders correctly.</p>
+                    </div>
+                    <p style="display:flex;align-items:center;gap:7px;font-size:12.5px;color:#968d7e">{{ icons.info14 }}One-time check — once verified, it stays verified.</p>
+                  </section>
+                  <section style="background:#fcfbf7;border:1px solid #e7e0d3;border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:10px">
+                    <div style="font-size:15.5px;font-weight:600;color:#211e1a">Account</div>
+                    <sc-for list="{{ accountRows }}" as="r" hint-placeholder-count="3">
+                      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;border-top:1px solid #efe9de;padding-top:11px;min-height:44px">
+                        <span style="font-size:13px;color:#5d564b">{{ r.k }}</span>
+                        <span style="font-size:13px;font-weight:600;color:#211e1a">{{ r.v }}</span>
+                      </div>
+                    </sc-for>
+                    <p style="font-size:12.5px;color:#968d7e;line-height:1.45;margin-top:4px">Plan &amp; billing, team invites and page-type mapping are desktop-only — this screen covers what you may need to flip in a hurry.</p>
+                  </section>
+                  <button style="display:flex;align-items:center;justify-content:center;gap:8px;border:1px solid #e7e0d3;border-radius:13px;padding:14px;font-size:14.5px;font-weight:600;color:#c2553c;min-height:48px">{{ icons.logout16 }}Log out</button>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ onPages }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;flex-direction:column;gap:13px;padding:0 16px 30px;animation:tf-slide .26s ease">
+                  <button onClick="{{ back }}" style="display:inline-flex;align-items:center;gap:6px;color:#968d7e;font-size:13px;font-weight:500;min-height:44px;margin-left:-4px">{{ icons.arrowLeft16 }}Home</button>
+                  <div>
+                    <div style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#968d7e">Behavior</div>
+                    <h2 style="font-size:26px;font-weight:400;color:#211e1a;margin-top:4px">Shopper behavior</h2>
+                    <p style="font-size:13px;color:#5d564b;margin-top:6px;line-height:1.45">Page views and time on page. Last 7 days.</p>
+                  </div>
+                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:11px">
+                    <sc-for list="{{ behaviorStats }}" as="b" hint-placeholder-count="4">
+                      <div style="background:#fcfbf7;border:1px solid #e7e0d3;border-radius:15px;padding:14px;display:flex;flex-direction:column;gap:7px;min-height:88px">
+                        <span style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;color:#968d7e">{{ b.label }}</span>
+                        <span style="font-size:{{ b.size }};line-height:1.05;color:#211e1a">{{ b.value }}</span>
+                        <span style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:11px;color:{{ b.subColor }}">{{ b.sub }}</span>
+                      </div>
+                    </sc-for>
+                  </div>
+                  <div style="display:flex;gap:11px;align-items:flex-start;background:color-mix(in oklab,#5b54e0 8%,#fcfbf7);border:1px solid color-mix(in oklab,#5b54e0 22%,#e7e0d3);border-radius:14px;padding:14px">
+                    <span style="color:#5b54e0;display:flex;flex:0 0 auto">{{ icons.sparkle17 }}</span>
+                    <p style="font-size:13px;color:#5d564b;line-height:1.5">Page views are up 9% on the previous 7 days. Shoppers linger longest on <strong style="font-weight:600;color:#211e1a">Product</strong> pages (1m 12s), and views peaked Wednesday.</p>
+                  </div>
+                  <section style="background:#fcfbf7;border:1px solid #e7e0d3;border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:4px">
+                    <div style="font-size:14.5px;font-weight:600;color:#211e1a">By page type</div>
+                    <div style="font-size:12px;color:#968d7e;margin-bottom:6px">Tap a row to filter the trend</div>
+                    <sc-for list="{{ pageTypes }}" as="p" hint-placeholder-count="5">
+                      <button onClick="{{ p.pick }}" style="display:flex;flex-direction:column;gap:7px;border-top:1px solid #efe9de;padding:11px 6px;border-radius:8px;background:{{ p.bg }};min-height:44px">
+                        <span style="display:flex;align-items:baseline;justify-content:space-between;gap:10px">
+                          <span style="font-size:13px;font-weight:600;color:#211e1a">{{ p.name }}</span>
+                          <span style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:12px;color:#968d7e">{{ p.views }} views · {{ p.time }}</span>
+                        </span>
+                        <span style="height:8px;border-radius:99px;background:#e7e0d3;overflow:hidden;display:block;width:100%"><span style="display:block;height:100%;background:#5b54e0;border-radius:99px;width:{{ p.share }}"></span></span>
+                      </button>
+                    </sc-for>
+                  </section>
+                  <section style="background:#fcfbf7;border:1px solid #e7e0d3;border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:4px">
+                    <div style="font-size:14.5px;font-weight:600;color:#211e1a">Top pages</div>
+                    <div style="display:grid;grid-template-columns:1fr 62px 68px;gap:10px;padding:9px 2px;border-bottom:1px solid #e7e0d3;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:#968d7e">
+                      <span>Path</span><span style="text-align:right">Views</span><span style="text-align:right">Avg time</span>
+                    </div>
+                    <sc-for list="{{ topPaths }}" as="t" hint-placeholder-count="5">
+                      <div style="display:grid;grid-template-columns:1fr 62px 68px;gap:10px;padding:11px 2px;border-bottom:1px solid #efe9de;font-size:12.5px;min-height:44px;align-items:center">
+                        <span style="font-family:'IBM Plex Mono',ui-monospace,monospace;color:#211e1a;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ t.path }}</span>
+                        <span style="text-align:right;font-family:'IBM Plex Mono',ui-monospace,monospace;color:#5d564b">{{ t.views }}</span>
+                        <span style="text-align:right;font-family:'IBM Plex Mono',ui-monospace,monospace;color:#5d564b">{{ t.time }}</span>
+                      </div>
+                    </sc-for>
+                  </section>
+                  <section style="background:#fcfbf7;border:1px solid #e7e0d3;border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:12px">
+                    <div>
+                      <div style="font-size:14.5px;font-weight:600;color:#211e1a">Conversion funnel</div>
+                      <div style="font-size:12px;color:#968d7e;margin-top:2px">Unique visitors by stage</div>
+                    </div>
+                    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:4px 0">
+                      <span style="display:flex;flex-direction:column;align-items:center"><span style="font-size:20px;font-weight:700;color:#211e1a">11.6k</span><span style="font-size:12px;color:#968d7e">Product</span></span>
+                      <span style="font-size:12px;color:#968d7e;white-space:nowrap">21% →</span>
+                      <span style="display:flex;flex-direction:column;align-items:center"><span style="font-size:20px;font-weight:700;color:#211e1a">2.4k</span><span style="font-size:12px;color:#968d7e">Cart</span></span>
+                      <span style="font-size:12px;color:#968d7e;white-space:nowrap">43% →</span>
+                      <span style="display:flex;flex-direction:column;align-items:center"><span style="font-size:20px;font-weight:700;color:#211e1a">1.0k</span><span style="font-size:12px;color:#968d7e">Checkout</span></span>
+                    </div>
+                  </section>
+                  <section style="background:#fcfbf7;border:1px solid #e7e0d3;border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:10px">
+                    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px">
+                      <div>
+                        <div style="font-size:14.5px;font-weight:600;color:#211e1a">AI behavior insight</div>
+                        <div style="font-size:12px;color:#968d7e;margin-top:2px">What your shoppers' time tells us</div>
+                      </div>
+                      <button onClick="{{ analyze }}" style="font-size:13px;font-weight:600;color:#5b54e0;min-height:44px;padding:0 2px">{{ analyzeLabel }}</button>
+                    </div>
+                    <sc-if value="{{ insightIdle }}" hint-placeholder-val="{{ true }}">
+                      <div style="padding:26px 12px;text-align:center;color:#968d7e;font-size:13px">Tap Analyze to turn shopper time-on-page into insights.</div>
+                    </sc-if>
+                    <sc-if value="{{ insightDone }}" hint-placeholder-val="{{ false }}">
+                      <div style="display:flex;flex-direction:column;gap:12px;animation:tf-fade .3s ease">
+                        <p style="font-size:13.5px;color:#211e1a;line-height:1.5">Product pages hold attention but the cart loses three in four visitors — the gap is between add-to-cart and checkout, not discovery.</p>
+                        <sc-for list="{{ insightItems }}" as="it" hint-placeholder-count="3">
+                          <div style="display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:start">
+                            <span style="width:8px;height:8px;margin-top:6px;border-radius:99px;background:{{ it.sev }}"></span>
+                            <span>
+                              <span style="display:block;font-weight:600;color:#211e1a;font-size:13.5px">{{ it.title }}</span>
+                              <span style="display:block;color:#5d564b;font-size:12.5px;line-height:1.45;margin-top:2px">{{ it.detail }}</span>
+                            </span>
+                          </div>
+                        </sc-for>
+                      </div>
+                    </sc-if>
+                  </section>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ onEvents }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;flex-direction:column;gap:13px;padding:0 16px 30px;animation:tf-slide .26s ease">
+                  <button onClick="{{ back }}" style="display:inline-flex;align-items:center;gap:6px;color:#968d7e;font-size:13px;font-weight:500;min-height:44px;margin-left:-4px">{{ icons.arrowLeft16 }}Home</button>
+                  <div>
+                    <div style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#968d7e">Behavior</div>
+                    <h2 style="font-size:26px;font-weight:400;color:#211e1a;margin-top:4px">Events</h2>
+                    <p style="font-size:13px;color:#5d564b;margin-top:6px;line-height:1.45">Custom events your storefront sends with <span style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:12px">testerify.customEvent()</span>.</p>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:9px;background:#fcfbf7;border:1px solid #e7e0d3;border-radius:12px;padding:11px 13px;color:#968d7e;min-height:44px">
+                    {{ icons.search16 }}
+                    <input value="{{ eventQuery }}" onChange="{{ setEventQuery }}" placeholder="Search events" aria-label="Search events" style="flex:1;min-width:0;border:none;background:none;outline:none;font-size:14px;color:#211e1a">
+                  </div>
+                  <section style="background:#fcfbf7;border:1px solid #e7e0d3;border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:2px">
+                    <div style="font-size:14.5px;font-weight:600;color:#211e1a">Custom events</div>
+                    <div style="font-size:12px;color:#968d7e;margin-bottom:6px">Triggers per event — tap a row for the breakdown</div>
+                    <sc-for list="{{ events }}" as="e" hint-placeholder-count="5">
+                      <div style="border-top:1px solid #efe9de;padding:12px 0">
+                        <button onClick="{{ e.toggle }}" style="display:flex;align-items:center;gap:11px;width:100%;min-height:44px">
+                          <span style="color:#968d7e;display:flex;transform:{{ e.chev }};transition:transform .15s ease">{{ icons.chevron14 }}</span>
+                          <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:4px">
+                            <span style="display:flex;align-items:center;gap:7px;flex-wrap:wrap">
+                              <span style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:13px;color:#211e1a">{{ e.name }}</span>
+                              <sc-if value="{{ e.siteWide }}" hint-placeholder-val="{{ false }}">
+                                <span style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:9.5px;letter-spacing:.05em;text-transform:uppercase;color:#968d7e;border:1px solid #e7e0d3;border-radius:6px;padding:2px 6px">site-wide</span>
+                              </sc-if>
+                            </span>
+                            <span style="font-size:11.5px;color:#968d7e">{{ e.visitors }} visitors · {{ e.reach }} of visitors · last {{ e.lastFired }}</span>
+                          </span>
+                          <span style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:14px;font-weight:600;color:#211e1a;flex:0 0 auto">{{ e.total }}</span>
+                        </button>
+                        <sc-if value="{{ e.open }}" hint-placeholder-val="{{ false }}">
+                          <div style="display:flex;flex-direction:column;gap:14px;margin-top:12px;padding:13px;background:#f4f1ea;border:1px solid #e7e0d3;border-radius:12px;animation:tf-fade .25s ease">
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+                              <sc-for list="{{ e.overview }}" as="o" hint-placeholder-count="4">
+                                <span style="display:flex;flex-direction:column;gap:2px">
+                                  <span style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:9.5px;letter-spacing:.07em;text-transform:uppercase;color:#968d7e">{{ o.k }}</span>
+                                  <span style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:14px;font-weight:600;color:#211e1a">{{ o.v }}</span>
+                                </span>
+                              </sc-for>
+                            </div>
+                            <div style="display:flex;flex-direction:column;gap:9px">
+                              <span style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#968d7e">Where it fired</span>
+                              <sc-for list="{{ e.buckets }}" as="b" hint-placeholder-count="3">
+                                <span style="display:flex;flex-direction:column;gap:5px">
+                                  <span style="display:flex;align-items:baseline;justify-content:space-between;gap:10px">
+                                    <span style="font-size:12.5px;color:#211e1a;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ b.label }}</span>
+                                    <span style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:11.5px;color:#968d7e;flex:0 0 auto">{{ b.meta }}</span>
+                                  </span>
+                                  <span style="height:7px;border-radius:99px;background:#e7e0d3;overflow:hidden;display:block"><span style="display:block;height:100%;border-radius:99px;background:{{ b.color }};width:{{ b.width }}"></span></span>
+                                </span>
+                              </sc-for>
+                            </div>
+                            <div style="display:flex;flex-direction:column;gap:8px">
+                              <span style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#968d7e">Recent activity</span>
+                              <sc-for list="{{ e.samples }}" as="sm" hint-placeholder-count="2">
+                                <span style="display:flex;flex-direction:column;gap:5px;padding-top:8px;border-top:1px solid #e7e0d3">
+                                  <span style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+                                    <span style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10.5px;color:#968d7e">{{ sm.when }}</span>
+                                    <sc-for list="{{ sm.chips }}" as="ch" hint-placeholder-count="3">
+                                      <span style="font-size:10.5px;color:#5d564b;background:#ece6da;border-radius:6px;padding:2px 7px">{{ ch }}</span>
+                                    </sc-for>
+                                  </span>
+                                  <span style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:11px;color:#5d564b;overflow-wrap:anywhere">{{ sm.meta }}</span>
+                                </span>
+                              </sc-for>
+                            </div>
+                          </div>
+                        </sc-if>
+                      </div>
+                    </sc-for>
+                  </section>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ onTeam }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;flex-direction:column;gap:13px;padding:0 16px 30px;animation:tf-slide .26s ease">
+                  <button onClick="{{ back }}" style="display:inline-flex;align-items:center;gap:6px;color:#968d7e;font-size:13px;font-weight:500;min-height:44px;margin-left:-4px">{{ icons.arrowLeft16 }}Home</button>
+                  <div>
+                    <div style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#968d7e">Workspace</div>
+                    <h2 style="font-size:26px;font-weight:400;color:#211e1a;margin-top:4px">Team</h2>
+                    <p style="font-size:13px;color:#5d564b;margin-top:6px;line-height:1.45">Invite colleagues into this workspace and manage their access.</p>
+                  </div>
+                  <section style="background:#fcfbf7;border:1px solid #e7e0d3;border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:11px">
+                    <div>
+                      <div style="font-size:15.5px;font-weight:600;color:#211e1a">Invite a colleague</div>
+                      <div style="font-size:12.5px;color:#968d7e;margin-top:3px">They'll get a private link to join Alder &amp; Ash.</div>
+                    </div>
+                    <input placeholder="colleague@company.com" aria-label="Invite email" style="height:46px;border:1px solid #e7e0d3;border-radius:10px;background:#f4f1ea;color:#211e1a;font-size:14px;padding:0 13px">
+                    <div style="display:inline-flex;gap:2px;padding:2px;background:#ece6da;border:1px solid #e7e0d3;border-radius:8px;align-self:flex-start">
+                      <sc-for list="{{ roleOptions }}" as="r" hint-placeholder-count="3">
+                        <button onClick="{{ r.pick }}" style="display:inline-flex;align-items:center;padding:8px 13px;font-size:13px;border-radius:6px;color:{{ r.fg }};background:{{ r.bg }};box-shadow:{{ r.shadow }};min-height:38px">{{ r.label }}</button>
+                      </sc-for>
+                    </div>
+                    <button style="display:inline-flex;align-items:center;justify-content:center;gap:7px;background:#5b54e0;color:#fff;border-radius:11px;padding:13px;font-size:14px;font-weight:600;min-height:48px">{{ icons.send16 }}Create invite</button>
+                    <p style="font-size:12.5px;color:#968d7e;line-height:1.5"><strong style="color:#5d564b;font-weight:600">Member</strong> can create and manage tests. <strong style="color:#5d564b;font-weight:600">Manager</strong> can also invite teammates. <strong style="color:#5d564b;font-weight:600">Admin</strong> can change roles and workspace settings.</p>
+                  </section>
+                  <section style="background:#fcfbf7;border:1px solid #e7e0d3;border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:2px">
+                    <div style="font-size:15.5px;font-weight:600;color:#211e1a">Pending invites</div>
+                    <div style="font-size:12.5px;color:#968d7e;margin-top:3px;margin-bottom:6px">Links waiting to be accepted.</div>
+                    <sc-for list="{{ invites }}" as="i" hint-placeholder-count="2">
+                      <div style="display:flex;flex-direction:column;gap:9px;border-top:1px solid #efe9de;padding:12px 0">
+                        <span style="font-size:14px;font-weight:600;color:#211e1a;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ i.email }}</span>
+                        <span style="display:flex;align-items:center;gap:10px">
+                          <span style="font-size:11.5px;font-weight:600;padding:3px 10px;border-radius:20px;color:{{ i.roleFg }};background:{{ i.roleBg }}">{{ i.role }}</span>
+                          <span style="font-size:12.5px;color:#968d7e">Expires {{ i.expires }}</span>
+                        </span>
+                        <span style="display:flex;gap:8px">
+                          <button style="display:inline-flex;align-items:center;gap:6px;padding:10px 12px;border:1px solid #e7e0d3;border-radius:10px;font-size:13px;font-weight:600;color:#5d564b;min-height:44px">{{ icons.link15 }}Get link</button>
+                          <button style="display:inline-flex;align-items:center;padding:10px 12px;border:1px solid #e7e0d3;border-radius:10px;font-size:13px;font-weight:600;color:#c2553c;min-height:44px">Revoke</button>
+                        </span>
+                      </div>
+                    </sc-for>
+                  </section>
+                  <section style="background:#fcfbf7;border:1px solid #e7e0d3;border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:2px">
+                    <div style="font-size:15.5px;font-weight:600;color:#211e1a">Members</div>
+                    <div style="font-size:12.5px;color:#968d7e;margin-top:3px;margin-bottom:6px">4 people in this workspace.</div>
+                    <sc-for list="{{ members }}" as="m" hint-placeholder-count="4">
+                      <div style="display:flex;align-items:center;gap:11px;border-top:1px solid #efe9de;padding:13px 0;min-height:60px">
+                        <span style="width:36px;height:36px;flex:0 0 auto;border-radius:50%;background:color-mix(in oklab,#5b54e0 11%,#fcfbf7);color:#5b54e0;font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center">{{ m.initial }}</span>
+                        <span style="flex:1;min-width:0">
+                          <span style="display:flex;align-items:center;gap:7px">
+                            <span style="font-size:14.5px;font-weight:600;color:#211e1a">{{ m.name }}</span>
+                            <sc-if value="{{ m.you }}" hint-placeholder-val="{{ false }}">
+                              <span style="font-size:11px;font-weight:600;color:#5b54e0;background:color-mix(in oklab,#5b54e0 11%,#fcfbf7);padding:1px 7px;border-radius:20px">You</span>
+                            </sc-if>
+                          </span>
+                          <span style="display:block;font-size:12.5px;color:#968d7e;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ m.email }}</span>
+                          <span style="display:block;font-size:12px;color:#968d7e;margin-top:3px">{{ m.active }}</span>
+                        </span>
+                        <span style="font-size:11.5px;font-weight:600;padding:3px 10px;border-radius:20px;color:{{ m.roleFg }};background:{{ m.roleBg }};flex:0 0 auto">{{ m.role }}</span>
+                      </div>
+                    </sc-for>
+                  </section>
+                  <section style="background:#fcfbf7;border:1px solid #e7e0d3;border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:14px">
+                    <div>
+                      <div style="font-size:15.5px;font-weight:600;color:#211e1a">Alerts</div>
+                      <div style="font-size:12.5px;color:#968d7e;margin-top:3px;line-height:1.45">Get notified when a test reaches significance, ends, or shows a traffic problem.</div>
+                    </div>
+                    <sc-for list="{{ alertToggles }}" as="t" hint-placeholder-count="2">
+                      <button onClick="{{ t.toggle }}" style="display:flex;align-items:center;justify-content:space-between;gap:14px;min-height:44px;width:100%">
+                        <span style="font-size:14px;color:#211e1a;text-align:left;line-height:1.4">{{ t.label }}</span>
+                        <span style="position:relative;flex:0 0 auto;width:48px;height:28px;border-radius:999px;background:{{ t.bg }};transition:background .18s ease">
+                          <span style="position:absolute;top:3px;left:{{ t.knob }};width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.28);transition:left .18s ease"></span>
+                        </span>
+                      </button>
+                    </sc-for>
+                    <div style="display:flex;flex-direction:column;gap:6px">
+                      <span style="font-size:13px;font-weight:600;color:#211e1a">Slack incoming webhook <span style="font-weight:500;color:#968d7e">· preferred</span></span>
+                      <input value="https://hooks.slack.com/services/T02…" aria-label="Slack webhook" style="height:44px;border:1px solid #e7e0d3;border-radius:10px;background:#f4f1ea;color:#211e1a;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:12.5px;padding:0 12px">
+                    </div>
+                    <p style="font-size:13px;color:#5d564b;background:#ece6da;border-radius:9px;padding:10px 12px;line-height:1.45">Alerts and the weekly digest go to Slack.</p>
+                    <button style="display:inline-flex;align-items:center;justify-content:center;gap:7px;background:#5b54e0;color:#fff;border-radius:11px;padding:13px;font-size:14px;font-weight:600;min-height:48px">{{ icons.check18 }}Save alert settings</button>
+                  </section>
+                </div>
+              </sc-if>
+
+            </div>
+
+            <div style="flex:0 0 auto;position:relative;border-top:1px solid #e7e0d3;background:color-mix(in oklab,#fcfbf7 88%,#f4f1ea);padding:8px 8px 30px;display:flex;align-items:flex-end;gap:2px">
+              <sc-for list="{{ tabsLeft }}" as="tab" hint-placeholder-count="2">
+                <button onClick="{{ tab.go }}" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:7px 0 3px;border-radius:12px;color:{{ tab.color }};min-height:52px">
+                  <span style="display:flex;position:relative">{{ tab.icon }}</span>
+                  <span style="font-size:10.5px;font-weight:600;letter-spacing:.01em">{{ tab.label }}</span>
+                </button>
+              </sc-for>
+
+              <div style="flex:0 0 auto;width:76px;display:flex;flex-direction:column;align-items:center;gap:4px;min-height:52px;padding-top:7px">
+                <span style="height:26px"></span>
+                <span style="font-size:10.5px;font-weight:600;color:{{ copilotTabColor }}">Co-pilot</span>
+              </div>
+
+              <sc-for list="{{ tabsRight }}" as="tab" hint-placeholder-count="2">
+                <button onClick="{{ tab.go }}" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:7px 0 3px;border-radius:12px;color:{{ tab.color }};min-height:52px">
+                  <span style="display:flex;position:relative">{{ tab.icon }}<sc-if value="{{ tab.badge }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;top:-3px;right:-7px;min-width:16px;height:16px;padding:0 4px;border-radius:8px;background:#c2553c;color:#fff;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:9.5px;font-weight:600;display:flex;align-items:center;justify-content:center">{{ tab.badgeCount }}</span></sc-if></span>
+                  <span style="font-size:10.5px;font-weight:600;letter-spacing:.01em">{{ tab.label }}</span>
+                </button>
+              </sc-for>
+
+              <button onClick="{{ openCopilot }}" aria-label="Ask the co-pilot" style="position:absolute;left:50%;bottom:52px;transform:translateX(-50%);width:60px;height:60px;border-radius:50%;background:linear-gradient(150deg,#5b54e0,color-mix(in oklab,#5b54e0 62%,#aab0ff));color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 24px -8px color-mix(in oklab,#5b54e0 60%,transparent),0 0 0 6px #f4f1ea">{{ icons.sparkle26 }}</button>
+            </div>
+          </div>
+
+          <sc-if value="{{ showDetailBar }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute;left:0;right:0;bottom:{{ barBottom }};z-index:30;padding:16px 16px {{ barPadBottom }};background:linear-gradient(180deg,rgba(244,241,234,0),#f4f1ea 38%);display:flex;gap:10px;animation:tf-fade .3s ease">
+              <button onClick="{{ openShip }}" style="flex:1;display:inline-flex;align-items:center;justify-content:center;gap:8px;background:#5b54e0;color:#fff;border-radius:13px;padding:15px;font-size:15px;font-weight:600;min-height:52px;box-shadow:0 8px 20px -8px color-mix(in oklab,#5b54e0 55%,transparent)">{{ icons.flag18 }}Ship variant B</button>
+              <button style="display:inline-flex;align-items:center;justify-content:center;width:52px;height:52px;border-radius:13px;border:1px solid #e7e0d3;background:#fcfbf7;color:#5d564b">{{ icons.pause18 }}</button>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ showRollbackBar }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute;left:0;right:0;bottom:{{ barBottom }};z-index:30;padding:16px 16px {{ barPadBottom }};background:linear-gradient(180deg,rgba(244,241,234,0),#f4f1ea 38%);display:flex;align-items:center;gap:10px;animation:tf-fade .3s ease">
+              <span style="flex:1;display:flex;flex-direction:column">
+                <span style="display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:#211e1a">{{ icons.check14 }}Live for everyone</span>
+                <span style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:11px;color:#968d7e;margin-top:2px">rollback until Aug 24</span>
+              </span>
+              <button onClick="{{ rollback }}" style="display:inline-flex;align-items:center;justify-content:center;border:1px solid #e7e0d3;background:#fcfbf7;border-radius:13px;padding:14px 18px;font-size:14.5px;font-weight:600;color:#5d564b;min-height:52px">Roll back</button>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ moreOpen }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute;inset:0;z-index:70">
+              <button onClick="{{ closeAll }}" style="position:absolute;inset:0;background:rgba(33,30,26,.34);animation:tf-fade .2s ease;width:100%"></button>
+              <div style="position:absolute;left:0;right:0;bottom:0;max-height:74%;background:#f4f1ea;border-top-left-radius:24px;border-top-right-radius:24px;border-top:1px solid #e7e0d3;padding:12px 16px 34px;overflow-y:auto;animation:tf-sheet .28s cubic-bezier(.2,.7,.3,1)">
+                <div style="width:38px;height:4px;border-radius:2px;background:#d4ccbc;margin:0 auto 16px"></div>
+                <div style="font-size:19px;font-weight:600;color:#211e1a;margin-bottom:4px">Everything else</div>
+                <p style="font-size:12.5px;color:#968d7e;margin-bottom:14px">All 16 sidebar pages, adapted for one thumb. Only the heatmap overlay, flow canvas and variant editor stay on desktop.</p>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+                  <sc-for list="{{ moreItems }}" as="m" hint-placeholder-count="12">
+                    <button onClick="{{ m.go }}" style="display:flex;align-items:center;gap:10px;background:#fcfbf7;border:1px solid #e7e0d3;border-radius:14px;padding:14px 13px;min-height:56px">
+                      <span style="width:32px;height:32px;flex:0 0 auto;border-radius:9px;background:color-mix(in oklab,#5b54e0 11%,#fcfbf7);color:#5b54e0;display:flex;align-items:center;justify-content:center">{{ m.icon }}</span>
+                      <span style="font-size:13.5px;font-weight:600;color:#211e1a">{{ m.label }}</span>
+                    </button>
+                  </sc-for>
+                </div>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ copilotOpen }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute;inset:0;z-index:80">
+              <button onClick="{{ closeAll }}" style="position:absolute;inset:0;background:rgba(33,30,26,.34);animation:tf-fade .2s ease;width:100%"></button>
+              <div style="position:absolute;left:0;right:0;bottom:0;max-height:88%;background:#f4f1ea;border-top-left-radius:24px;border-top-right-radius:24px;border-top:1px solid #e7e0d3;padding:12px 16px 34px;overflow-y:auto;animation:tf-sheet .28s cubic-bezier(.2,.7,.3,1);display:flex;flex-direction:column;gap:13px">
+                <div style="width:38px;height:4px;border-radius:2px;background:#d4ccbc;margin:0 auto 6px"></div>
+                <div style="display:flex;align-items:center;gap:9px">
+                  <span style="width:32px;height:32px;border-radius:50%;background:linear-gradient(150deg,#5b54e0,color-mix(in oklab,#5b54e0 55%,#aab0ff));color:#fff;display:flex;align-items:center;justify-content:center">{{ icons.sparkle16 }}</span>
+                  <span style="font-size:15px;font-weight:600;color:#211e1a">Co-pilot</span>
+                  <span style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10.5px;color:#968d7e">{{ copilotStatus }}</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:9px;background:#fcfbf7;border:1px solid #e7e0d3;border-radius:14px;padding:6px 6px 6px 13px">
+                  <span style="flex:1;font-size:14px;color:{{ promptColor }};padding:8px 0">{{ promptText }}</span>
+                  <button onClick="{{ generate }}" style="display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:11px;background:#5b54e0;color:#fff">{{ icons.send16 }}</button>
+                </div>
+                <div style="display:flex;gap:7px;overflow-x:auto;padding-bottom:2px">
+                  <sc-for list="{{ goalChips }}" as="c" hint-placeholder-count="4">
+                    <button onClick="{{ c.pick }}" style="flex:0 0 auto;display:inline-flex;align-items:center;gap:6px;padding:9px 12px;border-radius:10px;border:1px solid #e7e0d3;background:#fcfbf7;color:#5d564b;font-size:12.5px;font-weight:500;min-height:40px"><span style="color:#5b54e0;display:flex">{{ icons.bolt13 }}</span>{{ c.label }}</button>
+                  </sc-for>
+                </div>
+                <div style="font-size:13px;font-weight:600;color:#211e1a;margin-top:2px">{{ ideasHead }}</div>
+                <sc-for list="{{ shownIdeas }}" as="i" hint-placeholder-count="3">
+                  <div style="border:1px solid #e7e0d3;border-radius:15px;padding:15px;background:#fcfbf7;display:flex;flex-direction:column;gap:9px">
+                    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+                      <span style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.05em;text-transform:uppercase;color:#5b54e0;background:color-mix(in oklab,#5b54e0 11%,#fcfbf7);padding:3px 8px;border-radius:6px">{{ i.tag }}</span>
+                      <span style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10.5px;font-weight:500;color:{{ i.impactColor }}">{{ i.impact }} impact</span>
+                    </div>
+                    <div style="font-size:15px;font-weight:600;line-height:1.28;color:#211e1a">{{ i.title }}</div>
+                    <p style="font-size:12.5px;color:#5d564b;line-height:1.45">{{ i.hypothesis }}</p>
+                    <div style="display:flex;gap:8px;margin-top:2px">
+                      <button style="flex:1;display:inline-flex;align-items:center;justify-content:center;gap:6px;background:#5b54e0;color:#fff;border-radius:11px;padding:11px;font-size:13.5px;font-weight:600;min-height:44px">{{ icons.sparkle15 }}Build draft</button>
+                      <button style="width:44px;height:44px;border-radius:11px;border:1px solid #e7e0d3;color:#968d7e;display:inline-flex;align-items:center;justify-content:center">{{ icons.plus16 }}</button>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ shipOpen }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute;inset:0;z-index:90">
+              <button onClick="{{ closeAll }}" style="position:absolute;inset:0;background:rgba(33,30,26,.4);animation:tf-fade .2s ease;width:100%"></button>
+              <div style="position:absolute;left:0;right:0;bottom:0;background:#f4f1ea;border-top-left-radius:24px;border-top-right-radius:24px;border-top:1px solid #e7e0d3;padding:12px 16px 34px;animation:tf-sheet .28s cubic-bezier(.2,.7,.3,1);display:flex;flex-direction:column;gap:13px">
+                <div style="width:38px;height:4px;border-radius:2px;background:#d4ccbc;margin:0 auto 6px"></div>
+                <div style="font-size:21px;font-weight:400;color:#211e1a;line-height:1.2">Ship <em style="font-style:italic;color:#5b54e0">variant B</em> to 100% of traffic?</div>
+                <p style="font-size:13px;color:#5d564b;line-height:1.5">The sticky add-to-cart bar becomes the only version every visitor sees. The test stops collecting and moves to Learnings — you can roll back for 30 days.</p>
+                <div style="background:#fcfbf7;border:1px solid #e7e0d3;border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:9px">
+                  <sc-for list="{{ shipFacts }}" as="f" hint-placeholder-count="3">
+                    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+                      <span style="font-size:12.5px;color:#5d564b">{{ f.label }}</span>
+                      <span style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:13px;font-weight:600;color:{{ f.color }}">{{ f.value }}</span>
+                    </div>
+                  </sc-for>
+                </div>
+                <button onClick="{{ confirmShip }}" style="display:inline-flex;align-items:center;justify-content:center;gap:8px;background:#5b54e0;color:#fff;border-radius:13px;padding:15px;font-size:15px;font-weight:600;min-height:52px">{{ icons.check18 }}Ship it</button>
+                <button onClick="{{ closeAll }}" style="display:inline-flex;align-items:center;justify-content:center;border:1px solid #e7e0d3;border-radius:13px;padding:14px;font-size:14.5px;font-weight:600;color:#5d564b;min-height:48px">Keep testing</button>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ toastOpen }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute;left:16px;right:16px;bottom:104px;z-index:95;display:flex;align-items:center;gap:11px;background:#211e1a;color:#f4f1ea;border-radius:14px;padding:14px 15px;box-shadow:0 14px 34px -12px rgba(33,30,26,.6);animation:tf-fade .24s ease">
+              <span style="color:#7be3a8;display:flex">{{ icons.check18 }}</span>
+              <span style="flex:1;font-size:13.5px;line-height:1.4">Variant B is live for everyone. Rollback stays available for 30 days.</span>
+            </div>
+          </sc-if>
+
+        </div>
+      </x-import>
+
+      <p style="max-width:402px;font-size:12px;color:#7a7264;line-height:1.5">Android: same layout, Material 3 bottom nav (no blurred glass), 16dp sheet corners, and the ship confirmation becomes a full-width dialog.</p>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:12px;max-width:340px">
+      <div style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:#7a7264">What the phone keeps — and drops</div>
+      <sc-for list="{{ notes }}" as="n" hint-placeholder-count="5">
+        <div style="background:#fcfbf7;border:1px solid #e7e0d3;border-radius:15px;padding:15px;display:flex;flex-direction:column;gap:5px">
+          <div style="font-size:13.5px;font-weight:600;color:#211e1a">{{ n.title }}</div>
+          <p style="font-size:12.5px;color:#5d564b;line-height:1.5">{{ n.body }}</p>
+        </div>
+      </sc-for>
+      <div style="background:color-mix(in oklab,#5b54e0 8%,#fcfbf7);border:1px solid color-mix(in oklab,#5b54e0 24%,#e7e0d3);border-radius:15px;padding:15px;display:flex;flex-direction:column;gap:5px">
+        <div style="font-size:13.5px;font-weight:600;color:#211e1a">Try it</div>
+        <p style="font-size:12.5px;color:#5d564b;line-height:1.5">Tap “1 test is ready to ship” → read the verdict → open the daily chart → Ship variant B. Then hit the centre co-pilot button and generate a new idea.</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;accent&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;options&quot;:[&quot;#5b54e0&quot;,&quot;#0d7a6f&quot;,&quot;#211e1a&quot;,&quot;#b9842a&quot;],&quot;default&quot;:&quot;#5b54e0&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Theme&quot;}}">
+const P = {
+  home: '<path d="M4 11.5 12 4l8 7.5"/><path d="M6 10v9.5h12V10"/><path d="M10 19.5V14h4v5.5"/>',
+  beaker: '<path d="M9 3h6"/><path d="M10 3v6L5.5 17a2.2 2.2 0 0 0 2 3.2h9a2.2 2.2 0 0 0 2-3.2L14 9V3"/><path d="M7.5 14h9"/>',
+  bars: '<path d="M5 20V10"/><path d="M12 20V4"/><path d="M19 20v-7"/>',
+  star: '<path d="M12 4l2.4 4.9 5.4.8-3.9 3.8.9 5.4-4.8-2.5-4.8 2.5.9-5.4L4.2 9.7l5.4-.8z"/>',
+  sparkle: '<path d="M12 3l1.6 5.4L19 10l-5.4 1.6L12 17l-1.6-5.4L5 10l5.4-1.6z"/><path d="M18.5 15.5l.7 2 2 .7-2 .7-.7 2-.7-2-2-.7 2-.7z"/>',
+  arrowUp: '<path d="M12 19V5"/><path d="M6 11l6-6 6 6"/>',
+  arrowLeft: '<path d="M19 12H5"/><path d="M11 6l-6 6 6 6"/>',
+  trendUp: '<path d="M4 16l5-5 3 3 7-7"/><path d="M16 7h4v4"/>',
+  users: '<path d="M16 19v-1.5a3.5 3.5 0 0 0-3.5-3.5h-5A3.5 3.5 0 0 0 4 17.5V19"/><circle cx="10" cy="8" r="3.2"/><path d="M19.5 19v-1.4a3.5 3.5 0 0 0-2.6-3.4M15.5 5.2a3.2 3.2 0 0 1 0 5.6"/>',
+  target: '<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="0.6" fill="currentColor"/>',
+  dollar: '<path d="M12 3v18"/><path d="M16 7.5C16 5.6 14.2 4.5 12 4.5S8 5.6 8 7.5 9.8 10 12 10.5s4 1.2 4 3.2-1.8 3-4 3-4-1.1-4-3"/>',
+  bolt: '<path d="M13 3 5 13h6l-1 8 8-10h-6z"/>',
+  check: '<path d="M5 12.5l4.5 4.5L19 7"/>',
+  plus: '<path d="M12 5v14M5 12h14"/>',
+  play: '<path d="M7 5.5v13l11-6.5z" fill="currentColor" stroke="none"/>',
+  pause: '<path d="M9 5v14M15 5v14"/>',
+  flag: '<path d="M6 21V4"/><path d="M6 5h11l-2 3.5L17 12H6"/>',
+  clock: '<circle cx="12" cy="12" r="8"/><path d="M12 8v4.5l3 1.8"/>',
+  chevron: '<path d="M9 6l6 6-6 6"/>',
+  layers: '<path d="M12 4l8 4-8 4-8-4z"/><path d="M4 12l8 4 8-4"/>',
+  link: '<path d="M10 14a5 5 0 0 0 7 0l2.5-2.5a5 5 0 0 0-7-7L11 6"/><path d="M14 10a5 5 0 0 0-7 0l-2.5 2.5a5 5 0 0 0 7 7L13 18"/>',
+  flow: '<circle cx="6" cy="6" r="2.4"/><circle cx="18" cy="12" r="2.4"/><circle cx="6" cy="18" r="2.4"/><path d="M8.1 7.2 15.6 11M15.7 13.2 8.1 16.9"/>',
+  megaphone: '<path d="M3.5 10.5v3a1.5 1.5 0 0 0 1.5 1.5h2.5l8 4V5l-8 4H5a1.5 1.5 0 0 0-1.5 1.5z"/><path d="M18.5 9.5a3.6 3.6 0 0 1 0 5"/><path d="M8.2 15.3l1.1 4.2h2.6l-1-4"/>',
+  globe: '<circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17"/><path d="M12 3.5c2.5 2.3 4 5.3 4 8.5s-1.5 6.2-4 8.5c-2.5-2.3-4-5.3-4-8.5s1.5-6.2 4-8.5z"/>',
+  x: '<path d="M6 6l12 12M18 6 6 18"/>',
+  warning: '<path d="M10.3 4.3 2.6 17.7A2 2 0 0 0 4.3 20.7h15.4a2 2 0 0 0 1.7-3L13.7 4.3a2 2 0 0 0-3.4 0z"/><path d="M12 9.5v4"/><circle cx="12" cy="16.8" r="0.7" fill="currentColor"/>',
+  search: '<circle cx="11" cy="11" r="6"/><path d="M20 20l-3.5-3.5"/>',
+  trash: '<path d="M5 7h14"/><path d="M9 7V5h6v2"/><path d="M7 7l1 12.5h8L17 7"/>',
+  edit: '<path d="M4 20h4L18.5 9.5a2 2 0 0 0-2.8-2.8L5 17.2z"/><path d="M14 8l2 2"/>',
+  info: '<circle cx="12" cy="12" r="8"/><path d="M12 11v5"/><circle cx="12" cy="8" r="0.7" fill="currentColor"/>',
+  logout: '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/>',
+  settings: '<circle cx="12" cy="12" r="3.1"/><path d="M19.4 13.5a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-1.8-.3 1.6 1.6 0 0 0-1 1.5V21a2 2 0 0 1-4 0v-.1a1.6 1.6 0 0 0-1-1.5 1.6 1.6 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.6 1.6 0 0 0 .3-1.8 1.6 1.6 0 0 0-1.5-1H3a2 2 0 0 1 0-4h.1a1.6 1.6 0 0 0 1.5-1 1.6 1.6 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.6 1.6 0 0 0 1.8.3H9a1.6 1.6 0 0 0 1-1.5V3a2 2 0 0 1 4 0v.1a1.6 1.6 0 0 0 1 1.5 1.6 1.6 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0-.3 1.8V9a1.6 1.6 0 0 0 1.5 1H21a2 2 0 0 1 0 4h-.1a1.6 1.6 0 0 0-1.5 1z"/>',
+  menu: '<path d="M4 7h16M4 12h16M4 17h16"/>',
+  bell: '<path d="M18 15.5V11a6 6 0 1 0-12 0v4.5L4.5 18h15z"/><path d="M10 18.5a2 2 0 0 0 4 0"/>',
+  phone: '<rect x="7" y="3" width="10" height="18" rx="2.4"/><path d="M11 18.5h2"/>',
+  monitor: '<rect x="3" y="5" width="18" height="12" rx="2"/><path d="M9 21h6M12 17v4"/>',
+  mail: '<rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3.5 7l8.5 6 8.5-6"/>',
+};
+
+function ic(name, size, color, extra) {
+  return React.createElement('svg', Object.assign({
+    width: size, height: size, viewBox: '0 0 24 24', fill: 'none',
+    stroke: 'currentColor', strokeWidth: 1.6, strokeLinecap: 'round', strokeLinejoin: 'round',
+    style: Object.assign({ display: 'block', flex: '0 0 auto' }, color ? { color } : {}),
+    dangerouslySetInnerHTML: { __html: P[name] || '' },
+  }, extra || {}));
+}
+
+function smoothPath(pts) {
+  if (pts.length < 2) return '';
+  let d = 'M ' + pts[0].x + ' ' + pts[0].y;
+  for (let i = 0; i < pts.length - 1; i++) {
+    const p0 = pts[i - 1] || pts[i], p1 = pts[i], p2 = pts[i + 1], p3 = pts[i + 2] || p2;
+    d += ' C ' + (p1.x + (p2.x - p0.x) / 6) + ' ' + (p1.y + (p2.y - p0.y) / 6) + ', ' +
+      (p2.x - (p3.x - p1.x) / 6) + ' ' + (p2.y - (p3.y - p1.y) / 6) + ', ' + p2.x + ' ' + p2.y;
+  }
+  return d;
+}
+
+const A_SERIES = [3.9, 4.1, 4.0, 4.3, 4.2, 4.4, 4.3, 4.2, 4.3];
+const B_SERIES = [4.0, 4.3, 4.5, 4.6, 4.7, 4.6, 4.8, 4.9, 4.9];
+const DAY_LABELS = ['Jul 17', 'Jul 19', 'Jul 21', 'Jul 23', 'Jul 25'];
+
+function detailChart() {
+  const W = 306, H = 176, pad = { l: 26, r: 6, t: 12, b: 24 };
+  const iw = W - pad.l - pad.r, ih = H - pad.t - pad.b;
+  const lo = 3.4, hi = 5.4, n = A_SERIES.length;
+  const xAt = (i) => pad.l + (i / (n - 1)) * iw;
+  const yAt = (v) => pad.t + ih - ((v - lo) / (hi - lo)) * ih;
+  const grid = [];
+  for (let i = 0; i <= 4; i++) {
+    const v = lo + ((hi - lo) / 4) * i;
+    grid.push(React.createElement('g', { key: 'g' + i },
+      React.createElement('line', { x1: pad.l, x2: pad.l + iw, y1: yAt(v), y2: yAt(v), stroke: '#e7e0d3', strokeDasharray: i === 0 ? '0' : '2 5' }),
+      React.createElement('text', { x: pad.l - 6, y: yAt(v) + 3.5, textAnchor: 'end', fontSize: 9, fill: '#968d7e', fontFamily: 'IBM Plex Mono, monospace' }, v.toFixed(1))));
+  }
+  const xl = DAY_LABELS.map((label, k) => React.createElement('text', {
+    key: 'x' + k, x: xAt(k * 2), y: H - 6, textAnchor: 'middle', fontSize: 9, fill: '#968d7e', fontFamily: 'IBM Plex Mono, monospace',
+  }, label));
+  const pathOf = (s) => smoothPath(s.map((v, i) => ({ x: xAt(i), y: yAt(v) })));
+  const bLine = pathOf(B_SERIES);
+  return React.createElement('svg', { width: '100%', height: H, viewBox: '0 0 ' + W + ' ' + H, style: { display: 'block' } },
+    grid, xl,
+    React.createElement('defs', null,
+      React.createElement('linearGradient', { id: 'mb-b', x1: 0, y1: 0, x2: 0, y2: 1 },
+        React.createElement('stop', { offset: '0%', stopColor: '#5b54e0', stopOpacity: 0.18 }),
+        React.createElement('stop', { offset: '100%', stopColor: '#5b54e0', stopOpacity: 0 }))),
+    React.createElement('path', { d: bLine + ' L ' + xAt(n - 1) + ' ' + (pad.t + ih) + ' L ' + xAt(0) + ' ' + (pad.t + ih) + ' Z', fill: 'url(#mb-b)' }),
+    React.createElement('path', { d: pathOf(A_SERIES), fill: 'none', stroke: '#968d7e', strokeWidth: 2, strokeDasharray: '4 4', strokeLinecap: 'round' }),
+    React.createElement('path', { d: bLine, fill: 'none', stroke: '#5b54e0', strokeWidth: 2.4, strokeLinecap: 'round' }),
+    React.createElement('circle', { cx: xAt(n - 1), cy: yAt(B_SERIES[n - 1]), r: 4, fill: '#5b54e0', stroke: '#fcfbf7', strokeWidth: 2 }));
+}
+
+// Sparkline — same construction as Sparkline.vue (smoothed line + soft fill).
+let sparkId = 0;
+function spark(data, color, w, h) {
+  const max = Math.max.apply(null, data), min = Math.min.apply(null, data), rng = (max - min) || 1;
+  const line = smoothPath(data.map((v, i) => ({ x: (i / (data.length - 1)) * w, y: h - 4 - ((v - min) / rng) * (h - 8) })));
+  const id = 'msp-' + (++sparkId);
+  return React.createElement('svg', { width: '100%', height: h, viewBox: '0 0 ' + w + ' ' + h, preserveAspectRatio: 'none', style: { display: 'block' } },
+    React.createElement('defs', null,
+      React.createElement('linearGradient', { id, x1: 0, y1: 0, x2: 0, y2: 1 },
+        React.createElement('stop', { offset: '0%', stopColor: color, stopOpacity: 0.2 }),
+        React.createElement('stop', { offset: '100%', stopColor: color, stopOpacity: 0 }))),
+    React.createElement('path', { d: line + ' L ' + w + ' ' + h + ' L 0 ' + h + ' Z', fill: 'url(#' + id + ')' }),
+    React.createElement('path', { d: line, fill: 'none', stroke: color, strokeWidth: 2, strokeLinecap: 'round' }));
+}
+
+// Win-rate ring — same read as Ring.vue on the desktop Analytics page.
+function ring(value, color) {
+  const size = 118, sw = 11, r = (size - sw) / 2, c = 2 * Math.PI * r;
+  return React.createElement('svg', { width: size, height: size, style: { display: 'block', flex: '0 0 auto' } },
+    React.createElement('circle', { cx: size / 2, cy: size / 2, r, fill: 'none', stroke: '#e7e0d3', strokeWidth: sw }),
+    React.createElement('circle', {
+      cx: size / 2, cy: size / 2, r, fill: 'none', stroke: color, strokeWidth: sw, strokeLinecap: 'round',
+      strokeDasharray: c, strokeDashoffset: c * (1 - value / 100),
+      transform: 'rotate(-90 ' + size / 2 + ' ' + size / 2 + ')',
+    }),
+    React.createElement('text', { x: size / 2, y: size / 2 + 4, textAnchor: 'middle', fontSize: 30, fill: '#211e1a', fontFamily: 'Instrument Sans, sans-serif' }, value + '%'),
+    React.createElement('text', { x: size / 2, y: size / 2 + 24, textAnchor: 'middle', fontSize: 9, fill: '#968d7e', fontFamily: 'IBM Plex Mono, monospace', letterSpacing: 1.2 }, 'WIN RATE'));
+}
+
+const ACCENT = '#5b54e0';
+const SOFT = 'color-mix(in oklab, #5b54e0 11%, #fcfbf7)';
+const POS = '#2f8f5b';
+const POS_SOFT = 'color-mix(in oklab, #2f8f5b 13%, #fcfbf7)';
+
+const TESTS = [
+  { id: 't1', name: 'PDP: sticky add-to-cart on mobile', subtitle: 'Product pages · mobile only · started Jul 16', goal: 'Add to cart · 12.5k visitors', status: 'Running', rate: '4.9', conf: '97%', confPct: 97, uplift: '14.2%', up: true, verdict: 'Ship it', meta: '12.5k · 9d' },
+  { id: 't2', name: 'Free shipping bar above the fold', subtitle: 'All pages · started Jul 12', goal: 'Purchase · 8.9k visitors', status: 'Running', rate: '3.4', conf: '71%', confPct: 71, uplift: '2.1%', up: true, verdict: 'Collecting', meta: '8.9k · 13d' },
+  { id: 't3', name: 'Collection grid: 2-up on mobile', subtitle: 'Collection pages · mobile · started Jul 19', goal: 'Add to cart · 6.1k visitors', status: 'Running', rate: '2.8', conf: '38%', confPct: 38, uplift: '1.4%', up: false, verdict: 'Collecting', meta: '6.1k · 6d' },
+  { id: 't4', name: 'Checkout: trust badges near pay', subtitle: 'Checkout · started Jul 21', goal: 'Purchase · 4.3k visitors', status: 'Running', rate: '5.6', conf: '84%', confPct: 84, uplift: '8.9%', up: true, verdict: 'Collecting', meta: '4.3k · 4d' },
+  { id: 't5', name: 'Bundle upsell in the cart drawer', subtitle: 'Cart · draft', goal: 'Draft · not launched', status: 'Draft', rate: '—', conf: '—', confPct: 0, uplift: '', up: true, verdict: 'Draft', meta: 'draft' },
+  { id: 't6', name: 'Single-column checkout form', subtitle: 'Checkout · shipped Jul 8', goal: 'Purchase · 21.4k visitors', status: 'Rolled out', rate: '6.2', conf: '99%', confPct: 99, uplift: '11.5%', up: true, verdict: 'Shipped', meta: 'shipped' },
+];
+
+const IDEAS = [
+  { tag: 'Product · Add-to-cart', impact: 'high', impactColor: POS, title: 'Make the add-to-cart button sticky on mobile', hypothesis: 'The button scrolls out of view after 380px — 68% of mobile sessions never see it again.' },
+  { tag: 'Cart · Shipping note', impact: 'medium', impactColor: '#b9842a', title: 'Show the free-shipping threshold in the cart', hypothesis: 'Average cart is $52, free shipping starts at $65. Naming the gap lifts AOV.' },
+  { tag: 'Collection · Filters', impact: 'medium', impactColor: '#b9842a', title: 'Move filters above the product grid', hypothesis: 'Only 4% open the filter drawer, yet filtered sessions convert 2.3× better.' },
+];
+
+// Concluded tests, newest first — the archive behind the Learnings screen.
+// `won` mirrors LearningsPage.vue's outcome(): a challenger promoted on a
+// winning verdict. Everything else reads as "No winner".
+const LEARNINGS = [
+  {
+    name: 'Single-column checkout form', kind: 'A/B', won: true, outcome: 'Won +11.5% · 99% conf.',
+    meta: [{ k: 'Runs on', v: '/checkout' }, { k: 'Visitors tested', v: '21.4k' }, { k: 'Started', v: 'Jun 24, 2026' }, { k: 'Concluded', v: 'Jul 8, 2026' }],
+    note: 'Every field removed from the payment step paid for itself. Next: try the same trim on the address step.',
+  },
+  {
+    name: 'Hero image: lifestyle vs product-only', kind: 'A/B', won: false, outcome: 'No winner',
+    meta: [{ k: 'Runs on', v: 'Home' }, { k: 'Visitors tested', v: '14.9k' }, { k: 'Started', v: 'Jun 10, 2026' }, { k: 'Concluded', v: 'Jun 30, 2026' }],
+    note: 'Tap to add what you learned…',
+  },
+  {
+    name: 'Cart drawer: free-shipping meter', kind: 'Nudge', won: true, outcome: 'Won +6.8% · 96% conf.',
+    meta: [{ k: 'Runs on', v: 'Cart' }, { k: 'Visitors tested', v: '9.2k' }, { k: 'Started', v: 'May 28, 2026' }, { k: 'Concluded', v: 'Jun 16, 2026' }],
+    note: 'Naming the gap to free shipping raised AOV, not just conversion. Worth testing the threshold itself next.',
+  },
+  {
+    name: 'PDP: reviews above the fold', kind: 'A/B', won: true, outcome: 'Won +5.2% · 97% conf.',
+    meta: [{ k: 'Runs on', v: 'Product' }, { k: 'Visitors tested', v: '18.7k' }, { k: 'Started', v: 'May 12, 2026' }, { k: 'Concluded', v: 'Jun 2, 2026' }],
+    note: 'Social proof beats spec detail on candles. Reviews earn their place high on every product page.',
+  },
+  {
+    name: 'Collection: 3-up vs 4-up grid', kind: 'A/B', won: false, outcome: 'No winner',
+    meta: [{ k: 'Runs on', v: 'Collection' }, { k: 'Visitors tested', v: '11.3k' }, { k: 'Started', v: 'Apr 28, 2026' }, { k: 'Concluded', v: 'May 18, 2026' }],
+    note: 'Density made no measurable difference on desktop. Retest on mobile only.',
+  },
+  {
+    name: 'Exit offer: 10% vs free shipping', kind: 'Offer', won: true, outcome: 'Won +3.9% · 96% conf.',
+    meta: [{ k: 'Runs on', v: 'All pages' }, { k: 'Visitors tested', v: '26.1k' }, { k: 'Started', v: 'Apr 6, 2026' }, { k: 'Concluded', v: 'Apr 27, 2026' }],
+    note: 'Free shipping outperformed the discount at a lower margin cost — keep discounts for winbacks only.',
+  },
+].map((l) => Object.assign({}, l, {
+  outcomeFg: l.won ? '#2f8f5b' : '#968d7e',
+  outcomeBg: l.won ? 'color-mix(in oklab, #2f8f5b 13%, #fcfbf7)' : '#ece6da',
+  outcomeIcon: l.won ? ic('check', 13) : null,
+  noteColor: l.note.startsWith('Tap to add') ? '#968d7e' : '#211e1a',
+}));
+
+// UTM breakdown per dimension (UtmTrackingPage.vue / UtmBreakdownTable).
+const UTM_ROWS = {
+  source: [
+    { value: 'instagram', visits: '5.1k', share: '41%' },
+    { value: 'google', visits: '3.2k', share: '26%' },
+    { value: 'klaviyo', visits: '1.9k', share: '15%' },
+    { value: 'tiktok', visits: '1.2k', share: '10%' },
+    { value: 'pinterest', visits: '620', share: '5%' },
+  ],
+  medium: [
+    { value: 'social', visits: '6.3k', share: '51%' },
+    { value: 'cpc', visits: '3.4k', share: '27%' },
+    { value: 'email', visits: '1.9k', share: '15%' },
+    { value: 'referral', visits: '480', share: '4%' },
+  ],
+  campaign: [
+    { value: 'summer-sale', visits: '4.6k', share: '37%' },
+    { value: 'candle-launch', visits: '3.1k', share: '25%' },
+    { value: 'welcome-flow', visits: '1.8k', share: '15%' },
+    { value: 'retargeting-jul', visits: '1.1k', share: '9%' },
+  ],
+};
+
+// Product analytics rows (ProductsPage.vue: views, add rate, conv rate, revenue;
+// `leaky` = above-median views with below-median conversion).
+const PRODUCTS = [
+  { title: 'Cedar Wick Candle', leaky: false, cells: [['views', '9.4k'], ['add', '11.2%'], ['conv', '4.1%'], ['rev', '$38.6k']] },
+  { title: 'Alder Wool Throw', leaky: true, cells: [['views', '7.1k'], ['add', '5.8%'], ['conv', '1.4%'], ['rev', '$12.2k']] },
+  { title: 'Stoneware Mug Set', leaky: false, cells: [['views', '5.6k'], ['add', '9.1%'], ['conv', '3.3%'], ['rev', '$19.8k']] },
+  { title: 'Linen Table Runner', leaky: true, cells: [['views', '4.8k'], ['add', '4.2%'], ['conv', '1.1%'], ['rev', '$6.4k']] },
+  { title: 'Brass Wick Trimmer', leaky: false, cells: [['views', '2.3k'], ['add', '13.6%'], ['conv', '5.2%'], ['rev', '$9.1k']] },
+].map((p) => Object.assign({}, p, { cells: p.cells.map(([k, v]) => ({ k, v })) }));
+
+// Replay sessions (ReplaySessionsPage.vue: entry path, device · pages · events,
+// trigger chip, duration, relative time).
+const REPLAYS = [
+  { path: '/products/cedar-wick-candle', meta: 'Mobile · 3 pages · 48 events', kind: 'rage', trigger: 'Rage', duration: '2m 14s', when: '18 mins ago' },
+  { path: '/cart', meta: 'Mobile · 2 pages · 31 events', kind: 'dead', trigger: 'Dead click', duration: '1m 02s', when: '1 hour ago' },
+  { path: '/checkout', meta: 'Desktop · 4 pages · 76 events', kind: 'rage', trigger: 'Rage', duration: '3m 41s', when: '3 hours ago' },
+  { path: '/collections/home', meta: 'Mobile · 5 pages · 62 events', kind: 'dead', trigger: 'Dead click', duration: '2m 27s', when: 'Yesterday' },
+  { path: '/products/alder-wool-throw', meta: 'Tablet · 2 pages · 22 events', kind: 'rage', trigger: 'Rage', duration: '54s', when: 'Yesterday' },
+].map((r) => Object.assign({}, r, {
+  trigFg: r.kind === 'rage' ? '#c2362b' : '#b97207',
+  trigBg: r.kind === 'rage' ? 'rgba(194,54,43,0.12)' : 'rgba(217,119,6,0.12)',
+}));
+
+// Role pills (TeamPage.vue .role-pill): admin = accent, manager = amber, member = neutral.
+function roleStyle(role) {
+  if (role === 'Admin') return { roleFg: '#5b54e0', roleBg: 'color-mix(in oklab, #5b54e0 11%, #fcfbf7)' };
+  if (role === 'Manager') return { roleFg: '#8a5a00', roleBg: 'rgba(217,154,0,0.14)' };
+  return { roleFg: '#5d564b', roleBg: '#ece6da' };
+}
+
+// Custom events (CustomEventsPage.vue: totals, visitor reach, site-wide tag,
+// per-test buckets with variants, recent samples with metadata).
+const EVENTS = [
+  {
+    name: 'size_guide_opened', total: '4.2k', visitors: '3.1k', reach: '16%', lastFired: 'Jul 25', siteWide: true,
+    overview: [['Triggers', '4.2k'], ['Unique visitors', '3.1k'], ['Triggers / visitor', '1.35'], ['Visitor reach', '16%'], ['Tests', '2'], ['First seen', 'May 4']],
+    buckets: [
+      { label: 'PDP: sticky add-to-cart', meta: '2.1k · 1.6k visitors', width: '100%' },
+      { label: 'Variation 1 (sticky bar)', meta: '1.2k · 890 visitors', width: '57%', soft: true },
+      { label: 'Control', meta: '0.9k · 710 visitors', width: '43%', soft: true },
+      { label: 'site-wide', meta: '2.1k · 1.5k visitors', width: '98%', soft: true },
+    ],
+    samples: [
+      { when: 'Jul 25', chips: ['mobile', 'US', 'in test'], meta: '{"product":"alder-wool-throw","tab":"fit"}' },
+      { when: 'Jul 25', chips: ['desktop', 'DE', 'site-wide'], meta: '{"product":"cedar-wick-candle","tab":"care"}' },
+    ],
+  },
+  {
+    name: 'review_carousel_swiped', total: '3.6k', visitors: '2.4k', reach: '13%', lastFired: 'Jul 25', siteWide: false,
+    overview: [['Triggers', '3.6k'], ['Unique visitors', '2.4k'], ['Triggers / visitor', '1.50'], ['Visitor reach', '13%'], ['Tests', '1'], ['First seen', 'Jun 2']],
+    buckets: [
+      { label: 'PDP: reviews above the fold', meta: '3.6k · 2.4k visitors', width: '100%' },
+      { label: 'Variation 1', meta: '2.2k · 1.4k visitors', width: '61%', soft: true },
+      { label: 'Control', meta: '1.4k · 1.0k visitors', width: '39%', soft: true },
+    ],
+    samples: [{ when: 'Jul 25', chips: ['mobile', 'UK', 'in test'], meta: '{"index":3,"direction":"left"}' }],
+  },
+  {
+    name: 'shipping_estimate_checked', total: '2.8k', visitors: '2.2k', reach: '12%', lastFired: 'Jul 24', siteWide: true,
+    overview: [['Triggers', '2.8k'], ['Unique visitors', '2.2k'], ['Triggers / visitor', '1.27'], ['Visitor reach', '12%'], ['Tests', '1'], ['First seen', 'Apr 19']],
+    buckets: [
+      { label: 'Free shipping bar', meta: '1.6k · 1.3k visitors', width: '100%' },
+      { label: 'site-wide', meta: '1.2k · 0.9k visitors', width: '75%', soft: true },
+    ],
+    samples: [{ when: 'Jul 24', chips: ['mobile', 'CA', 'site-wide'], meta: '{"zip":"M5V","result":"2-4 days"}' }],
+  },
+  {
+    name: 'gift_note_added', total: '910', visitors: '780', reach: '4%', lastFired: 'Jul 23', siteWide: false,
+    overview: [['Triggers', '910'], ['Unique visitors', '780'], ['Triggers / visitor', '1.17'], ['Visitor reach', '4%'], ['Tests', '1'], ['First seen', 'Jun 28']],
+    buckets: [{ label: 'Bundle upsell in the cart drawer', meta: '910 · 780 visitors', width: '100%' }],
+    samples: [{ when: 'Jul 23', chips: ['desktop', 'US', 'in test'], meta: '{"chars":48}' }],
+  },
+  {
+    name: 'search_no_results', total: '640', visitors: '590', reach: '3%', lastFired: 'Jul 25', siteWide: true,
+    overview: [['Triggers', '640'], ['Unique visitors', '590'], ['Triggers / visitor', '1.08'], ['Visitor reach', '3%'], ['Tests', '0'], ['First seen', 'Mar 11']],
+    buckets: [{ label: 'site-wide', meta: '640 · 590 visitors', width: '100%', soft: true }],
+    samples: [{ when: 'Jul 25', chips: ['mobile', 'AU', 'site-wide'], meta: '{"query":"beeswax taper"}' }],
+  },
+].map((e) => Object.assign({}, e, { overview: e.overview.map(([k, v]) => ({ k, v })) }));
+
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = {
+      screen: 'home', sheet: null,
+      selected: 't1', filter: 'all', learningFilter: 'all', chartOpen: false,
+      phase: 'idle', prompt: '', shipped: false, toast: false,
+    };
+  }
+
+  go(screen) { this.setState({ screen, sheet: null, drawer: false, chartOpen: false }); }
+  openDetail(id) { this.setState({ screen: 'detail', selected: id, sheet: null, drawer: false, chartOpen: false }); }
+
+  generate(goal) {
+    this.setState({ phase: 'loading', prompt: goal || this.state.prompt });
+    clearTimeout(this._t);
+    this._t = setTimeout(() => this.setState({ phase: 'done' }), 900);
+  }
+
+  confirmShip() {
+    this.setState({ sheet: null, shipped: true, toast: true });
+    clearTimeout(this._tt);
+    this._tt = setTimeout(() => this.setState({ toast: false }), 4200);
+  }
+
+  componentWillUnmount() { clearTimeout(this._t); clearTimeout(this._tt); }
+
+  renderVals() {
+    const s = this.state;
+    const accent = this.props.accent || ACCENT;
+
+    // One nav: Home · Tests · [co-pilot] · Alerts · More. The centre slot is a
+    // raised button, so the tabs are split into two groups around it.
+    const tabOf = ([key, label, icon]) => {
+      const on = key === 'more' ? s.sheet === 'more' : (s.screen === key || (key === 'tests' && s.screen === 'detail'));
+      return {
+        label, badge: key === 'alerts', badgeCount: '3',
+        color: on ? accent : '#968d7e',
+        icon: ic(icon, 23),
+        go: key === 'more' ? () => this.setState({ sheet: 'more' }) : () => this.go(key),
+      };
+    };
+    const tabsLeft = [['home', 'Home', 'home'], ['tests', 'Tests', 'beaker']].map(tabOf);
+    const tabsRight = [['alerts', 'Alerts', 'bell'], ['more', 'More', 'layers']].map(tabOf);
+
+    // A shipped winner rewrites t1 everywhere: status, verdict, rate and the
+    // filter counts — the phone is the surface the merchant ships from, so the
+    // outcome has to be visible after the toast is gone.
+    const tests = TESTS.map((t) => (t.id === 't1' && s.shipped)
+      ? Object.assign({}, t, {
+          status: 'Rolled out', verdict: 'Shipped', conf: '97%', confPct: 97,
+          subtitle: 'Product pages · mobile only · shipped today',
+          goal: 'Add to cart · 12.5k visitors · 100% of traffic',
+          meta: '100% traffic',
+        })
+      : t);
+    const nRunning = tests.filter((t) => t.status === 'Running').length;
+    const nShipped = tests.filter((t) => t.status === 'Rolled out').length + 2;
+    const filterDef = [
+      ['all', 'All', '12'],
+      ['running', 'Running', String(nRunning)],
+      ['draft', 'Draft', '5'],
+      ['done', 'Shipped', String(nShipped)],
+    ];
+    const statusStyle = (st) => st === 'Running'
+      ? { statusFg: POS, statusBg: POS_SOFT, statusDot: React.createElement('span', { style: { width: 6, height: 6, borderRadius: '50%', background: POS, animation: 'tf-pulse 2.2s infinite' } }) }
+      : st === 'Draft'
+        ? { statusFg: '#5d564b', statusBg: '#ece6da', statusDot: null }
+        : { statusFg: accent, statusBg: SOFT, statusDot: null };
+
+    const rowOf = (t) => Object.assign({}, t, statusStyle(t.status), {
+      open: () => this.openDetail(t.id),
+      confWidth: t.confPct + '%',
+      confColor: t.confPct >= 95 ? POS : t.confPct >= 70 ? '#b9842a' : '#968d7e',
+      upliftColor: t.up ? POS : '#c2553c',
+      upliftIcon: t.uplift ? ic('arrowUp', 12, null, t.up ? {} : { style: { display: 'block', transform: 'rotate(180deg)' } }) : null,
+      verdictFg: t.verdict === 'Ship it' ? POS : t.verdict === 'Shipped' ? accent : '#5d564b',
+      verdictBg: t.verdict === 'Ship it' ? POS_SOFT : t.verdict === 'Shipped' ? SOFT : '#ece6da',
+      verdictIcon: t.verdict === 'Ship it' ? ic('check', 12) : t.verdict === 'Collecting' ? ic('clock', 12) : null,
+    });
+
+    const filtered = tests.filter((t) => s.filter === 'all'
+      || (s.filter === 'running' && t.status === 'Running')
+      || (s.filter === 'draft' && t.status === 'Draft')
+      || (s.filter === 'done' && t.status === 'Rolled out'));
+
+    const sel = tests.find((t) => t.id === s.selected) || tests[0];
+
+    // Learnings: outcome filter + free-text search over name and note.
+    const lq = (s.learningQuery || '').trim().toLowerCase();
+    const lf = s.learningFilter || 'all';
+    const learningRows = LEARNINGS.filter((l) => {
+      if (lf === 'won' && !l.won) return false;
+      if (lf === 'nowinner' && l.won) return false;
+      return !lq || (l.name + ' ' + l.note).toLowerCase().includes(lq);
+    });
+
+    const moreDef = [['Learnings', 'flag'], ['Nudges', 'megaphone'], ['Flows', 'flow'], ['Audiences', 'users'], ['Analytics', 'bars'], ['Products', 'dollar'], ['Events', 'bolt'], ['Heatmaps', 'target'], ['Replays', 'play'], ['Tracking', 'link'], ['Funnel', 'trendUp'], ['Pages', 'layers'], ['Favorites', 'star'], ['Live', 'globe'], ['Team', 'users'], ['Settings', 'settings']];
+
+    return {
+      icons: {
+        sparkle15: ic('sparkle', 15), sparkle16: ic('sparkle', 16), sparkle17: ic('sparkle', 17), sparkle24: ic('sparkle', 24),
+        send16: ic('send', 16), plus16: ic('plus', 16), chevron18: ic('chevron', 18), arrowLeft16: ic('arrowLeft', 16),
+        flag18: ic('flag', 18), flag20: ic('flag', 20), pause18: ic('pause', 18), check14: ic('check', 14), check18: ic('check', 18),
+        bolt13: ic('bolt', 13), sparkle26: ic('sparkle', 26), search16: ic('search', 16), warning13: ic('warning', 13),
+        flow18: ic('flow', 18), beaker14: ic('beaker', 14), trash16: ic('trash', 16), play15: ic('play', 15), starFill16: ic('star', 16, null, { fill: 'currentColor', stroke: 'none' }),
+        sparkle13: ic('sparkle', 13), sparkle14: ic('sparkle', 14), users18: ic('users', 18), edit16: ic('edit', 16), info14: ic('info', 14), logout16: ic('logout', 16),
+        chevron14: ic('chevron', 14), link15: ic('link', 15),
+      },
+
+      tabsLeft, tabsRight,
+      copilotTabColor: s.sheet === 'copilot' ? accent : '#968d7e',
+      onHome: s.screen === 'home', onTests: s.screen === 'tests', onDetail: s.screen === 'detail',
+      onAlerts: s.screen === 'alerts', onLive: s.screen === 'live',
+      // The action bar floats above whatever nav is showing — the tab/FAB bars
+      // are ~90px flow items, the drawer model has no bottom nav at all.
+      // Clears both the tab bar (~90px) and the raised co-pilot button above it.
+      barBottom: '118px',
+      barPadBottom: '14px',
+      detailPadBottom: '150px',
+      shipReady: !s.shipped,
+      hasShipped: s.shipped,
+      detailLive: !(s.shipped && sel.id === 't1'),
+      detailShipped: s.shipped && sel.id === 't1',
+      verdictKicker: (s.shipped && sel.id === 't1') ? 'Shipped · rollback available' : 'Co-pilot verdict',
+      showDetailBar: s.screen === 'detail' && sel.id === 't1' && !s.shipped && !s.sheet,
+      showRollbackBar: s.screen === 'detail' && sel.id === 't1' && s.shipped && !s.sheet,
+      rollback: () => this.setState({ shipped: false, toast: false }),
+      goTests: () => this.go('tests'), goAlerts: () => this.go('alerts'),
+      back: () => this.go(s.screen === 'detail' ? 'tests' : 'home'),
+      openWinner: () => this.openDetail('t1'),
+      closeAll: () => this.setState({ sheet: null, drawer: false }),
+      moreOpen: s.sheet === 'more', copilotOpen: s.sheet === 'copilot', shipOpen: s.sheet === 'ship',
+      openCopilot: () => this.setState({ sheet: 'copilot' }),
+      openShip: () => this.setState({ sheet: 'ship' }),
+      confirmShip: () => this.confirmShip(),
+      toastOpen: s.toast,
+
+      stats: [
+        { label: 'Visitors tested', value: '48.2k', delta: '+12.4%', deltaColor: POS, icon: ic('users', 15) },
+        { label: 'Active tests', value: '6', delta: '2 conclude soon', deltaColor: '#968d7e', icon: ic('beaker', 15) },
+        { label: 'Avg. conversion', value: '3.8%', delta: '+0.4pt', deltaColor: POS, icon: ic('target', 15) },
+        { label: 'Added revenue', value: '$41.2k', delta: 'est. · 4 winners', deltaColor: '#968d7e', icon: ic('dollar', 15) },
+      ].map((st) => Object.assign({}, st, { tap: () => this.openDetail('t1') })),
+
+      runningTests: tests.filter((t) => t.status === 'Running').map(rowOf),
+      filteredTests: filtered.map(rowOf),
+      filters: filterDef.map(([key, label, count]) => ({
+        label, count,
+        pick: () => this.setState({ filter: key }),
+        bg: s.filter === key ? SOFT : '#fcfbf7',
+        border: s.filter === key ? accent : '#e7e0d3',
+        fg: s.filter === key ? accent : '#5d564b',
+      })),
+
+      sel: Object.assign({}, sel, statusStyle(sel.status)),
+      variants: [
+        { key: 'A', label: 'Control', blurb: 'Add-to-cart in the page flow', tag: '', tagFg: '#968d7e', rate: '4.3', barWidth: '68%', barColor: '#b3aa99', keyBg: '#ece6da', keyFg: '#5d564b', bg: '#fcfbf7', border: '#e7e0d3', visitors: '6.2k', conversions: '267', rpv: '$1.84' },
+        { key: 'B', label: 'Sticky bar', blurb: 'Pinned to the bottom on scroll', tag: 'WINNER', tagFg: accent, rate: '4.9', barWidth: '100%', barColor: accent, keyBg: accent, keyFg: '#fff', bg: SOFT, border: 'color-mix(in oklab, #5b54e0 38%, transparent)', visitors: '6.3k', conversions: '309', rpv: '$2.11' },
+      ].map((v) => (v.key === 'B' && s.shipped ? Object.assign({}, v, { tag: 'LIVE · 100%' }) : v)),
+      sigStats: [
+        { label: 'Confidence', value: '97%' },
+        { label: 'Uplift', value: '+14.2%' },
+        { label: 'Days live', value: '9' },
+      ],
+      chartOpen: s.chartOpen,
+      toggleChart: () => this.setState({ chartOpen: !s.chartOpen }),
+      chartToggleLabel: s.chartOpen ? 'Hide daily chart' : 'Show daily conversion chart',
+      chartToggleIcon: ic(s.chartOpen ? 'x' : 'bars', 15),
+      detailChart: detailChart(),
+
+      shipFacts: [
+        { label: 'Winner', value: 'Variant B', color: '#211e1a' },
+        { label: 'Measured uplift', value: '+14.2%', color: POS },
+        { label: 'Est. added revenue / mo', value: '+$4.8k', color: POS },
+      ],
+
+      copilotStatus: s.phase === 'loading' ? 'thinking…' : s.phase === 'done' ? 'ready' : 'online',
+      promptText: s.prompt || 'Describe a goal — e.g. increase add-to-cart rate',
+      promptColor: s.prompt ? '#211e1a' : '#968d7e',
+      generate: () => this.generate(),
+      goalChips: ['Increase add-to-cart rate', 'Reduce mobile checkout drop-off', 'Raise average order value', 'Improve email signup']
+        .map((label) => ({ label, pick: () => this.generate(label) })),
+      ideasHead: s.phase === 'loading' ? 'Thinking…' : s.phase === 'done' ? 'Generated ideas' : 'Suggested for your store',
+      shownIdeas: IDEAS,
+
+      alertGroups: [
+        {
+          label: 'Today',
+          items: [
+            { title: 'Sticky add-to-cart reached 97% confidence', body: 'Variant B is up 14.2%. Review and ship it.', time: '2 hours ago', icon: ic('flag', 18), icoBg: POS_SOFT, icoFg: POS, bg: 'color-mix(in oklab, #2f8f5b 6%, #fcfbf7)', border: 'color-mix(in oklab, #2f8f5b 26%, #e7e0d3)', open: () => this.openDetail('t1') },
+            { title: 'Traffic split drifted on the checkout test', body: 'Variant A is getting 54% of visitors — worth a look before day 7.', time: '5 hours ago', icon: ic('warning', 18), icoBg: 'color-mix(in oklab, #b9842a 15%, #fcfbf7)', icoFg: '#b9842a', bg: '#fcfbf7', border: '#e7e0d3', open: () => this.openDetail('t4') },
+          ],
+        },
+        {
+          label: 'This week',
+          items: [
+            { title: 'Weekly digest is ready', body: '3 tests moved, $9.4k estimated added revenue, 1 new idea queued.', time: 'Mon 08:00', icon: ic('mail', 18), icoBg: '#ece6da', icoFg: '#5d564b', bg: '#fcfbf7', border: '#e7e0d3', open: () => this.go('home') },
+            { title: 'Single-column checkout shipped to 100%', body: 'Rolled out Jul 8 — tracking +11.5% RPV since.', time: 'Jul 21', icon: ic('check', 18), icoBg: SOFT, icoFg: accent, bg: '#fcfbf7', border: '#e7e0d3', open: () => this.openDetail('t6') },
+          ],
+        },
+      ],
+
+      sessions: [
+        { path: '/products/cedar-wick-candle', meta: 'Mobile · Austin, TX · in test B', time: 'now', icon: ic('phone', 16) },
+        { path: '/collections/home', meta: 'Desktop · Berlin, DE', time: '12s', icon: ic('monitor', 16) },
+        { path: '/cart', meta: 'Mobile · Toronto, CA · in test B', time: '34s', icon: ic('phone', 16) },
+        { path: '/products/alder-wool-throw', meta: 'Mobile · Leeds, UK', time: '1m', icon: ic('phone', 16) },
+        { path: '/', meta: 'Desktop · Lisbon, PT', time: '2m', icon: ic('monitor', 16) },
+      ],
+
+      moreItems: moreDef.map(([label, icon]) => {
+        const target = {
+          Live: 'live', Learnings: 'learnings', Analytics: 'analytics', Funnel: 'funnel', Heatmaps: 'heatmaps',
+          Flows: 'flows', Favorites: 'favorites', Tracking: 'tracking', Products: 'products', Replays: 'replays',
+          Nudges: 'nudges', Audiences: 'audiences', Settings: 'settings',
+          Pages: 'pages', Events: 'events', Team: 'team',
+        }[label];
+        return {
+          label, icon: ic(icon, 17),
+          go: () => (target ? this.go(target) : this.setState({ sheet: null })),
+        };
+      }),
+
+      onPages: s.screen === 'pages',
+      onEvents: s.screen === 'events',
+      onTeam: s.screen === 'team',
+
+      behaviorStats: [
+        { label: 'Total views', value: '42.7k', sub: '+9% vs prev', size: '28px', subColor: POS },
+        { label: 'Unique visitors', value: '18.9k', sub: '+6% vs prev', size: '28px', subColor: POS },
+        { label: 'Avg time on page', value: '52s', sub: '−3s vs prev', size: '28px', subColor: '#968d7e' },
+        { label: 'Top page type', value: 'Product', sub: '18.4k views', size: '22px', subColor: '#968d7e' },
+      ],
+      pageTypes: [
+        { name: 'Product', share: '100%', views: '18.4k', time: '1m 12s' },
+        { name: 'Collection', share: '64%', views: '11.8k', time: '48s' },
+        { name: 'Home', share: '47%', views: '8.7k', time: '31s' },
+        { name: 'Cart', share: '22%', views: '4.1k', time: '1m 04s' },
+        { name: 'Checkout', share: '13%', views: '2.5k', time: '2m 08s' },
+      ].map((p) => ({
+        name: p.name, share: p.share, views: p.views, time: p.time,
+        pick: () => this.setState({ pageType: s.pageType === p.name ? null : p.name }),
+        bg: s.pageType === p.name ? SOFT : 'transparent',
+      })),
+      topPaths: [
+        { path: '/products/cedar-wick-candle', views: '9.4k', time: '1m 21s' },
+        { path: '/', views: '8.7k', time: '31s' },
+        { path: '/collections/home', views: '6.2k', time: '52s' },
+        { path: '/cart', views: '4.1k', time: '1m 04s' },
+        { path: '/products/alder-wool-throw', views: '3.8k', time: '58s' },
+      ],
+      analyze: () => this.setState({ insight: s.insight === 'done' ? 'idle' : 'done' }),
+      analyzeLabel: s.insight === 'done' ? 'Refresh' : 'Analyze',
+      insightIdle: s.insight !== 'done',
+      insightDone: s.insight === 'done',
+      insightItems: [
+        { sev: '#e5484d', title: 'Cart is the leak', detail: '79% of visitors who reach the cart never open checkout — worst on mobile.' },
+        { sev: '#f5a623', title: 'Collection dwell is short', detail: '48s with 64% of product traffic — filters may not be doing their job.' },
+        { sev: '#30a46c', title: 'Product pages hold attention', detail: '1m 12s average, up 4s — imagery and reviews are working.' },
+      ],
+
+      eventQuery: s.eventQuery || '',
+      setEventQuery: (e) => this.setState({ eventQuery: e.target.value }),
+      events: EVENTS
+        .filter((e) => !(s.eventQuery || '').trim() || e.name.includes((s.eventQuery || '').trim().toLowerCase()))
+        .map((e) => Object.assign({}, e, {
+          open: s.openEvent === e.name,
+          chev: s.openEvent === e.name ? 'rotate(90deg)' : 'none',
+          toggle: () => this.setState({ openEvent: s.openEvent === e.name ? null : e.name }),
+          buckets: e.buckets.map((b) => Object.assign({}, b, { color: b.soft ? 'color-mix(in oklab, #5b54e0 45%, #f4f1ea)' : accent })),
+        })),
+
+      roleOptions: [['member', 'Member'], ['manager', 'Manager'], ['admin', 'Admin']].map(([key, label]) => ({
+        label,
+        pick: () => this.setState({ inviteRole: key }),
+        bg: (s.inviteRole || 'member') === key ? '#fcfbf7' : 'transparent',
+        fg: (s.inviteRole || 'member') === key ? '#211e1a' : '#968d7e',
+        shadow: (s.inviteRole || 'member') === key ? '0 1px 2px rgba(0,0,0,.06)' : 'none',
+      })),
+      invites: [
+        { email: 'dana@alderandash.com', role: 'Manager', expires: 'Aug 1, 2026' },
+        { email: 'freelance.cro@gmail.com', role: 'Member', expires: 'Jul 29, 2026' },
+      ].map((i) => Object.assign({}, i, roleStyle(i.role))),
+      members: [
+        { name: 'Alp Senel', email: 'alp@alderandash.com', role: 'Admin', active: 'Active just now', you: true },
+        { name: 'Mira Halloran', email: 'mira@alderandash.com', role: 'Manager', active: 'Active 3 hours ago', you: false },
+        { name: 'Theo Brandt', email: 'theo@alderandash.com', role: 'Member', active: 'Active yesterday', you: false },
+        { name: 'Nia Okafor', email: 'nia@alderandash.com', role: 'Member', active: 'Never signed in', you: false },
+      ].map((m) => Object.assign({}, m, roleStyle(m.role), { initial: m.name.charAt(0) })),
+      alertToggles: [
+        { key: 'alertsEnabled', label: 'Send me test alerts', on: s.alertsEnabled !== false },
+        { key: 'autoStop', label: 'Automatically complete a test when it reaches significance', on: s.autoStop === true },
+      ].map((t) => ({
+        label: t.label,
+        toggle: () => this.setState({ [t.key]: !t.on }),
+        bg: t.on ? accent : '#e7e0d3',
+        knob: t.on ? '23px' : '3px',
+      })),
+
+      onNudges: s.screen === 'nudges',
+      onAudiences: s.screen === 'audiences',
+      onSettings: s.screen === 'settings',
+
+      nudges: [
+        {
+          name: 'Free shipping progress bar', where: 'Cart, Product pages', status: 'Running', on: true,
+          stats: [['Visitors', '9.4k', '#211e1a'], ['Nudge conv.', '3.9%', '#211e1a'], ['Holdout conv.', '3.4%', '#211e1a'], ['Added revenue', '+$6.2k', POS]],
+          note: 'vs. the 20% holdout at 96% confidence',
+        },
+        {
+          name: 'Low stock badge', where: 'Product pages', status: 'Paused', on: false,
+          stats: [['Visitors', '4.1k', '#211e1a'], ['Nudge conv.', '4.2%', '#211e1a'], ['Holdout conv.', '4.3%', '#211e1a'], ['Added revenue', '−$310', '#c2553c']],
+          note: 'vs. the 20% holdout at 41% confidence',
+        },
+      ].map((n) => Object.assign({}, n, statusStyle(n.status), {
+        stats: n.stats.map(([k, v, color]) => ({ k, v, color })),
+        cta: n.on ? 'Pause' : 'Launch',
+        ctaIcon: ic(n.on ? 'pause' : 'play', 15),
+        ctaBg: n.on ? SOFT : accent,
+        ctaFg: n.on ? accent : '#fff',
+      })),
+      widgets: [
+        { icon: ic('megaphone', 18), name: 'Announcement bar', where: 'All pages', description: 'A dismissible bar at the top of every page for shipping cut-offs, sales or restocks.', impact: 'Typically lifts add-to-cart 2–5% when the message is time-bound.' },
+        { icon: ic('clock', 18), name: 'Countdown timer', where: 'Product, Cart', description: 'Counts down to a deadline you set — free-shipping cut-off, sale end, restock.', impact: 'Strongest on sale pages; can hurt trust on evergreen products.' },
+        { icon: ic('logout', 18), name: 'Exit-intent popup', where: 'All pages', description: 'Catches the cursor leaving with one offer or an email capture.', impact: 'Recovers 3–8% of abandoning sessions on desktop.' },
+        { icon: ic('check', 18), name: 'Trust badges', where: 'Cart, Checkout', description: 'Payment, returns and secure-checkout marks near the pay button.', impact: 'Best on first-time-visitor traffic and paid social.' },
+      ],
+
+      audiences: [
+        { name: 'Mobile shoppers from Instagram', conditions: 'Mobile · utm_source contains "instagram"' },
+        { name: 'Returning desktop buyers', conditions: 'Desktop · Returning visitors' },
+        { name: 'Paid search, new visitors', conditions: 'utm_medium contains "cpc" · New visitors' },
+        { name: 'Browsed then bounced', conditions: 'completed "Browse then bounce" this session' },
+      ],
+
+      collectLabel: s.collecting === false ? 'Paused' : 'Collecting',
+      collectDot: s.collecting === false ? '#968d7e' : POS,
+      collectRing: s.collecting === false ? 'rgba(120,120,120,.14)' : 'rgba(47,143,91,.16)',
+      collectCopy: s.collecting === false
+        ? 'Your storefront is dormant. No analytics or A/B test data is being recorded, and running tests are not serving variants. The pixel stays installed — flip this back on any time.'
+        : 'Your storefront is actively reporting. Analytics, heatmaps, replays, and A/B test results are being collected.',
+      switchBg: s.collecting === false ? '#e7e0d3' : accent,
+      knobLeft: s.collecting === false ? '3px' : '23px',
+      toggleCollect: () => this.setState({ collecting: s.collecting === false }),
+      accountRows: [
+        { k: 'Store', v: 'Alder & Ash' },
+        { k: 'Signed in as', v: 'alp@alderandash.com' },
+        { k: 'Role', v: 'Admin' },
+      ],
+
+      onFlows: s.screen === 'flows',
+      onFavorites: s.screen === 'favorites',
+      onTracking: s.screen === 'tracking',
+      onProducts: s.screen === 'products',
+      onReplays: s.screen === 'replays',
+
+      flows: [
+        { name: 'Browse then bounce', steps: 'Home › Product › Home', campaign: 'PDP: sticky add-to-cart', status: 'Running', on: true },
+        { name: 'Cart abandoners', steps: 'Product › Add to cart › Exit intent', campaign: 'Exit offer: free shipping', status: 'Running', on: true },
+        { name: 'Deep scrollers on collections', steps: 'Collection › Scroll ≥ 75%', campaign: 'No test linked', status: 'Paused', on: false },
+      ].map((f) => Object.assign({}, f, {
+        statusFg: f.on ? POS : '#b9842a',
+        statusBg: f.on ? POS_SOFT : 'color-mix(in oklab, #b9842a 15%, #fcfbf7)',
+        statusDot: f.on ? React.createElement('span', { style: { width: 6, height: 6, borderRadius: '50%', background: POS, animation: 'tf-pulse 2.2s infinite' } }) : null,
+        toggleIcon: ic(f.on ? 'pause' : 'play', 16),
+      })),
+
+      pinned: [
+        { id: 't1', name: 'PDP: sticky add-to-cart on mobile', goal: 'alderandash.com/products', status: 'Running', rate: '4.9', uplift: '+14.2%', conf: '97%' },
+        { id: 't4', name: 'Checkout: trust badges near pay', goal: 'alderandash.com/checkout', status: 'Running', rate: '5.6', uplift: '+8.9%', conf: '84%' },
+      ].map((p, i) => Object.assign({}, p, statusStyle(p.status), {
+        open: () => this.openDetail(p.id),
+        upliftColor: POS,
+        spark: spark(i === 0 ? [3.1, 3.4, 3.9, 4.2, 4.1, 4.6, 4.9] : [4.8, 5.0, 5.2, 5.1, 5.4, 5.5, 5.6], accent, 300, 46),
+      })),
+      savedIdeas: [
+        { tag: 'Cart · Shipping note', impact: 'medium', impactColor: '#b9842a', title: 'Show the free-shipping threshold in the cart', hypothesis: 'Average cart is $52, free shipping starts at $65. Naming the gap lifts AOV.' },
+        { tag: 'Search · Empty state', impact: 'low', impactColor: '#968d7e', title: 'Suggest best sellers on empty search results', hypothesis: '6% of searches return nothing and 71% of those sessions end there.' },
+      ],
+
+      trackingStats: [
+        { label: 'Tagged visits', value: '12.4k', sub: '+18% vs prev', size: '28px', subColor: POS },
+        { label: 'Unique visitors', value: '8.9k', sub: '+11% vs prev', size: '28px', subColor: POS },
+        { label: 'Top source', value: 'instagram', sub: '41% of visits', size: '20px', subColor: '#968d7e' },
+        { label: 'Distinct sources', value: '14', sub: 'this range', size: '28px', subColor: '#968d7e' },
+      ],
+      dimensions: [['source', 'Source'], ['medium', 'Medium'], ['campaign', 'Campaign']].map(([key, label]) => ({
+        label,
+        pick: () => this.setState({ dimension: key }),
+        bg: (s.dimension || 'source') === key ? '#fcfbf7' : 'transparent',
+        fg: (s.dimension || 'source') === key ? '#211e1a' : '#968d7e',
+        shadow: (s.dimension || 'source') === key ? '0 1px 2px rgba(0,0,0,.06)' : 'none',
+      })),
+      trackingRows: (UTM_ROWS[s.dimension || 'source'] || UTM_ROWS.source),
+
+      productStats: [
+        { label: 'Product views', value: '31.2k' },
+        { label: 'Add-to-cart rate', value: '8.4%' },
+        { label: 'Conversion rate', value: '2.9%' },
+        { label: 'Product revenue', value: '$96.4k' },
+      ],
+      productQuery: s.productQuery || '',
+      setProductQuery: (e) => this.setState({ productQuery: e.target.value }),
+      products: PRODUCTS.filter((p) => !(s.productQuery || '').trim() || p.title.toLowerCase().includes((s.productQuery || '').trim().toLowerCase())),
+
+      replayKpis: [
+        { label: 'Sessions recorded', value: '248', icon: ic('play', 16) },
+        { label: 'Avg duration', value: '1m 48s', icon: ic('clock', 16) },
+        { label: 'Interactions', value: '9.1k', icon: ic('bolt', 16) },
+      ],
+      triggers: [['all', 'All'], ['rage', 'Rage'], ['dead', 'Dead clicks']].map(([key, label]) => ({
+        label,
+        pick: () => this.setState({ trigger: key }),
+        bg: (s.trigger || 'all') === key ? '#fcfbf7' : 'transparent',
+        fg: (s.trigger || 'all') === key ? '#211e1a' : '#968d7e',
+        shadow: (s.trigger || 'all') === key ? '0 1px 2px rgba(0,0,0,.06)' : 'none',
+      })),
+      replaySessions: REPLAYS.filter((r) => (s.trigger || 'all') === 'all' || r.kind === s.trigger),
+      replaySub: (s.trigger || 'all') === 'all'
+        ? 'Newest 5 of 248 recorded sessions — something went wrong in each'
+        : 'Filtered to ' + ((s.trigger === 'rage') ? 'rage clicks' : 'dead clicks'),
+
+      onLearnings: s.screen === 'learnings',
+      onAnalytics: s.screen === 'analytics',
+      onFunnel: s.screen === 'funnel',
+      onHeatmaps: s.screen === 'heatmaps',
+
+      learningFilters: [['all', 'All'], ['won', 'Won'], ['nowinner', 'No winner']].map(([key, label]) => ({
+        label,
+        count: String(key === 'all' ? LEARNINGS.length : LEARNINGS.filter((l) => (key === 'won' ? l.won : !l.won)).length),
+        pick: () => this.setState({ learningFilter: key }),
+        bg: (s.learningFilter || 'all') === key ? SOFT : '#fcfbf7',
+        border: (s.learningFilter || 'all') === key ? accent : '#e7e0d3',
+        fg: (s.learningFilter || 'all') === key ? accent : '#5d564b',
+      })),
+      learnings: learningRows,
+      noLearnings: learningRows.length === 0,
+      learningQuery: s.learningQuery || '',
+      setLearningQuery: (e) => this.setState({ learningQuery: e.target.value }),
+      analyticsStats: [
+        { label: 'Tests run', value: '12', sub: 'drafts excluded', icon: ic('beaker', 15) },
+        { label: 'Winners shipped', value: '4', sub: '33% win rate', icon: ic('check', 15) },
+        { label: 'Avg. winning uplift', value: '+9.6%', sub: 'winners only', icon: ic('trendUp', 15) },
+        { label: 'Revenue impact', value: '$312k', sub: 'tested sessions', icon: ic('dollar', 15) },
+      ],
+      winRateRing: ring(33, accent),
+      upliftRows: [
+        { name: 'Sticky add-to-cart (mobile)', value: '+14.2%', width: '100%', color: accent },
+        { name: 'Single-column checkout', value: '+11.5%', width: '81%', color: accent },
+        { name: 'Trust badges near pay', value: '+8.9%', width: '63%', color: accent },
+        { name: 'Free shipping bar', value: '+2.1%', width: '15%', color: accent },
+        { name: 'Collection grid 2-up', value: '−1.4%', width: '10%', color: '#c2553c' },
+      ],
+      velocity: [['W1', '32%'], ['W2', '48%'], ['W3', '32%'], ['W4', '64%'], ['W5', '48%'], ['W6', '80%'], ['W7', '64%'], ['W8', '100%']]
+        .map(([label, height]) => ({ label, height })),
+
+      funnelStats: [
+        { label: 'Store visitors', value: '24.6k', sub: 'last 7 days', size: '28px', subColor: '#968d7e' },
+        { label: 'Purchases', value: '598', sub: 'tracked orders', size: '28px', subColor: '#968d7e' },
+        { label: 'Overall conversion', value: '2.4%', sub: '+0.2pt vs prev', size: '28px', subColor: POS },
+        { label: 'Biggest drop-off', value: 'Checkout', sub: '46% drop', size: '20px', subColor: '#c2553c' },
+      ],
+      funnelSteps: [
+        { idx: '1', name: 'Landing', source: 'page view', visitors: '24.6k', reach: '100%', drop: '', dropColor: '#968d7e' },
+        { idx: '2', name: 'Product', source: 'page type', visitors: '15.9k', reach: '65%', drop: '−35%', dropColor: '#c2553c' },
+        { idx: '3', name: 'Cart', source: 'add to cart', visitors: '4.6k', reach: '19%', drop: '−71%', dropColor: '#c2553c' },
+        { idx: '4', name: 'Checkout', source: 'page type', visitors: '2.5k', reach: '10%', drop: '−46%', dropColor: '#c2553c' },
+        { idx: '5', name: 'Purchase', source: 'order tracking', visitors: '598', reach: '2.4%', drop: '−76%', dropColor: '#c2553c' },
+      ],
+
+      heatStats: [
+        { label: 'Pages with data', value: '12' },
+        { label: 'Clicks tracked', value: '184k' },
+      ],
+      heatPages: [
+        { path: '/products/cedar-wick-candle', devices: '38.1k mobile · 12.4k desktop', share: '27%', clicks: '50.5k clicks', hasFrustration: true, frustration: '1.2k' },
+        { path: '/', devices: '21.6k mobile · 14.8k desktop', share: '20%', clicks: '36.4k clicks', hasFrustration: false, frustration: '' },
+        { path: '/collections/home', devices: '18.2k mobile · 9.1k desktop', share: '15%', clicks: '27.3k clicks', hasFrustration: true, frustration: '480' },
+        { path: '/cart', devices: '12.9k mobile · 5.2k desktop', share: '9.8%', clicks: '18.1k clicks', hasFrustration: false, frustration: '' },
+        { path: '/products/alder-wool-throw', devices: '8.4k mobile · 3.3k desktop', share: '6.4%', clicks: '11.7k clicks', hasFrustration: true, frustration: '310' },
+      ],
+
+      notes: [
+        { title: 'Numbers first, charts on tap', body: 'Every screen leads with the figure and the verdict; the daily chart is one tap behind a button, so nothing is squeezed into 360px.' },
+        { title: 'Shipping a winner is a first-class flow', body: 'Alert → verdict → confirmation sheet with the exact uplift and the rollback window. The one desktop action worth doing from a phone.' },
+        { title: 'The co-pilot is a sheet, not a page', body: 'It slides over whatever you are looking at, keeps the goal chips, and hands off to the desktop editor for the actual variant build.' },
+        { title: 'The 17-item sidebar collapses to 4 + AI', body: 'Home, Tests, Alerts, More — and the co-pilot raised in the centre. All 16 other pages have real mobile screens; only the heatmap click overlay, the flow canvas and the variant editor stay on desktop.' },
+        { title: 'One accent, one paper', body: 'Indigo #5b54e0 on #f4f1ea with 15–20px card radii — identical tokens to the panel, so the two feel like one product.' },
+      ],
+    };
+  }
+}
+</script>
+</body>
+</html>
+
