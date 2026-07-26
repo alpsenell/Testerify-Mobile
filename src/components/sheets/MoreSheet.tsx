@@ -1,4 +1,5 @@
 import { Pressable, Text, View } from 'react-native'
+import { router } from 'expo-router'
 import { Icon, IconName } from '../Icon'
 import { colors, fonts } from '../../theme'
 import { useToast } from '../../stores/toast'
@@ -29,6 +30,10 @@ export function MoreSheet() {
 
   const tap = (label: string) => {
     close()
+    if (label === 'Live') {
+      router.push('/screens/live')
+      return
+    }
     show(`${label} is coming to mobile — it lives on the desktop panel for now.`)
   }
 

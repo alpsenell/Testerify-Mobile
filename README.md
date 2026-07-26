@@ -95,7 +95,8 @@ Automated tests don't touch a real device, a real network toggle, or the real ba
    - Open via the raised center FAB. Pick a goal chip, generate ideas.
    - Build draft on a generated idea → toast confirms, and the new draft appears under the Tests tab (Draft filter).
 8. **More sheet**
-   - Open via the tab bar "More" button. Tap a few of the 16 secondary-screen entries → each shows its "coming to mobile" toast rather than crashing or navigating nowhere.
+   - Open via the tab bar "More" button. Tap a few of the 15 still-unbuilt secondary-screen entries → each shows its "coming to mobile" toast rather than crashing or navigating nowhere.
+   - Tap "Live" → navigates to the real Live screen (see step 11) instead of a toast.
 9. **Session persistence**
    - Kill the app fully (swipe away / force-stop) and relaunch → should land signed-in on Home without hitting the login screen again (session restores from `expo-secure-store`).
 10. **Offline handling**
@@ -103,6 +104,11 @@ Automated tests don't touch a real device, a real network toggle, or the real ba
     - Previously-loaded screens still show their last-fetched (cached) data rather than going blank.
     - Try pull-to-refresh or a mutation (e.g. ship) while offline → fails gracefully with a toast/retry affordance, no crash.
     - Disable airplane mode → banner disappears, next refresh succeeds.
+11. **Live screen**
+    - Open via More sheet → "Live" → back button returns to Home (not the tab you came from — Live is only reachable from the More sheet).
+    - On-site-now count and the by-location rows match the desktop panel's Live page for the same test-store account. Note: the design's "63 in a test · 41 on a product page" split and per-visitor session rows are intentionally not rendered — no backend field backs either (see spec deviations); the location aggregate stands in for both.
+    - Leave the screen open ~15–20s → the count/location rows refresh in place (polls every 15s) without a visible flash of loading/empty state.
+    - Pull-to-refresh works independently of the poll.
 
 Log anything off-script (visual glitch, crash, wrong number) against the screen/step above rather than as a vague "something looked wrong."
 
