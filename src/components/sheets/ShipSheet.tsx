@@ -87,8 +87,8 @@ export function ShipSheet() {
           opacity: shipDisabled ? 0.6 : 1,
         }}
       >
-        <Icon name="check" size={18} color="#fff" />
-        <Text style={{ fontFamily: fonts.sansSemi, fontSize: 15, color: '#fff' }}>
+        <Icon name="check" size={18} color={colors.white} />
+        <Text style={{ fontFamily: fonts.sansSemi, fontSize: 15, color: colors.white }}>
           {promote.isPending ? 'Shipping…' : 'Ship it'}
         </Text>
       </Pressable>

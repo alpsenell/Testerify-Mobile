@@ -34,16 +34,16 @@ export function TabBar({ state, navigation, badgeCount = 0 }: BottomTabBarProps 
       </View>
       {tab('alerts', 'Alerts', 'bell', badgeCount > 0 ? (
         <View style={{ position: 'absolute', top: -3, right: -7, minWidth: 16, height: 16, paddingHorizontal: 4, borderRadius: 8, backgroundColor: colors.neg, alignItems: 'center', justifyContent: 'center' }}>
-          <Text style={{ fontFamily: fonts.monoSemi, fontSize: 9.5, color: '#fff' }}>{badgeCount}</Text>
+          <Text style={{ fontFamily: fonts.monoSemi, fontSize: 9.5, color: colors.white }}>{badgeCount}</Text>
         </View>
       ) : undefined)}
       <Pressable onPress={openMore} accessibilityRole="button" style={{ flex: 1, alignItems: 'center', gap: 4, paddingTop: 7, minHeight: 52 }}>
         <Icon name="layers" size={23} color={colors.muted} />
         <Text style={{ fontFamily: fonts.sansSemi, fontSize: 10.5, color: colors.muted }}>More</Text>
       </Pressable>
-      <Pressable onPress={openCopilot} accessibilityLabel="Ask the co-pilot"
+      <Pressable onPress={openCopilot} accessibilityRole="button" accessibilityLabel="Ask the co-pilot"
         style={{ position: 'absolute', alignSelf: 'center', left: '50%', marginLeft: -30, bottom: 52, width: 60, height: 60, borderRadius: 30, backgroundColor: colors.accent, alignItems: 'center', justifyContent: 'center', borderWidth: 6, borderColor: colors.paper, shadowColor: colors.accent, shadowOpacity: 0.45, shadowRadius: 12, shadowOffset: { width: 0, height: 10 }, elevation: 8 }}>
-        <Icon name="sparkle" size={26} color="#fff" />
+        <Icon name="sparkle" size={26} color={colors.white} />
       </Pressable>
     </View>
   )

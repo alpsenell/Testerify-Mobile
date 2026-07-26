@@ -26,12 +26,30 @@ const SHIPPED = {
   rollout: { winnerVariantId: 'v2', promotedAt: '2026-07-20T00:00:00Z' },
 }
 
+// Each test's QueryClient is tracked here so it can be torn down afterward —
+// see the afterEach below.
+let currentQueryClient: QueryClient | undefined
+
 beforeEach(() => {
   ;(campaigns.fetchCampaigns as jest.Mock).mockResolvedValue([RUNNING, DRAFT, SHIPPED])
 })
 
+// react-query schedules a 5-minute gcTime setTimeout (never .unref()'d) the
+// moment a query's last observer unmounts — which RNTL's own afterEach does
+// for every test here. Left unhandled, each of this file's QueryClients
+// leaves that real timer running, and the Jest worker never exits naturally
+// (the "worker process has failed to exit gracefully" warning). clear()
+// removes every query/mutation from the cache, which cancels their gcTime
+// timers immediately — it doesn't touch the app's real gcTime default, only
+// disposes of this test's client once the test is done with it.
+afterEach(() => {
+  currentQueryClient?.clear()
+  currentQueryClient = undefined
+})
+
 const renderTests = async () => {
   const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+  currentQueryClient = qc
   return await render(<QueryClientProvider client={qc}><TestsScreen /></QueryClientProvider>)
 }
 

@@ -42,8 +42,8 @@ function IdeaCard({ idea, active, disabled, onBuild }: {
           opacity: disabled ? 0.6 : 1,
         }}
       >
-        <Icon name="sparkle" size={16} color="#fff" />
-        <Text style={{ fontFamily: fonts.sansSemi, fontSize: 13.5, color: '#fff' }}>
+        <Icon name="sparkle" size={16} color={colors.white} />
+        <Text style={{ fontFamily: fonts.sansSemi, fontSize: 13.5, color: colors.white }}>
           {active ? 'Building…' : 'Build draft'}
         </Text>
       </Pressable>
@@ -122,7 +122,7 @@ export function CopilotSheet() {
             opacity: generate.isPending || !goal.trim() ? 0.6 : 1,
           }}
         >
-          <Icon name="send" size={17} color="#fff" />
+          <Icon name="send" size={17} color={colors.white} />
         </Pressable>
       </View>
 

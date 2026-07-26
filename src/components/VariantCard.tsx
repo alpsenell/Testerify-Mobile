@@ -27,7 +27,7 @@ export function VariantCard({ letter, name, blurb, tag, rate, barWidth, barColor
           backgroundColor: highlight ? colors.accent : colors.track,
           alignItems: 'center', justifyContent: 'center',
         }}>
-          <Text style={{ fontFamily: fonts.sansSemi, fontSize: 13, color: highlight ? '#fff' : colors.secondary }}>{letter}</Text>
+          <Text style={{ fontFamily: fonts.sansSemi, fontSize: 13, color: highlight ? colors.white : colors.secondary }}>{letter}</Text>
         </View>
         <View style={{ flex: 1 }}>
           <Text style={{ fontFamily: fonts.sansSemi, fontSize: 14.5, color: colors.ink }}>{name}</Text>
@@ -38,7 +38,7 @@ export function VariantCard({ letter, name, blurb, tag, rate, barWidth, barColor
 
       {tag ? (
         <View style={{ alignSelf: 'flex-start', backgroundColor: colors.accent, borderRadius: 20, paddingHorizontal: 9, paddingVertical: 3 }}>
-          <Text style={{ fontFamily: fonts.sansSemi, fontSize: 10.5, color: '#fff' }}>{tag}</Text>
+          <Text style={{ fontFamily: fonts.sansSemi, fontSize: 10.5, color: colors.white }}>{tag}</Text>
         </View>
       ) : null}
 

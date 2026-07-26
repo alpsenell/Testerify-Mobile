@@ -7,6 +7,7 @@ import { EmptyState } from '../EmptyState'
 import { Skeleton } from '../Skeleton'
 import { Card } from '../Card'
 import { colors, radius } from '../../theme'
+import * as env from '../../utils/env'
 
 const types = (n: any, acc: Record<string, number> = {}) => {
   if (!n || typeof n !== 'object') return acc
@@ -20,6 +21,27 @@ const drawn = (t: Record<string, number>) =>
 const NAMES: IconName[] = ['home','beaker','bars','star','sparkle','arrowUp','arrowLeft','trendUp',
   'users','target','dollar','bolt','check','plus','play','pause','flag','clock',
   'chevron','layers','x','warning','search','mail','send','trash']
+
+// Skeleton/StatusPill guard their Animated.loop start behind isTestEnv()
+// (src/utils/env.ts) so the shimmer/pulse never leaves a real timer running
+// under Jest — that timer was the root cause of the "worker process has
+// failed to exit gracefully" warning. Jest always runs with NODE_ENV=test, so
+// tests that need to exercise the real (non-test) animation-starting code
+// path stub isTestEnv() to return false for the duration of the render, then
+// restore it. Flipping process.env.NODE_ENV itself isn't an option here —
+// React Native's own Animated internals read that same variable to bypass a
+// "no attached native view" check that only makes sense outside a real
+// device/simulator, and NODE_ENV=test is what keeps that check off under
+// Jest; isTestEnv() is a separate seam precisely so we can stub our own
+// guard without disturbing RN's.
+const withRealAnimations = async (fn: () => Promise<void> | void) => {
+  const spy = jest.spyOn(env, 'isTestEnv').mockReturnValue(false)
+  try {
+    await fn()
+  } finally {
+    spy.mockRestore()
+  }
+}
 
 // StatusPill and basic component tests
 test('StatusPill renders its label', async () => {
@@ -79,12 +101,21 @@ test('StatusPill tone selects the matching foreground colour', async () => {
 
 // Skeleton tests
 test('Skeleton stops its animation loop on unmount', async () => {
-  const stop = jest.fn()
+  await withRealAnimations(async () => {
+    const stop = jest.fn()
+    const spy = jest.spyOn(Animated, 'loop')
+      .mockReturnValue({ start: jest.fn(), stop, reset: jest.fn() } as any)
+    const r = await render(<Skeleton height={20} />)
+    await r.unmount()
+    expect(stop).toHaveBeenCalledTimes(1)
+    spy.mockRestore()
+  })
+})
+
+test('Skeleton does not start its animation loop under the test environment', async () => {
   const spy = jest.spyOn(Animated, 'loop')
-    .mockReturnValue({ start: jest.fn(), stop, reset: jest.fn() } as any)
-  const r = await render(<Skeleton height={20} />)
-  await r.unmount()
-  expect(stop).toHaveBeenCalledTimes(1)
+  await render(<Skeleton height={20} />)
+  expect(spy).not.toHaveBeenCalled()
   spy.mockRestore()
 })
 
@@ -112,13 +143,15 @@ test('Card style prop overrides the base', async () => {
 
 // StatusPill pulse cleanup test
 test('StatusPill stops its pulse loop on unmount', async () => {
-  const stop = jest.fn()
-  const spy = jest.spyOn(Animated, 'loop')
-    .mockReturnValue({ start: jest.fn(), stop, reset: jest.fn() } as any)
-  const r = await render(<StatusPill label="Running" tone="pos" pulse />)
-  await r.unmount()
-  expect(stop).toHaveBeenCalledTimes(1)
-  spy.mockRestore()
+  await withRealAnimations(async () => {
+    const stop = jest.fn()
+    const spy = jest.spyOn(Animated, 'loop')
+      .mockReturnValue({ start: jest.fn(), stop, reset: jest.fn() } as any)
+    const r = await render(<StatusPill label="Running" tone="pos" pulse />)
+    await r.unmount()
+    expect(stop).toHaveBeenCalledTimes(1)
+    spy.mockRestore()
+  })
 })
 
 // Icon fill tests
@@ -168,6 +201,13 @@ test('StatusPill does not start a loop when pulse is false', async () => {
   spy.mockRestore()
 })
 
+test('StatusPill does not start its pulse loop under the test environment', async () => {
+  const spy = jest.spyOn(Animated, 'loop')
+  await render(<StatusPill label="Running" tone="pos" pulse />)
+  expect(spy).not.toHaveBeenCalled()
+  spy.mockRestore()
+})
+
 // RetryCard message tests
 test('RetryCard shows its default message', async () => {
   await render(<RetryCard onRetry={jest.fn()} />)
@@ -181,21 +221,25 @@ test('RetryCard shows a custom message', async () => {
 
 // Animation start tests
 test('Skeleton starts its shimmer loop on mount', async () => {
-  const start = jest.fn()
-  const spy = jest.spyOn(Animated, 'loop')
-    .mockReturnValue({ start, stop: jest.fn(), reset: jest.fn() } as any)
-  await render(<Skeleton height={20} />)
-  expect(start).toHaveBeenCalledTimes(1)
-  spy.mockRestore()
+  await withRealAnimations(async () => {
+    const start = jest.fn()
+    const spy = jest.spyOn(Animated, 'loop')
+      .mockReturnValue({ start, stop: jest.fn(), reset: jest.fn() } as any)
+    await render(<Skeleton height={20} />)
+    expect(start).toHaveBeenCalledTimes(1)
+    spy.mockRestore()
+  })
 })
 
 test('StatusPill starts its pulse loop when pulse is true', async () => {
-  const start = jest.fn()
-  const spy = jest.spyOn(Animated, 'loop')
-    .mockReturnValue({ start, stop: jest.fn(), reset: jest.fn() } as any)
-  await render(<StatusPill label="Running" tone="pos" pulse />)
-  expect(start).toHaveBeenCalledTimes(1)
-  spy.mockRestore()
+  await withRealAnimations(async () => {
+    const start = jest.fn()
+    const spy = jest.spyOn(Animated, 'loop')
+      .mockReturnValue({ start, stop: jest.fn(), reset: jest.fn() } as any)
+    await render(<StatusPill label="Running" tone="pos" pulse />)
+    expect(start).toHaveBeenCalledTimes(1)
+    spy.mockRestore()
+  })
 })
 
 // Skeleton size tests
@@ -250,21 +294,25 @@ test('Icon color drives the stroke of an unfilled icon', async () => {
 afterEach(() => { jest.restoreAllMocks() })
 
 test('Skeleton binds its animated value to the rendered opacity', async () => {
-  const timing = jest.spyOn(Animated, 'timing')
-  const r = await render(<Skeleton height={20} />)
-  const value = timing.mock.calls[0][0] as Animated.Value
-  value.setValue(0.42)
-  await r.rerender(<Skeleton height={20} />)
-  expect(flat((r.toJSON() as any).props.style).opacity).toBe(0.42)
+  await withRealAnimations(async () => {
+    const timing = jest.spyOn(Animated, 'timing')
+    const r = await render(<Skeleton height={20} />)
+    const value = timing.mock.calls[0][0] as Animated.Value
+    value.setValue(0.42)
+    await r.rerender(<Skeleton height={20} />)
+    expect(flat((r.toJSON() as any).props.style).opacity).toBe(0.42)
+  })
 })
 
 test('StatusPill binds its animated value to the pulse dot opacity', async () => {
-  const timing = jest.spyOn(Animated, 'timing')
-  const r = await render(<StatusPill label="Running" tone="pos" pulse />)
-  const value = timing.mock.calls[0][0] as Animated.Value
-  value.setValue(0.42)
-  await r.rerender(<StatusPill label="Running" tone="pos" pulse />)
-  expect(flat(nodes(r.toJSON(), 'View')[1].props.style).opacity).toBe(0.42)
+  await withRealAnimations(async () => {
+    const timing = jest.spyOn(Animated, 'timing')
+    const r = await render(<StatusPill label="Running" tone="pos" pulse />)
+    const value = timing.mock.calls[0][0] as Animated.Value
+    value.setValue(0.42)
+    await r.rerender(<StatusPill label="Running" tone="pos" pulse />)
+    expect(flat(nodes(r.toJSON(), 'View')[1].props.style).opacity).toBe(0.42)
+  })
 })
 
 test('Icon scales its 24x24 artwork into the requested size', async () => {

@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { Animated, Text, View } from 'react-native'
 import { colors, fonts } from '../theme'
+import { isTestEnv } from '../utils/env'
 
 const TONES = {
   pos: { fg: colors.pos, bg: colors.posSoft },
@@ -15,6 +16,10 @@ export function StatusPill({ label, tone, pulse = false }: { label: string; tone
   const opacity = useRef(new Animated.Value(1)).current
   useEffect(() => {
     if (!pulse) return
+    // See Skeleton.tsx: Animated.loop's real timer never settles under Jest
+    // and leaks, forcing the worker to be killed on exit. Skip starting it
+    // under test — the pulse is cosmetic and untested.
+    if (isTestEnv()) return
     const loop = Animated.loop(Animated.sequence([
       Animated.timing(opacity, { toValue: 0.35, duration: 1100, useNativeDriver: true }),
       Animated.timing(opacity, { toValue: 1, duration: 1100, useNativeDriver: true }),

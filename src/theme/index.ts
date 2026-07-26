@@ -3,7 +3,7 @@ import { TextStyle } from 'react-native'
 export const colors = {
   paper: '#f4f1ea', card: '#fcfbf7', border: '#e7e0d3', hairline: '#efe9de',
   ink: '#211e1a', secondary: '#5d564b', muted: '#968d7e', faint: '#b3aa99',
-  track: '#ece6da',
+  track: '#ece6da', white: '#fff',
   accent: '#5b54e0', accentSoft: '#eae9f4', accentBorder: '#c5bed6',
   pos: '#2f8f5b', posSoft: '#e1ede3', posBorder: '#b7cbb4',
   neg: '#c2553c', warn: '#b9842a', warnSoft: '#f2e9d8',

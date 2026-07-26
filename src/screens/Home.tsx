@@ -48,7 +48,7 @@ export function HomeScreen() {
           <Text style={[type.h2, { marginTop: 2 }]}>{company?.name ?? '—'}</Text>
         </View>
         <View style={{ width: 38, height: 38, borderRadius: 19, backgroundColor: colors.accent, alignItems: 'center', justifyContent: 'center' }}>
-          <Text style={{ color: '#fff', fontFamily: fonts.sans, fontSize: 17 }}>{(user?.name ?? '?')[0]}</Text>
+          <Text style={{ color: colors.white, fontFamily: fonts.sans, fontSize: 17 }}>{(user?.name ?? '?')[0]}</Text>
         </View>
       </View>
 
@@ -56,7 +56,7 @@ export function HomeScreen() {
       <Card style={{ borderRadius: 20, padding: 18, gap: 0 }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 9, marginBottom: 12 }}>
           <View style={{ width: 34, height: 34, borderRadius: 17, backgroundColor: colors.accent, alignItems: 'center', justifyContent: 'center' }}>
-            <Icon name="sparkle" size={17} color="#fff" />
+            <Icon name="sparkle" size={17} color={colors.white} />
           </View>
           <Text style={{ fontFamily: fonts.sansSemi, fontSize: 13, color: colors.ink }}>Testerify Co-pilot</Text>
         </View>
@@ -70,7 +70,7 @@ export function HomeScreen() {
           <Icon name="sparkle" size={17} color={colors.accent} />
           <Text style={{ flex: 1, fontFamily: fonts.sans, fontSize: 14, color: colors.muted }}>Describe a goal…</Text>
           <View style={{ width: 32, height: 32, borderRadius: 9, backgroundColor: colors.accent, alignItems: 'center', justifyContent: 'center' }}>
-            <Icon name="send" size={16} color="#fff" />
+            <Icon name="send" size={16} color={colors.white} />
           </View>
         </Pressable>
       </Card>

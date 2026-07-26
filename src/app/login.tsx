@@ -41,7 +41,7 @@ export default function Login() {
         {error && <Text style={{ fontFamily: fonts.sans, fontSize: 13, color: colors.neg }}>{error}</Text>}
         <Pressable onPress={submit} disabled={busy || !email || !password}
           style={{ backgroundColor: colors.accent, opacity: busy || !email || !password ? 0.6 : 1, borderRadius: 13, minHeight: 52, alignItems: 'center', justifyContent: 'center' }}>
-          <Text style={{ fontFamily: fonts.sansSemi, fontSize: 15, color: '#fff' }}>{busy ? 'Signing in…' : 'Sign in'}</Text>
+          <Text style={{ fontFamily: fonts.sansSemi, fontSize: 15, color: colors.white }}>{busy ? 'Signing in…' : 'Sign in'}</Text>
         </Pressable>
       </View>
     </KeyboardAvoidingView>

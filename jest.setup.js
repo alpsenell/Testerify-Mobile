@@ -17,3 +17,17 @@ jest.mock('react-native-reanimated', () => require('react-native-reanimated/mock
 // care about connectivity (e.g. the root layout test) render unaffected,
 // while OfflineBanner's own test drives it via NetInfo.addEventListener.mock.calls.
 jest.mock('@react-native-community/netinfo', () => require('@react-native-community/netinfo/jest/netinfo-mock'))
+
+// react-native-safe-area-context's real native module isn't available under
+// Jest. OfflineBanner (mounted in the root layout) reads useSafeAreaInsets()
+// for its top padding, so it needs insets even outside of a SafeAreaProvider
+// (expo-router supplies the real provider only at runtime). The package
+// ships an official jest mock for exactly this — it falls back to a
+// zeroed-out Metrics object when no provider is present. The mock file only
+// has a default export (no named exports), so it must be unwrapped with
+// `.default` — the repo's transformIgnorePatterns allowlist inadvertently
+// transforms this file too (its "react-native" alternative matches as a
+// substring prefix of "react-native-safe-area-context"), which is what
+// surfaces the plain CJS `{ default: {...} }` shape here instead of the
+// production build's proper named exports.
+jest.mock('react-native-safe-area-context', () => require('react-native-safe-area-context/jest/mock').default)

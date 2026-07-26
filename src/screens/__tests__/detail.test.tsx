@@ -46,8 +46,26 @@ const PAUSED: CampaignDetailData = {
   ...WINNING, id: 't5', status: 'paused',
 }
 
+// Each test's QueryClient is tracked here so it can be torn down afterward —
+// see the afterEach below.
+let currentQueryClient: QueryClient | undefined
+
+// react-query schedules a 5-minute gcTime setTimeout (never .unref()'d) the
+// moment a query's last observer unmounts — which RNTL's own afterEach does
+// for every test here. Left unhandled, each of this file's QueryClients
+// leaves that real timer running, and the Jest worker never exits naturally
+// (the "worker process has failed to exit gracefully" warning). clear()
+// removes every query/mutation from the cache, which cancels their gcTime
+// timers immediately — it doesn't touch the app's real gcTime default, only
+// disposes of this test's client once the test is done with it.
+afterEach(() => {
+  currentQueryClient?.clear()
+  currentQueryClient = undefined
+})
+
 const renderDetail = async () => {
   const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+  currentQueryClient = qc
   return await render(<QueryClientProvider client={qc}><TestDetailScreen /></QueryClientProvider>)
 }
 

@@ -252,8 +252,8 @@ export function TestDetailScreen() {
         <View style={{ position: 'absolute', left: 0, right: 0, bottom: 0, paddingHorizontal: 16, paddingTop: 24, paddingBottom: Platform.OS === 'ios' ? 34 : 18, backgroundColor: colors.paper }}>
           <Pressable onPress={() => openShip(c.id)}
             style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: colors.accent, borderRadius: 14, minHeight: 52 }}>
-            <Icon name="flag" size={18} color="#fff" />
-            <Text style={{ fontFamily: fonts.sansSemi, fontSize: 15, color: '#fff' }}>Ship {challengerForShip?.name ?? 'winner'}</Text>
+            <Icon name="flag" size={18} color={colors.white} />
+            <Text style={{ fontFamily: fonts.sansSemi, fontSize: 15, color: colors.white }}>Ship {challengerForShip?.name ?? 'winner'}</Text>
           </Pressable>
         </View>
       )}
