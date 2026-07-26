@@ -8,7 +8,7 @@ export type AiIdea = {
 }
 export type SavedSuggestions = { ideas: AiIdea[]; source: 'you' | 'company' | null; goal: string | null; generatedAt: string | null }
 
-// 402 Plan-gated: Growth+ required (Scale-tier feature)
+// 402 Plan-gated: Growth+ required (FEATURE.AI_ASSIST)
 export type AiInsightsResponse = {
   behavior: PageBehaviorResponse
   summary: string

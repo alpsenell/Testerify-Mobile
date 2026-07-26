@@ -242,11 +242,10 @@ export type CustomEventsResponse = {
   totalVisitors: number
 }
 
-export const fetchCustomEvents = (args: { from?: string; to?: string; preset?: number; view?: string } = {}) => {
+export const fetchCustomEvents = (args: { from?: string; to?: string; view?: string } = {}) => {
   const params = new URLSearchParams()
   if (args.from) params.set('from', args.from)
   if (args.to) params.set('to', args.to)
-  if (args.preset) params.set('preset', String(args.preset))
   if (args.view) params.set('view', args.view)
   const qs = params.toString()
   return apiFetch<CustomEventsResponse>(`/api/stats/custom-events${qs ? `?${qs}` : ''}`)
