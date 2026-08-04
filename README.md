@@ -95,7 +95,7 @@ Automated tests don't touch a real device, a real network toggle, or the real ba
    - Open via the raised center FAB. Pick a goal chip, generate ideas.
    - Build draft on a generated idea → toast confirms, and the new draft appears under the Tests tab (Draft filter).
 8. **More sheet**
-   - Open via the tab bar "More" button. Tap a few of the 8 still-unbuilt secondary-screen entries → each shows its "coming to mobile" toast rather than crashing or navigating nowhere.
+   - Open via the tab bar "More" button. Tap a few of the 7 still-unbuilt secondary-screen entries → each shows its "coming to mobile" toast rather than crashing or navigating nowhere.
    - Tap "Live" → navigates to the real Live screen (see step 11) instead of a toast.
    - Tap "Learnings" → navigates to the real Learnings screen (see step 12) instead of a toast.
    - Tap "Analytics" → navigates to the real Analytics screen (see step 13) instead of a toast.
@@ -104,6 +104,7 @@ Automated tests don't touch a real device, a real network toggle, or the real ba
    - Tap "Tracking" → navigates to the real Tracking screen (see step 16) instead of a toast.
    - Tap "Products" → navigates to the real Products screen (see step 17) instead of a toast.
    - Tap "Pages" → navigates to the real Shopper behavior screen (see step 18) instead of a toast.
+   - Tap "Events" → navigates to the real Events screen (see step 19) instead of a toast.
 9. **Session persistence**
    - Kill the app fully (swipe away / force-stop) and relaunch → should land signed-in on Home without hitting the login screen again (session restores from `expo-secure-store`).
 10. **Offline handling**
@@ -153,6 +154,11 @@ Automated tests don't touch a real device, a real network toggle, or the real ba
     - Open via More sheet → "Pages" → back returns to Home. Last-7-days window; cross-check views, visitors and the by-page-type rows against the desktop panel's behavior page. "Avg time on page" is a views-weighted average across page types — the endpoint reports no site-wide average — so expect it to sit between the per-type figures.
     - Tap a page-type row → the Top pages table refetches scoped to that type and a "<type> · Clear" affordance appears; tapping the row again (or Clear) restores the unscoped table. Tiles stay on the whole window by design.
     - **AI behavior insight:** starts idle. Tap Analyze → it waits as long as the server needs (no client timeout) → summary plus severity-dotted items. On a Free/Growth-gated store it must show the upgrade note, **not** a retry card; any other failure shows Retry and retrying must work.
+
+19. **Events screen**
+    - Open via More sheet → "Events" → back returns to Home. Rows list every custom event with its fire count, visitors, reach and last-fired time — cross-check against the desktop panel's Events page.
+    - Tap a row → chevron rotates, breakdown expands (overview grid, per-campaign and site-wide bars, recent samples with device/country/campaign chips and the raw payload). Tap again to collapse. An event with no campaign or sample data says so rather than rendering empty bars.
+    - Search matches the event name; no match → "No events match."
 
 Log anything off-script (visual glitch, crash, wrong number) against the screen/step above rather than as a vague "something looked wrong."
 
