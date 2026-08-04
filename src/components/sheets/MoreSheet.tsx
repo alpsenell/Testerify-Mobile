@@ -24,14 +24,23 @@ const ITEMS: { label: string; icon: IconName }[] = [
   { label: 'Settings', icon: 'settings' },
 ]
 
+// Built Phase-2 screens, by their More-sheet label. Anything absent still
+// falls through to the "coming to mobile" toast — each screen task moves its
+// own label in here as the route lands.
+const ROUTES: Record<string, string> = {
+  Live: '/screens/live',
+  Learnings: '/screens/learnings',
+}
+
 export function MoreSheet() {
   const show = useToast((s) => s.show)
   const close = useSheets((s) => s.close)
 
   const tap = (label: string) => {
     close()
-    if (label === 'Live') {
-      router.push('/screens/live')
+    const route = ROUTES[label]
+    if (route) {
+      router.push(route)
       return
     }
     show(`${label} is coming to mobile — it lives on the desktop panel for now.`)

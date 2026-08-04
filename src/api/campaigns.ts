@@ -36,5 +36,7 @@ export const fetchCampaigns = () => apiFetch<{ campaigns: CampaignListItem[] }>(
 export const fetchCampaign = (id: string) => apiFetch<{ campaign: CampaignDetailData }>(`/api/campaigns/${id}`).then(r => r.campaign)
 export const promoteCampaign = (id: string, variantId: string) =>
   apiFetch<{ campaign: unknown; rollout: unknown }>(`/api/campaigns/${id}`, { method: 'POST', body: JSON.stringify({ action: 'promote', variantId }) })
+export const updateLearningNote = (id: string, learningNote: string) =>
+  apiFetch<{ campaign: unknown }>(`/api/campaigns/${id}`, { method: 'PATCH', body: JSON.stringify({ learningNote }) })
 export const rollbackCampaign = (id: string) =>
   apiFetch<{ campaign: unknown }>(`/api/campaigns/${id}`, { method: 'PATCH', body: JSON.stringify({ status: 'running' }) })

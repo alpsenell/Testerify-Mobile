@@ -95,8 +95,9 @@ Automated tests don't touch a real device, a real network toggle, or the real ba
    - Open via the raised center FAB. Pick a goal chip, generate ideas.
    - Build draft on a generated idea → toast confirms, and the new draft appears under the Tests tab (Draft filter).
 8. **More sheet**
-   - Open via the tab bar "More" button. Tap a few of the 15 still-unbuilt secondary-screen entries → each shows its "coming to mobile" toast rather than crashing or navigating nowhere.
+   - Open via the tab bar "More" button. Tap a few of the 14 still-unbuilt secondary-screen entries → each shows its "coming to mobile" toast rather than crashing or navigating nowhere.
    - Tap "Live" → navigates to the real Live screen (see step 11) instead of a toast.
+   - Tap "Learnings" → navigates to the real Learnings screen (see step 12) instead of a toast.
 9. **Session persistence**
    - Kill the app fully (swipe away / force-stop) and relaunch → should land signed-in on Home without hitting the login screen again (session restores from `expo-secure-store`).
 10. **Offline handling**
@@ -109,6 +110,11 @@ Automated tests don't touch a real device, a real network toggle, or the real ba
     - On-site-now count and the by-location rows match the desktop panel's Live page for the same test-store account. Note: the design's "63 in a test · 41 on a product page" split and per-visitor session rows are intentionally not rendered — no backend field backs either (see spec deviations); the location aggregate stands in for both.
     - Leave the screen open ~15–20s → the count/location rows refresh in place (polls every 15s) without a visible flash of loading/empty state.
     - Pull-to-refresh works independently of the poll.
+12. **Learnings screen**
+    - Open via More sheet → "Learnings" → back returns to Home.
+    - Only concluded tests appear (shipped or completed) — nothing still running or in draft. Cross-check the list and each card's outcome badge, meta grid (runs on / visitors tested / started / concluded) and note against the desktop panel's Learnings page for the same test-store account.
+    - Filter chips (All / Won / No winner) and the search field (matches name *and* note) narrow the list; searching for nonsense shows "No learnings match."
+    - **Note editing (test store only):** tap a note → inline editor opens → edit → Save. The row shows the saved text after the server responds; reopen the screen (or pull-to-refresh) and confirm it persisted. Cancel discards. Save while offline → error toast, editor stays open with your text intact.
 
 Log anything off-script (visual glitch, crash, wrong number) against the screen/step above rather than as a vague "something looked wrong."
 

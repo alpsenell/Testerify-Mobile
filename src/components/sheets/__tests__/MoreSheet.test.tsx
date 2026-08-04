@@ -10,26 +10,21 @@ jest.useFakeTimers()
 
 jest.mock('expo-router', () => ({ router: { push: jest.fn() } }))
 
-// 'Live' is excluded here — it now navigates to a real screen instead of
-// showing the generic "coming to mobile" toast; covered separately below.
+// Labels that still toast. Built Phase-2 screens ('Live', 'Learnings') are
+// excluded — they navigate to a real screen instead of showing the generic
+// "coming to mobile" toast; each is covered by its own case below.
 const LABELS = [
-  'Learnings', 'Nudges', 'Flows', 'Audiences', 'Analytics', 'Products',
+  'Nudges', 'Flows', 'Audiences', 'Analytics', 'Products',
   'Events', 'Heatmaps', 'Replays', 'Tracking', 'Funnel', 'Pages',
   'Favorites', 'Team', 'Settings',
 ]
 
+// Built screens, by label and route.
+const ROUTED: [string, string][] = [['Live', '/screens/live'], ['Learnings', '/screens/learnings']]
+
 beforeEach(() => {
   useSheets.setState({ sheet: { kind: 'more' } })
   useToast.setState({ message: null })
-})
-
-test('tapping an item closes the sheet and shows its toast', async () => {
-  await render(<MoreSheet />)
-  fireEvent.press(screen.getByText('Learnings'))
-  expect(useSheets.getState().sheet).toBeNull()
-  expect(useToast.getState().message).toBe(
-    'Learnings is coming to mobile — it lives on the desktop panel for now.'
-  )
 })
 
 test.each(LABELS)('tapping "%s" closes the sheet and shows its own toast', async (label) => {
@@ -41,10 +36,10 @@ test.each(LABELS)('tapping "%s" closes the sheet and shows its own toast', async
   )
 })
 
-test('tapping "Live" closes the sheet and navigates to the Live screen instead of showing a toast', async () => {
+test.each(ROUTED)('tapping "%s" closes the sheet and navigates to %s instead of showing a toast', async (label, route) => {
   await render(<MoreSheet />)
-  fireEvent.press(screen.getAllByText('Live')[0])
+  fireEvent.press(screen.getAllByText(label)[0])
   expect(useSheets.getState().sheet).toBeNull()
-  expect(router.push).toHaveBeenCalledWith('/screens/live')
+  expect(router.push).toHaveBeenCalledWith(route)
   expect(useToast.getState().message).toBeNull()
 })
