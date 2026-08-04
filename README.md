@@ -95,9 +95,10 @@ Automated tests don't touch a real device, a real network toggle, or the real ba
    - Open via the raised center FAB. Pick a goal chip, generate ideas.
    - Build draft on a generated idea → toast confirms, and the new draft appears under the Tests tab (Draft filter).
 8. **More sheet**
-   - Open via the tab bar "More" button. Tap a few of the 14 still-unbuilt secondary-screen entries → each shows its "coming to mobile" toast rather than crashing or navigating nowhere.
+   - Open via the tab bar "More" button. Tap a few of the 13 still-unbuilt secondary-screen entries → each shows its "coming to mobile" toast rather than crashing or navigating nowhere.
    - Tap "Live" → navigates to the real Live screen (see step 11) instead of a toast.
    - Tap "Learnings" → navigates to the real Learnings screen (see step 12) instead of a toast.
+   - Tap "Analytics" → navigates to the real Analytics screen (see step 13) instead of a toast.
 9. **Session persistence**
    - Kill the app fully (swipe away / force-stop) and relaunch → should land signed-in on Home without hitting the login screen again (session restores from `expo-secure-store`).
 10. **Offline handling**
@@ -115,6 +116,13 @@ Automated tests don't touch a real device, a real network toggle, or the real ba
     - Only concluded tests appear (shipped or completed) — nothing still running or in draft. Cross-check the list and each card's outcome badge, meta grid (runs on / visitors tested / started / concluded) and note against the desktop panel's Learnings page for the same test-store account.
     - Filter chips (All / Won / No winner) and the search field (matches name *and* note) narrow the list; searching for nonsense shows "No learnings match."
     - **Note editing (test store only):** tap a note → inline editor opens → edit → Save. The row shows the saved text after the server responds; reopen the screen (or pull-to-refresh) and confirm it persisted. Cancel discards. Save while offline → error toast, editor stays open with your text intact.
+
+13. **Analytics screen**
+    - Open via More sheet → "Analytics" → back returns to Home.
+    - Every figure is derived from the campaigns list, so cross-check against the desktop panel: tests run (excludes drafts), winners shipped + win rate, average winning uplift, and revenue measured on shipped winners. Note the revenue tile is *revenue on winning tests*, not incremental lift — the list endpoint reports no incremental figure.
+    - Win-rate ring matches the "% win rate" tile; its legend counts add up to tests run.
+    - Uplift leaderboard: bars scale to the largest absolute uplift, losses render in red with a "−" sign.
+    - Testing velocity: 8 week columns, oldest left, labelled by UTC week start; totals match the tests you started in those weeks.
 
 Log anything off-script (visual glitch, crash, wrong number) against the screen/step above rather than as a vague "something looked wrong."
 

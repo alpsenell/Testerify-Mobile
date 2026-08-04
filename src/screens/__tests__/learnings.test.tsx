@@ -47,11 +47,11 @@ beforeEach(() => {
 })
 
 afterEach(async () => {
-  // react-query batches its observer notifications behind a setTimeout(0);
-  // a mutation that settles at the very end of a test would otherwise fire
-  // that batch after teardown — outside act(), which both warns and leaves a
-  // timer holding the Jest worker open. Flush it inside act() first.
-  await act(async () => { await Promise.resolve() })
+  // react-query batches its observer notifications behind a setTimeout(0). A
+  // query or mutation that settles at the very end of a test would otherwise
+  // fire that batch after teardown — outside act(), which both warns and
+  // leaves a timer holding the Jest worker open. Drain it inside act() first.
+  await act(async () => { await new Promise((resolve) => setTimeout(resolve, 0)) })
   useToast.setState({ show: realShow })
   cleanup()
   currentQueryClient?.clear()

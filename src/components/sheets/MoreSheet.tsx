@@ -30,6 +30,7 @@ const ITEMS: { label: string; icon: IconName }[] = [
 const ROUTES: Record<string, string> = {
   Live: '/screens/live',
   Learnings: '/screens/learnings',
+  Analytics: '/screens/analytics',
 }
 
 export function MoreSheet() {

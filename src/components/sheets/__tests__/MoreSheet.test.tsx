@@ -14,13 +14,17 @@ jest.mock('expo-router', () => ({ router: { push: jest.fn() } }))
 // excluded — they navigate to a real screen instead of showing the generic
 // "coming to mobile" toast; each is covered by its own case below.
 const LABELS = [
-  'Nudges', 'Flows', 'Audiences', 'Analytics', 'Products',
+  'Nudges', 'Flows', 'Audiences', 'Products',
   'Events', 'Heatmaps', 'Replays', 'Tracking', 'Funnel', 'Pages',
   'Favorites', 'Team', 'Settings',
 ]
 
 // Built screens, by label and route.
-const ROUTED: [string, string][] = [['Live', '/screens/live'], ['Learnings', '/screens/learnings']]
+const ROUTED: [string, string][] = [
+  ['Live', '/screens/live'],
+  ['Learnings', '/screens/learnings'],
+  ['Analytics', '/screens/analytics'],
+]
 
 beforeEach(() => {
   useSheets.setState({ sheet: { kind: 'more' } })
