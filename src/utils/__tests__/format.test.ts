@@ -1,4 +1,4 @@
-import { compact, pct, signedPct, money, relTime, daysBetween } from '../format'
+import { compact, duration, pct, signedPct, money, relTime, daysBetween } from '../format'
 
 const NOW = new Date('2026-07-25T12:00:00Z')
 
@@ -44,4 +44,25 @@ test('relTime', () => {
 
 test('daysBetween', () => {
   expect(daysBetween('2026-07-16T00:00:00Z', NOW)).toBe(9)
+})
+
+describe('duration', () => {
+  test('renders seconds, minutes and hours', () => {
+    expect(duration(48_000)).toBe('48s')
+    expect(duration(72_000)).toBe('1m 12s')
+    expect(duration(120_000)).toBe('2m')
+    expect(duration(7_500_000)).toBe('2h 5m')
+    expect(duration(7_200_000)).toBe('2h')
+  })
+
+  test('an untimed figure is an em dash, not a zero', () => {
+    expect(duration(null)).toBe('—')
+    expect(duration(-1)).toBe('—')
+    expect(duration(NaN)).toBe('—')
+  })
+
+  test('rounds to the nearest second', () => {
+    expect(duration(1_400)).toBe('1s')
+    expect(duration(1_600)).toBe('2s')
+  })
 })

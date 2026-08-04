@@ -51,6 +51,21 @@ export function shortDate(d: Date | string): string {
   return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' })
 }
 
+// Human duration for a time-on-page figure: "1m 12s", "48s", "2h 5m". Null
+// input means the endpoint had nothing timed, which reads as an em dash
+// rather than as "0s".
+export function duration(ms: number | null): string {
+  if (ms === null || !Number.isFinite(ms) || ms < 0) return '—'
+  const totalSeconds = Math.round(ms / 1000)
+  if (totalSeconds < 60) return `${totalSeconds}s`
+  const minutes = Math.floor(totalSeconds / 60)
+  const seconds = totalSeconds % 60
+  if (minutes < 60) return seconds === 0 ? `${minutes}m` : `${minutes}m ${seconds}s`
+  const hours = Math.floor(minutes / 60)
+  const restMinutes = minutes % 60
+  return restMinutes === 0 ? `${hours}h` : `${hours}h ${restMinutes}m`
+}
+
 export function relTime(iso: string, now: Date = new Date()): string {
   const d = new Date(iso)
   const diffMs = now.getTime() - d.getTime()

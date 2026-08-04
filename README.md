@@ -95,7 +95,7 @@ Automated tests don't touch a real device, a real network toggle, or the real ba
    - Open via the raised center FAB. Pick a goal chip, generate ideas.
    - Build draft on a generated idea → toast confirms, and the new draft appears under the Tests tab (Draft filter).
 8. **More sheet**
-   - Open via the tab bar "More" button. Tap a few of the 9 still-unbuilt secondary-screen entries → each shows its "coming to mobile" toast rather than crashing or navigating nowhere.
+   - Open via the tab bar "More" button. Tap a few of the 8 still-unbuilt secondary-screen entries → each shows its "coming to mobile" toast rather than crashing or navigating nowhere.
    - Tap "Live" → navigates to the real Live screen (see step 11) instead of a toast.
    - Tap "Learnings" → navigates to the real Learnings screen (see step 12) instead of a toast.
    - Tap "Analytics" → navigates to the real Analytics screen (see step 13) instead of a toast.
@@ -103,6 +103,7 @@ Automated tests don't touch a real device, a real network toggle, or the real ba
    - Tap "Heatmaps" → navigates to the real Heatmaps screen (see step 15) instead of a toast.
    - Tap "Tracking" → navigates to the real Tracking screen (see step 16) instead of a toast.
    - Tap "Products" → navigates to the real Products screen (see step 17) instead of a toast.
+   - Tap "Pages" → navigates to the real Shopper behavior screen (see step 18) instead of a toast.
 9. **Session persistence**
    - Kill the app fully (swipe away / force-stop) and relaunch → should land signed-in on Home without hitting the login screen again (session restores from `expo-secure-store`).
 10. **Offline handling**
@@ -147,6 +148,11 @@ Automated tests don't touch a real device, a real network toggle, or the real ba
     - Search matches product title and handle; no match → "No products match."
     - **"High traffic · low conversion" is derived on-device, not a backend flag** — it marks products with at-or-above-average views that convert below the store's own rate. Sanity-check a flagged product against its numbers; nothing is flagged when the store has no measurable conversion rate.
     - A window spanning several currencies drops the currency symbol and says "mixed currencies" rather than picking one.
+
+18. **Pages screen (Shopper behavior)**
+    - Open via More sheet → "Pages" → back returns to Home. Last-7-days window; cross-check views, visitors and the by-page-type rows against the desktop panel's behavior page. "Avg time on page" is a views-weighted average across page types — the endpoint reports no site-wide average — so expect it to sit between the per-type figures.
+    - Tap a page-type row → the Top pages table refetches scoped to that type and a "<type> · Clear" affordance appears; tapping the row again (or Clear) restores the unscoped table. Tiles stay on the whole window by design.
+    - **AI behavior insight:** starts idle. Tap Analyze → it waits as long as the server needs (no client timeout) → summary plus severity-dotted items. On a Free/Growth-gated store it must show the upgrade note, **not** a retry card; any other failure shows Retry and retrying must work.
 
 Log anything off-script (visual glitch, crash, wrong number) against the screen/step above rather than as a vague "something looked wrong."
 
