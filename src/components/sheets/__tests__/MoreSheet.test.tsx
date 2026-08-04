@@ -15,7 +15,7 @@ jest.mock('expo-router', () => ({ router: { push: jest.fn() } }))
 // "coming to mobile" toast; each is covered by its own case below.
 const LABELS = [
   'Nudges', 'Flows', 'Audiences', 'Products',
-  'Events', 'Heatmaps', 'Replays', 'Tracking', 'Pages',
+  'Events', 'Replays', 'Tracking', 'Pages',
   'Favorites', 'Team', 'Settings',
 ]
 
@@ -25,6 +25,7 @@ const ROUTED: [string, string][] = [
   ['Learnings', '/screens/learnings'],
   ['Analytics', '/screens/analytics'],
   ['Funnel', '/screens/funnel'],
+  ['Heatmaps', '/screens/heatmaps'],
 ]
 
 beforeEach(() => {

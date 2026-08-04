@@ -95,11 +95,12 @@ Automated tests don't touch a real device, a real network toggle, or the real ba
    - Open via the raised center FAB. Pick a goal chip, generate ideas.
    - Build draft on a generated idea → toast confirms, and the new draft appears under the Tests tab (Draft filter).
 8. **More sheet**
-   - Open via the tab bar "More" button. Tap a few of the 12 still-unbuilt secondary-screen entries → each shows its "coming to mobile" toast rather than crashing or navigating nowhere.
+   - Open via the tab bar "More" button. Tap a few of the 11 still-unbuilt secondary-screen entries → each shows its "coming to mobile" toast rather than crashing or navigating nowhere.
    - Tap "Live" → navigates to the real Live screen (see step 11) instead of a toast.
    - Tap "Learnings" → navigates to the real Learnings screen (see step 12) instead of a toast.
    - Tap "Analytics" → navigates to the real Analytics screen (see step 13) instead of a toast.
    - Tap "Funnel" → navigates to the real Funnel screen (see step 14) instead of a toast.
+   - Tap "Heatmaps" → navigates to the real Heatmaps screen (see step 15) instead of a toast.
 9. **Session persistence**
    - Kill the app fully (swipe away / force-stop) and relaunch → should land signed-in on Home without hitting the login screen again (session restores from `expo-secure-store`).
 10. **Offline handling**
@@ -129,6 +130,10 @@ Automated tests don't touch a real device, a real network toggle, or the real ba
     - Open via More sheet → "Funnel" → back returns to Home. Window is a fixed last-7-days (UTC, today inclusive) — cross-check the step visitor counts and percentages against the desktop panel's Funnel page for the same window.
     - Steps your pixel doesn't track render as "—" with the endpoint's hint, never as 0.
     - The "Biggest drop" tile names the same step that shows the largest −% in the list.
+
+15. **Heatmaps screen**
+    - Open via More sheet → "Heatmaps" → back returns to Home. Page ranking, device split, click share and frustration chips should match the desktop panel's Heatmaps list. The click overlay itself is desktop-only by design — there is no overlay here.
+    - The "N pages hidden for having fewer than M clicks" footnote only appears when the endpoint reports hidden pages.
 
 Log anything off-script (visual glitch, crash, wrong number) against the screen/step above rather than as a vague "something looked wrong."
 
