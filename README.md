@@ -95,13 +95,14 @@ Automated tests don't touch a real device, a real network toggle, or the real ba
    - Open via the raised center FAB. Pick a goal chip, generate ideas.
    - Build draft on a generated idea → toast confirms, and the new draft appears under the Tests tab (Draft filter).
 8. **More sheet**
-   - Open via the tab bar "More" button. Tap a few of the 10 still-unbuilt secondary-screen entries → each shows its "coming to mobile" toast rather than crashing or navigating nowhere.
+   - Open via the tab bar "More" button. Tap a few of the 9 still-unbuilt secondary-screen entries → each shows its "coming to mobile" toast rather than crashing or navigating nowhere.
    - Tap "Live" → navigates to the real Live screen (see step 11) instead of a toast.
    - Tap "Learnings" → navigates to the real Learnings screen (see step 12) instead of a toast.
    - Tap "Analytics" → navigates to the real Analytics screen (see step 13) instead of a toast.
    - Tap "Funnel" → navigates to the real Funnel screen (see step 14) instead of a toast.
    - Tap "Heatmaps" → navigates to the real Heatmaps screen (see step 15) instead of a toast.
    - Tap "Tracking" → navigates to the real Tracking screen (see step 16) instead of a toast.
+   - Tap "Products" → navigates to the real Products screen (see step 17) instead of a toast.
 9. **Session persistence**
    - Kill the app fully (swipe away / force-stop) and relaunch → should land signed-in on Home without hitting the login screen again (session restores from `expo-secure-store`).
 10. **Offline handling**
@@ -140,6 +141,12 @@ Automated tests don't touch a real device, a real network toggle, or the real ba
     - Open via More sheet → "Tracking" → back returns to Home. Last-7-days UTM window; cross-check tagged visits, unique visitors, top source and the breakdown against the desktop panel's Tracking page.
     - Source / Medium / Campaign toggle refetches and swaps the rows; the tiles stay on the window totals.
     - The summary line only claims what the endpoint reports — with no previous period it drops the trend clause instead of showing a change.
+
+17. **Products screen**
+    - Open via More sheet → "Products" → back returns to Home. Last-7-days window; cross-check views, add rate, units and revenue against the desktop panel's Products page.
+    - Search matches product title and handle; no match → "No products match."
+    - **"High traffic · low conversion" is derived on-device, not a backend flag** — it marks products with at-or-above-average views that convert below the store's own rate. Sanity-check a flagged product against its numbers; nothing is flagged when the store has no measurable conversion rate.
+    - A window spanning several currencies drops the currency symbol and says "mixed currencies" rather than picking one.
 
 Log anything off-script (visual glitch, crash, wrong number) against the screen/step above rather than as a vague "something looked wrong."
 
