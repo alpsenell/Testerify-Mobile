@@ -95,7 +95,7 @@ Automated tests don't touch a real device, a real network toggle, or the real ba
    - Open via the raised center FAB. Pick a goal chip, generate ideas.
    - Build draft on a generated idea → toast confirms, and the new draft appears under the Tests tab (Draft filter).
 8. **More sheet**
-   - Open via the tab bar "More" button. Tap a few of the 6 still-unbuilt secondary-screen entries → each shows its "coming to mobile" toast rather than crashing or navigating nowhere.
+   - Open via the tab bar "More" button. Tap a few of the 5 still-unbuilt secondary-screen entries → each shows its "coming to mobile" toast rather than crashing or navigating nowhere.
    - Tap "Live" → navigates to the real Live screen (see step 11) instead of a toast.
    - Tap "Learnings" → navigates to the real Learnings screen (see step 12) instead of a toast.
    - Tap "Analytics" → navigates to the real Analytics screen (see step 13) instead of a toast.
@@ -106,6 +106,7 @@ Automated tests don't touch a real device, a real network toggle, or the real ba
    - Tap "Pages" → navigates to the real Shopper behavior screen (see step 18) instead of a toast.
    - Tap "Events" → navigates to the real Events screen (see step 19) instead of a toast.
    - Tap "Replays" → navigates to the real Session replays screen (see step 20) instead of a toast.
+   - Tap "Favorites" → navigates to the real Favorites screen (see step 21) instead of a toast.
 9. **Session persistence**
    - Kill the app fully (swipe away / force-stop) and relaunch → should land signed-in on Home without hitting the login screen again (session restores from `expo-secure-store`).
 10. **Offline handling**
@@ -166,6 +167,12 @@ Automated tests don't touch a real device, a real network toggle, or the real ba
     - All / Rage / Dead clicks refetches through the endpoint's own trigger filter.
     - **There is no mobile player by design** — the play button toasts "Replays play on the desktop panel."
     - On a Free/Growth store (replay is Scale-tier) the screen must show the upgrade note, **not** a retry card.
+
+21. **Favorites screen (on-device only)**
+    - Open a test detail → tap the header star → it fills. Open More sheet → "Favorites" → the test appears as a rich card (status pill, name, target, sparkline, conv. rate / uplift / confidence). Tap the card → opens that test. Unpin from the detail header → it leaves Favorites.
+    - Open the co-pilot → generate ideas → tap the "+" beside an idea's Build draft button → toast confirms and the button flips to its saved state. The idea appears under Favorites → "Saved AI ideas"; Build there creates a draft (check the Tests tab, Draft filter) and Remove deletes it.
+    - **Pins and saved ideas are stored on the device (AsyncStorage), not on the server** — they survive an app restart but do not appear in the desktop panel or on another device. Kill and relaunch the app to confirm both persist.
+    - A pinned test that no longer exists on the backend silently drops out of the list.
 
 Log anything off-script (visual glitch, crash, wrong number) against the screen/step above rather than as a vague "something looked wrong."
 

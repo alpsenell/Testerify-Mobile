@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { fetchSuggestions, generateSuggestions, generateTestDraft, type AiIdea } from '../../api/ai'
 import { useSheets } from '../../stores/sheets'
 import { useToast } from '../../stores/toast'
+import { useFavorites } from '../../stores/favorites'
 import { draftRequestFor, ideaTag, impactColor } from '../../utils/copilot'
 import { Icon } from '../Icon'
 import { Skeleton } from '../Skeleton'
@@ -18,8 +19,8 @@ const GOAL_CHIPS = [
 
 const errMessage = (e: unknown, fallback: string) => (e instanceof Error ? e.message : fallback)
 
-function IdeaCard({ idea, active, disabled, onBuild }: {
-  idea: AiIdea; active: boolean; disabled: boolean; onBuild: () => void
+function IdeaCard({ idea, active, disabled, onBuild, onSave, saved }: {
+  idea: AiIdea; active: boolean; disabled: boolean; onBuild: () => void; onSave: () => void; saved: boolean
 }) {
   return (
     <View style={{ backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, borderRadius: radius.card, padding: 14, marginBottom: 10 }}>
@@ -33,20 +34,38 @@ function IdeaCard({ idea, active, disabled, onBuild }: {
       </View>
       <Text style={{ fontFamily: fonts.sansSemi, fontSize: 14.5, color: colors.ink, marginBottom: 4 }}>{idea.title}</Text>
       <Text style={[type.body, { marginBottom: 12 }]}>{idea.hypothesis}</Text>
-      <Pressable
-        disabled={disabled}
-        onPress={onBuild}
-        style={{
-          flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8,
-          backgroundColor: colors.accent, borderRadius: 12, minHeight: 44,
-          opacity: disabled ? 0.6 : 1,
-        }}
-      >
-        <Icon name="sparkle" size={16} color={colors.white} />
-        <Text style={{ fontFamily: fonts.sansSemi, fontSize: 13.5, color: colors.white }}>
-          {active ? 'Building…' : 'Build draft'}
-        </Text>
-      </Pressable>
+      <View style={{ flexDirection: 'row', gap: 8 }}>
+        <Pressable
+          disabled={disabled}
+          onPress={onBuild}
+          style={{
+            flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8,
+            backgroundColor: colors.accent, borderRadius: 12, minHeight: 44,
+            opacity: disabled ? 0.6 : 1,
+          }}
+        >
+          <Icon name="sparkle" size={16} color={colors.white} />
+          <Text style={{ fontFamily: fonts.sansSemi, fontSize: 13.5, color: colors.white }}>
+            {active ? 'Building…' : 'Build draft'}
+          </Text>
+        </Pressable>
+        {/* Saves the idea to the on-device Favorites store so it survives the
+            sheet closing — the Phase-1 omission this closes. */}
+        <Pressable
+          accessibilityRole="button"
+          accessibilityState={{ selected: saved }}
+          accessibilityLabel={saved ? `Saved: ${idea.title}` : `Save ${idea.title} to favorites`}
+          onPress={onSave}
+          style={{
+            width: 48, alignItems: 'center', justifyContent: 'center',
+            borderWidth: 1, borderColor: saved ? colors.accent : colors.border,
+            backgroundColor: saved ? colors.accentSoft : 'transparent',
+            borderRadius: 12, minHeight: 44,
+          }}
+        >
+          <Icon name={saved ? 'check' : 'plus'} size={18} color={saved ? colors.accent : colors.secondary} />
+        </Pressable>
+      </View>
     </View>
   )
 }
@@ -55,6 +74,8 @@ export function CopilotSheet() {
   const close = useSheets((s) => s.close)
   const show = useToast((s) => s.show)
   const qc = useQueryClient()
+  const saveIdea = useFavorites((s) => s.saveIdea)
+  const savedIdeas = useFavorites((s) => s.savedIdeas)
   const [goal, setGoal] = useState('')
 
   const { data, isPending: suggestionsPending } = useQuery({ queryKey: ['suggestions'], queryFn: fetchSuggestions })
@@ -170,6 +191,8 @@ export function CopilotSheet() {
             active={isActiveBuild(idea)}
             disabled={build.isPending}
             onBuild={() => build.mutate(draftRequestFor(idea))}
+            saved={savedIdeas.some((i) => i.title === idea.title)}
+            onSave={() => { saveIdea(idea); show(`Saved "${idea.title}" to Favorites.`) }}
           />
         ))
       )}

@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { TestDetailScreen } from '../TestDetail'
 import * as campaigns from '../../api/campaigns'
 import type { CampaignDetailData } from '../../api/campaigns'
+import { useFavorites } from '../../stores/favorites'
 
 jest.mock('expo-router', () => ({
   router: { push: jest.fn(), back: jest.fn() },
@@ -59,6 +60,7 @@ let currentQueryClient: QueryClient | undefined
 // timers immediately — it doesn't touch the app's real gcTime default, only
 // disposes of this test's client once the test is done with it.
 afterEach(() => {
+  useFavorites.setState({ pinnedIds: [], savedIdeas: [] })
   currentQueryClient?.clear()
   currentQueryClient = undefined
 })
@@ -107,4 +109,23 @@ test('paused campaign that was winning renders the paused-verdict headline', asy
   ;(campaigns.fetchCampaign as jest.Mock).mockResolvedValue(PAUSED)
   const { getByText } = await renderDetail()
   await waitFor(() => expect(getByText('Sticky bar was ahead by +14.2%')).toBeTruthy())
+})
+
+test('the header star pins and unpins the test on device', async () => {
+  ;(campaigns.fetchCampaign as jest.Mock).mockResolvedValue(WINNING)
+  const { getByLabelText } = await renderDetail()
+  await waitFor(() => expect(getByLabelText('Pin to favorites')).toBeTruthy())
+
+  fireEvent.press(getByLabelText('Pin to favorites'))
+  await waitFor(() => expect(useFavorites.getState().pinnedIds).toEqual(['t1']))
+
+  fireEvent.press(getByLabelText('Unpin from favorites'))
+  await waitFor(() => expect(useFavorites.getState().pinnedIds).toEqual([]))
+})
+
+test('the star renders pinned when the test is already a favorite', async () => {
+  useFavorites.setState({ pinnedIds: ['t1'], savedIdeas: [] })
+  ;(campaigns.fetchCampaign as jest.Mock).mockResolvedValue(WINNING)
+  const { getByLabelText } = await renderDetail()
+  await waitFor(() => expect(getByLabelText('Unpin from favorites')).toBeTruthy())
 })

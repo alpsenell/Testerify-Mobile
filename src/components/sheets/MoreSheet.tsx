@@ -38,6 +38,7 @@ const ROUTES: Record<string, string> = {
   Pages: '/screens/pages',
   Events: '/screens/events',
   Replays: '/screens/replays',
+  Favorites: '/screens/favorites',
 }
 
 export function MoreSheet() {

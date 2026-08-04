@@ -5,6 +5,7 @@ import { router, useLocalSearchParams } from 'expo-router'
 import { fetchCampaign, rollbackCampaign } from '../api/campaigns'
 import type { CampaignDetailData, CampaignVariant } from '../api/campaigns'
 import { useSheets } from '../stores/sheets'
+import { useFavorites } from '../stores/favorites'
 import { useToast } from '../stores/toast'
 import { statusLabel, statusTone, statusPulse, rollbackUntil } from '../utils/testModel'
 import { compact, pct, signedPct, money, daysBetween, shortDate } from '../utils/format'
@@ -93,6 +94,8 @@ export function TestDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>()
   const [chartOpen, setChartOpen] = useState(false)
   const openShip = useSheets((s) => s.openShip)
+  const pinnedIds = useFavorites((s) => s.pinnedIds)
+  const togglePin = useFavorites((s) => s.togglePin)
   const show = useToast((s) => s.show)
   const qc = useQueryClient()
   const detail = useQuery({ queryKey: ['campaign', id], queryFn: () => fetchCampaign(id as string) })
@@ -169,7 +172,20 @@ export function TestDetailScreen() {
           <Text style={{ fontFamily: fonts.sansSemi, fontSize: 14, color: colors.secondary }}>Tests</Text>
         </Pressable>
 
-        <StatusPill label={statusLabel(c.status)} tone={statusTone(c.status)} pulse={statusPulse(c.status)} />
+        {/* Pinning is on-device only (see stores/favorites.ts) — the star
+            drives the Favorites screen, not any server-side state. */}
+        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
+          <StatusPill label={statusLabel(c.status)} tone={statusTone(c.status)} pulse={statusPulse(c.status)} />
+          <Pressable
+            accessibilityRole="button"
+            accessibilityState={{ selected: pinnedIds.includes(c.id) }}
+            accessibilityLabel={pinnedIds.includes(c.id) ? 'Unpin from favorites' : 'Pin to favorites'}
+            onPress={() => togglePin(c.id)}
+            style={{ minHeight: 44, minWidth: 44, alignItems: 'flex-end', justifyContent: 'center' }}
+          >
+            <Icon name="star" size={20} color={pinnedIds.includes(c.id) ? colors.warn : colors.faint} filled={pinnedIds.includes(c.id)} />
+          </Pressable>
+        </View>
         <Text style={type.h1}>{c.name}</Text>
         <Text style={type.small}>{targetPath(c.targetUrl)} · started {shortDate(c.createdAt)}</Text>
 

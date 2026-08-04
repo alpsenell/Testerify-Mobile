@@ -6,6 +6,7 @@ import { useToast } from '../../../stores/toast'
 import * as ai from '../../../api/ai'
 import type { AiIdea, SavedSuggestions } from '../../../api/ai'
 import { draftRequestFor } from '../../../utils/copilot'
+import { useFavorites } from '../../../stores/favorites'
 
 jest.mock('../../../api/ai')
 
@@ -52,6 +53,7 @@ beforeEach(() => {
 // in defaultOptions sidesteps that entirely by not scheduling one in the
 // first place. See ship.test.tsx for the same pattern.
 afterEach(() => {
+  useFavorites.setState({ pinnedIds: [], savedIdeas: [] })
   currentQueryClient?.clear()
   currentQueryClient = undefined
 })
@@ -151,4 +153,22 @@ test('pressing Build on a second idea while the first build is pending does not 
   expect(ai.generateTestDraft).toHaveBeenCalledWith(draftRequestFor(IDEA))
 
   resolveBuild({ campaign: { id: 'c1' }, hypothesis: null })
+})
+
+test('the save affordance keeps an idea in the on-device favorites store', async () => {
+  const { getByLabelText } = await renderSheet()
+  await waitFor(() => expect(getByLabelText(`Save ${IDEA.title} to favorites`)).toBeTruthy())
+
+  fireEvent.press(getByLabelText(`Save ${IDEA.title} to favorites`))
+  await waitFor(() => expect(useFavorites.getState().savedIdeas).toEqual([IDEA]))
+  expect(useToast.getState().message).toBe(`Saved "${IDEA.title}" to Favorites.`)
+
+  // The button flips to its saved state rather than offering to save twice.
+  await waitFor(() => expect(getByLabelText(`Saved: ${IDEA.title}`)).toBeTruthy())
+})
+
+test('an already-saved idea renders in its saved state', async () => {
+  useFavorites.setState({ pinnedIds: [], savedIdeas: [IDEA] })
+  const { getByLabelText } = await renderSheet()
+  await waitFor(() => expect(getByLabelText(`Saved: ${IDEA.title}`)).toBeTruthy())
 })
