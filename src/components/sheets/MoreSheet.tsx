@@ -31,6 +31,7 @@ const ROUTES: Record<string, string> = {
   Live: '/screens/live',
   Learnings: '/screens/learnings',
   Analytics: '/screens/analytics',
+  Funnel: '/screens/funnel',
 }
 
 export function MoreSheet() {
