@@ -175,6 +175,12 @@ All eleven are reached from the More sheet only, so **back always returns to Hom
     - **Pins and saved ideas are stored on the device (AsyncStorage), not on the server** — they survive an app restart but do not appear in the desktop panel or on another device. Kill and relaunch the app to confirm both persist.
     - A pinned test that no longer exists on the backend silently drops out of the list.
 
+22. **Flows screen (test store only)**
+    - Open via More sheet → "Flows" → back returns to Home. Cards show name, status, step count and the linked test — cross-check against the desktop panel's Flows page. There is deliberately **no "New" button**: building a flow is the desktop canvas.
+    - **Pause an active flow** → the pill flips to Paused instantly (optimistic). Confirm on desktop that the flow really stopped. Resume and re-check.
+    - **Pause while offline** (airplane mode) → the pill flips, then rolls back to Active with an error toast. This is the rollback path; verify it doesn't leave a lying pill.
+    - **Delete a flow** → native confirm first; cancelling must not delete. Confirming removes the row and it stays gone after pull-to-refresh.
+
 Log anything off-script (visual glitch, crash, wrong number) against the screen/step above rather than as a vague "something looked wrong."
 
 ## Android notes
