@@ -196,6 +196,12 @@ All eleven are reached from the More sheet only, so **back always returns to Hom
     - **Revoke** → confirm, then the invite disappears and its link no longer works.
     - **Remove a member / change a role** → confirm first; verify the change on desktop. Do this only with a disposable test-store account.
 
+25. **Settings screen (test store only)**
+    - Open via More sheet → "Settings" → back returns to Home. Data-collection state, workspace, plan, your role and email match the desktop panel. There is deliberately **no purchase-tracking card** — no field backs it.
+    - **As an admin, pause data collection** → confirm dialog spells out the consequence → the state flips to Paused only after the server answers. Verify on the storefront that new page views stop arriving within a minute, then resume (no confirm on the way back on) and verify collection restarts. Do this on the test store only.
+    - As a **member**, the state text renders but there is no switch at all.
+    - **Log out** → confirm → lands on the login screen. Relaunching the app must not restore the session (this is the one flow that clears `expo-secure-store`).
+
 Log anything off-script (visual glitch, crash, wrong number) against the screen/step above rather than as a vague "something looked wrong."
 
 ## Android notes

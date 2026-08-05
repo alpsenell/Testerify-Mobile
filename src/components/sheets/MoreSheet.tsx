@@ -42,6 +42,7 @@ const ROUTES: Record<string, string> = {
   Flows: '/screens/flows',
   Nudges: '/screens/nudges',
   Team: '/screens/team',
+  Settings: '/screens/settings',
 }
 
 export function MoreSheet() {
