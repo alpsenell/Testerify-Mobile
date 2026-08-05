@@ -47,9 +47,16 @@ export function HomeScreen() {
           <Text style={type.kicker}>{dateLine}</Text>
           <Text style={[type.h2, { marginTop: 2 }]}>{company?.name ?? '—'}</Text>
         </View>
-        <View style={{ width: 38, height: 38, borderRadius: 19, backgroundColor: colors.accent, alignItems: 'center', justifyContent: 'center' }}>
-          <Text style={{ color: colors.white, fontFamily: fonts.sans, fontSize: 17 }}>{(user?.name ?? '?')[0]}</Text>
-        </View>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Account and settings"
+          onPress={() => router.push('/screens/settings')}
+          style={{ width: 44, height: 44, alignItems: 'center', justifyContent: 'center' }}
+        >
+          <View style={{ width: 38, height: 38, borderRadius: 19, backgroundColor: colors.accent, alignItems: 'center', justifyContent: 'center' }}>
+            <Text style={{ color: colors.white, fontFamily: fonts.sans, fontSize: 17 }}>{(user?.name ?? '?')[0]}</Text>
+          </View>
+        </Pressable>
       </View>
 
       {/* Co-pilot hero */}
