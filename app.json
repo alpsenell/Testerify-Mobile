@@ -38,6 +38,7 @@
       ],
       "expo-secure-store",
       "expo-font",
+      "./plugins/withoutPushEntitlement.js",
       "expo-notifications"
     ],
     "experiments": {
