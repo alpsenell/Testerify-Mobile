@@ -187,6 +187,15 @@ All eleven are reached from the More sheet only, so **back always returns to Hom
     - Pause while offline → pill rolls back with an error toast.
     - Draft or concluded nudges show no pause/resume control at all.
 
+24. **Team screen (test store only)** — needs **two accounts** to check properly
+    - Signed in as an **admin**: invite form, pending invites and members all render. Cross-check the roster and roles against the desktop panel's Team page.
+    - Signed in as a **member**: no invite form, no pending-invites section, no remove or role controls anywhere. Signed in as a **manager**: invite form and remove, but no role controls and no Admin option in the role picker.
+    - Nobody sees remove/role controls on their **own** row, at any role.
+    - **Create an invite** → the link appears once, below the button. Share it (share sheet opens), then confirm the colleague can actually accept it. Navigating away loses the link by design.
+    - **New link** on a pending invite → confirm dialog warns the old link stops working; after confirming, verify the *old* link is dead and the new one works.
+    - **Revoke** → confirm, then the invite disappears and its link no longer works.
+    - **Remove a member / change a role** → confirm first; verify the change on desktop. Do this only with a disposable test-store account.
+
 Log anything off-script (visual glitch, crash, wrong number) against the screen/step above rather than as a vague "something looked wrong."
 
 ## Android notes
