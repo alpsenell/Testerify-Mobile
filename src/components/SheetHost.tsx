@@ -12,10 +12,21 @@ export function SheetHost() {
   const sheet = useSheets((s) => s.sheet)
   const close = useSheets((s) => s.close)
   const ref = useRef<BottomSheetModal>(null)
+  // Whether present() has ever run. Calling dismiss() on a modal that was
+  // never presented wedges it: BottomSheetModal sets status DISMISSING, the
+  // close animation has no mounted sheet to run on, the status never
+  // resolves, and every later present() is silently dropped by
+  // handlePortalRender. The mount-time effect (sheet = null) must no-op.
+  const presented = useRef(false)
 
   useEffect(() => {
-    if (sheet) ref.current?.present()
-    else ref.current?.dismiss()
+    if (sheet) {
+      presented.current = true
+      ref.current?.present()
+    } else if (presented.current) {
+      presented.current = false
+      ref.current?.dismiss()
+    }
   }, [sheet])
 
   return (
