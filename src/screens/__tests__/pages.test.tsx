@@ -1,7 +1,7 @@
 import { act, cleanup, render, waitFor, fireEvent } from '@testing-library/react-native'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { router } from 'expo-router'
-import { PagesScreen, PAGES_DAYS } from '../Pages'
+import { PagesScreen } from '../Pages'
 import * as stats from '../../api/stats'
 import * as ai from '../../api/ai'
 import { ApiError } from '../../api/client'
@@ -55,6 +55,8 @@ afterEach(async () => {
   currentQueryClient = undefined
 })
 
+const spanDays = (from: string, to: string) => Math.round((Date.parse(to) - Date.parse(from)) / 86_400_000) + 1
+
 const renderScreen = async () => {
   const qc = new QueryClient({ defaultOptions: { queries: { retry: false }, mutations: { retry: false } } })
   currentQueryClient = qc
@@ -69,7 +71,7 @@ test('queries an inclusive 7-day window', async () => {
   expect(args.from).toMatch(/^\d{4}-\d{2}-\d{2}$/)
   expect(args.to).toMatch(/^\d{4}-\d{2}-\d{2}$/)
   expect(args.pageType).toBeUndefined()
-  expect(PAGES_DAYS).toBe(7)
+  expect(spanDays(args.from, args.to)).toBe(7)
 })
 
 test('tiles cover views, visitors, weighted average time and the longest read', async () => {

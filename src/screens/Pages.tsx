@@ -1,7 +1,6 @@
-import { useMemo, useState } from 'react'
-import { Pressable, RefreshControl, ScrollView, Text, View } from 'react-native'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { router } from 'expo-router'
+import { useState } from 'react'
+import { Pressable, Text, View } from 'react-native'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import { fetchPageBehavior } from '../api/stats'
 import { fetchInsights } from '../api/ai'
 import type { AiInsightsResponse } from '../api/ai'
@@ -9,15 +8,17 @@ import { Skeleton } from '../components/Skeleton'
 import { RetryCard } from '../components/RetryCard'
 import { EmptyState } from '../components/EmptyState'
 import { StatTile } from '../components/StatTile'
+import { RangeChips } from '../components/RangeChips'
+import { ScreenShell } from '../components/ScreenShell'
 import { Icon } from '../components/Icon'
+import { qk } from '../api/keys'
 import { compact, duration, pct, signedPct } from '../utils/format'
-import { lastNDays } from '../utils/range'
+import { windowSentence } from '../utils/range'
+import { useDateRange } from '../hooks/useDateRange'
 import { percentChange } from '../utils/tracking'
 import { behaviorSummary, longestPageType, overallAvgMs } from '../utils/pages'
 import { isPlanGated } from '../utils/planGate'
 import { colors, fonts, type } from '../theme'
-
-export const PAGES_DAYS = 7
 
 function FunnelNode({ value, label }: { value: number; label: string }) {
   return (
@@ -33,19 +34,18 @@ const SEVERITY: Record<AiInsightsResponse['insights'][number]['severity'], strin
 }
 
 export function PagesScreen() {
-  const range = useMemo(() => lastNDays(PAGES_DAYS), [])
+  const { days, setDays, range } = useDateRange(7)
   const [pageType, setPageType] = useState<string | null>(null)
-  const qc = useQueryClient()
 
   const behavior = useQuery({
-    queryKey: ['page-behavior', range.from, range.to],
+    queryKey: qk.pageBehavior(range),
     queryFn: () => fetchPageBehavior(range),
   })
 
   // Tapping a page type asks the endpoint for that slice — the top-paths table
   // below swaps to it while the totals above stay on the whole window.
   const scoped = useQuery({
-    queryKey: ['page-behavior', range.from, range.to, pageType],
+    queryKey: qk.pageBehavior(range, pageType),
     queryFn: () => fetchPageBehavior({ ...range, pageType: pageType as string }),
     enabled: pageType !== null,
   })
@@ -57,43 +57,30 @@ export function PagesScreen() {
   const paths = (pageType !== null ? scoped.data?.topPaths : data?.topPaths) ?? []
   const avgMs = data ? overallAvgMs(data.pages) : null
   const longest = data ? longestPageType(data.pages) : null
-  const summary = data ? behaviorSummary(data, PAGES_DAYS) : null
+  const summary = data ? behaviorSummary(data, days) : null
   const viewChange = data?.totals.previous ? percentChange(data.totals.views, data.totals.previous.views) : null
   const visitorChange = data?.totals.previous ? percentChange(data.totals.visitors, data.totals.previous.visitors) : null
 
   return (
-    <ScrollView
-      style={{ flex: 1, backgroundColor: colors.paper }}
-      contentContainerStyle={{ padding: 16, paddingTop: 62, paddingBottom: 30, gap: 13 }}
-      refreshControl={<RefreshControl refreshing={behavior.isRefetching} onRefresh={() => qc.invalidateQueries()} tintColor={colors.muted} />}
+    <ScreenShell
+      kicker="Behavior"
+      title="Shopper behavior"
+      subtitle={`Page views and time on page. ${windowSentence(days)}.`}
+      refreshing={behavior.isRefetching}
+      pending={behavior.isPending}
+      errored={behavior.isError || (!behavior.isPending && !data)}
+      onRetry={() => behavior.refetch()}
+      skeletonHeights={[88, 88, 180]}
+      toolbar={<RangeChips days={days} onPick={(d) => { setDays(d); setPageType(null) }} />}
     >
-      <Pressable accessibilityRole="button" onPress={() => router.back()} style={{ flexDirection: 'row', alignItems: 'center', gap: 6, minHeight: 44, alignSelf: 'flex-start' }}>
-        <Icon name="arrowLeft" size={18} color={colors.secondary} />
-        <Text style={{ fontFamily: fonts.sansSemi, fontSize: 14, color: colors.secondary }}>Home</Text>
-      </Pressable>
-
-      <View>
-        <Text style={type.kicker}>Behavior</Text>
-        <Text style={[type.h1, { marginTop: 4 }]}>Shopper behavior</Text>
-        <Text style={[type.body, { marginTop: 6 }]}>Page views and time on page. Last {PAGES_DAYS} days.</Text>
-      </View>
-
-      {behavior.isPending ? (
-        <View style={{ gap: 10 }}>
-          <Skeleton height={88} />
-          <Skeleton height={88} />
-          <Skeleton height={180} />
-        </View>
-      ) : behavior.isError || !data ? (
-        <RetryCard onRetry={() => behavior.refetch()} />
-      ) : (
+      {!data ? null : (
         <>
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 11 }}>
             <StatTile icon="layers" label="Page views" value={compact(data.totals.views)}
-              sub={viewChange === null ? 'no previous window' : `${signedPct(viewChange, 0)} vs previous ${PAGES_DAYS}d`}
+              sub={viewChange === null ? 'no previous window' : `${signedPct(viewChange, 0)} vs previous ${days}d`}
               subColor={viewChange === null ? colors.muted : viewChange < 0 ? colors.neg : colors.pos} />
             <StatTile icon="users" label="Visitors" value={compact(data.totals.visitors)}
-              sub={visitorChange === null ? 'no previous window' : `${signedPct(visitorChange, 0)} vs previous ${PAGES_DAYS}d`}
+              sub={visitorChange === null ? 'no previous window' : `${signedPct(visitorChange, 0)} vs previous ${days}d`}
               subColor={visitorChange === null ? colors.muted : visitorChange < 0 ? colors.neg : colors.pos} />
             <StatTile icon="clock" label="Avg time on page" value={duration(avgMs)}
               sub={`${compact(data.totals.timedViews)} timed views`} />
@@ -225,6 +212,6 @@ export function PagesScreen() {
           </View>
         </>
       )}
-    </ScrollView>
+    </ScreenShell>
   )
 }

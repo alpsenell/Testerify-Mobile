@@ -72,7 +72,22 @@ function NudgeCard({ nudge }: { nudge: CampaignListItem }) {
         <Stat k="Confidence" v={pct(nudge.confidence, 0)} />
       </View>
 
-      {nudge.status === 'running' || nudge.status === 'paused' ? (
+      {nudge.status === 'draft' ? (
+        <View style={{ flexDirection: 'row', justifyContent: 'flex-end', paddingTop: 10, borderTopWidth: 1, borderTopColor: colors.border }}>
+          {/* Launch reuses the same status write; a 402 running-cap rolls the
+              optimistic flip back and toasts the server's upgrade note — the
+              draft stays a draft. */}
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={`Launch ${nudge.name}`}
+            onPress={() => toggle.mutate('running')}
+            style={{ flexDirection: 'row', alignItems: 'center', gap: 7, minHeight: 44, paddingHorizontal: 13, borderRadius: 10, backgroundColor: colors.accent }}
+          >
+            <Icon name="play" size={15} color={colors.white} />
+            <Text style={{ fontFamily: fonts.sansSemi, fontSize: 13, color: colors.white }}>Launch</Text>
+          </Pressable>
+        </View>
+      ) : nudge.status === 'running' || nudge.status === 'paused' ? (
         <View style={{ flexDirection: 'row', justifyContent: 'flex-end', paddingTop: 10, borderTopWidth: 1, borderTopColor: colors.border }}>
           <Pressable
             accessibilityRole="button"
@@ -105,11 +120,21 @@ export function NudgesScreen() {
         <Text style={{ fontFamily: fonts.sansSemi, fontSize: 14, color: colors.secondary }}>Home</Text>
       </Pressable>
 
-      <View>
-        <Text style={type.kicker}>Widget library</Text>
-        <Text style={[type.h1, { marginTop: 4 }]}>Nudges</Text>
-        <Text style={[type.body, { marginTop: 6 }]}>Every nudge runs against a holdout that proves it pays for itself.</Text>
+      <View style={{ flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between', gap: 10 }}>
+        <View style={{ flex: 1, minWidth: 0 }}>
+          <Text style={type.kicker}>Widget library</Text>
+          <Text style={[type.h1, { marginTop: 4 }]}>Nudges</Text>
+        </View>
+        <Pressable
+          accessibilityRole="button"
+          onPress={() => router.push('/screens/nudge-create')}
+          style={{ flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: colors.accent, borderRadius: 11, paddingHorizontal: 14, minHeight: 44, justifyContent: 'center' }}
+        >
+          <Icon name="plus" size={15} color={colors.white} />
+          <Text style={{ fontFamily: fonts.sansSemi, fontSize: 13.5, color: colors.white }}>New nudge</Text>
+        </Pressable>
       </View>
+      <Text style={type.body}>Every nudge runs against a holdout that proves it pays for itself.</Text>
 
       {campaigns.isPending ? (
         <View style={{ gap: 10 }}>
@@ -119,7 +144,7 @@ export function NudgesScreen() {
       ) : campaigns.isError ? (
         <RetryCard onRetry={() => campaigns.refetch()} />
       ) : nudges.length === 0 ? (
-        <EmptyState message="No nudges yet — build one on the desktop panel." />
+        <EmptyState message="No nudges yet — tap “New nudge” to pick one from the library." />
       ) : (
         <>
           <Text style={{ fontFamily: fonts.sansBold, fontSize: 15, color: colors.ink }}>Your nudges</Text>

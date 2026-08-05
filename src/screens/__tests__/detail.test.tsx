@@ -1,7 +1,9 @@
 import { render, waitFor, fireEvent } from '@testing-library/react-native'
+import { Share } from 'react-native'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { TestDetailScreen } from '../TestDetail'
 import * as campaigns from '../../api/campaigns'
+import * as stats from '../../api/stats'
 import type { CampaignDetailData } from '../../api/campaigns'
 import { useFavorites } from '../../stores/favorites'
 
@@ -10,6 +12,7 @@ jest.mock('expo-router', () => ({
   useLocalSearchParams: () => ({ id: 't1' }),
 }))
 jest.mock('../../api/campaigns')
+jest.mock('../../api/stats')
 
 const WINNING: CampaignDetailData = {
   id: 't1', name: 'PDP: sticky add-to-cart on mobile', status: 'running', kind: 'ab',
@@ -128,4 +131,61 @@ test('the star renders pinned when the test is already a favorite', async () => 
   ;(campaigns.fetchCampaign as jest.Mock).mockResolvedValue(WINNING)
   const { getByLabelText } = await renderDetail()
   await waitFor(() => expect(getByLabelText('Unpin from favorites')).toBeTruthy())
+})
+
+const SEGMENT: stats.SegmentResponse = {
+  dimension: 'device', controlId: 'v1', challengerId: 'v2', truncated: 0,
+  rows: [
+    {
+      value: 'mobile', label: 'Mobile',
+      control: { impressions: 4000, conversions: 160, revenue: 7000, rate: 4.0 },
+      challenger: { impressions: 4100, conversions: 205, revenue: 9000, rate: 5.0 },
+      uplift: 25, confidence: 98, status: 'winning',
+      sequential: { pValue: 0.01, decision: 'variant', diffCI: null },
+      enoughData: true, controlRpv: 1.75, variantRpv: 2.2, impressions: 8100,
+    },
+    {
+      value: 'tablet', label: 'Tablet',
+      control: { impressions: 60, conversions: 2, revenue: 100, rate: 3.3 },
+      challenger: { impressions: 55, conversions: 3, revenue: 160, rate: 5.5 },
+      uplift: 63, confidence: 55, status: 'not_enough_data',
+      sequential: { pValue: 0.5, decision: 'continue', diffCI: null },
+      enoughData: false, controlRpv: null, variantRpv: null, impressions: 115,
+    },
+  ],
+}
+
+test('the segment breakdown expands, fetches the dimension and flags thin slices', async () => {
+  ;(campaigns.fetchCampaign as jest.Mock).mockResolvedValue(WINNING)
+  ;(stats.fetchSegment as jest.Mock).mockResolvedValue(SEGMENT)
+  const { getByText, queryByText } = await renderDetail()
+  await waitFor(() => expect(getByText('Segment breakdown')).toBeTruthy())
+
+  // Collapsed by default — no fetch until opened.
+  expect(stats.fetchSegment).not.toHaveBeenCalled()
+  fireEvent.press(getByText('Show'))
+
+  await waitFor(() => expect(getByText('Mobile')).toBeTruthy())
+  expect(stats.fetchSegment).toHaveBeenCalledWith('t1', 'device')
+  expect(getByText('+25.0%')).toBeTruthy()
+  expect(getByText('needs more data')).toBeTruthy()
+  expect(queryByText('+63.0%')).toBeNull()
+})
+
+test('share mints a fresh link and hands it to the native share sheet', async () => {
+  ;(campaigns.fetchCampaign as jest.Mock).mockResolvedValue(WINNING)
+  ;(campaigns.enableShare as jest.Mock).mockResolvedValue({
+    token: 'tok', url: 'https://panel.testerify.com/r/tok', shareEnabled: true,
+  })
+  const shareSpy = jest.spyOn(Share, 'share').mockResolvedValue({ action: 'sharedAction' } as never)
+
+  const { getByLabelText } = await renderDetail()
+  await waitFor(() => expect(getByLabelText('Share result link')).toBeTruthy())
+
+  fireEvent.press(getByLabelText('Share result link'))
+  await waitFor(() => expect(campaigns.enableShare).toHaveBeenCalledWith('t1'))
+  await waitFor(() => expect(shareSpy).toHaveBeenCalled())
+  const arg = shareSpy.mock.calls[0][0] as { message?: string; url?: string }
+  expect(arg.url ?? arg.message).toBe('https://panel.testerify.com/r/tok')
+  shareSpy.mockRestore()
 })

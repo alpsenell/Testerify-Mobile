@@ -6,6 +6,7 @@ import { colors, radius } from '../theme'
 import { MoreSheet } from './sheets/MoreSheet'
 import { ShipSheet } from './sheets/ShipSheet'
 import { CopilotSheet } from './sheets/CopilotSheet'
+import { StoreSwitcherSheet } from './sheets/StoreSwitcherSheet'
 
 export function SheetHost() {
   const sheet = useSheets((s) => s.sheet)
@@ -30,6 +31,7 @@ export function SheetHost() {
         {sheet?.kind === 'more' && <MoreSheet />}
         {sheet?.kind === 'ship' && <ShipSheet />}
         {sheet?.kind === 'copilot' && <CopilotSheet />}
+        {sheet?.kind === 'storeSwitcher' && <StoreSwitcherSheet />}
       </BottomSheetView>
     </BottomSheetModal>
   )

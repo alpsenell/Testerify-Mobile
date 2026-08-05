@@ -1,12 +1,13 @@
 import { Pressable, Text, View } from 'react-native'
 import { router } from 'expo-router'
+import type { Href } from 'expo-router'
 import { Icon, IconName } from '../Icon'
 import { colors, fonts } from '../../theme'
-import { useToast } from '../../stores/toast'
 import { useSheets } from '../../stores/sheets'
 
 const ITEMS: { label: string; icon: IconName }[] = [
   { label: 'Learnings', icon: 'flag' },
+  { label: 'Queue', icon: 'sparkle' },
   { label: 'Nudges', icon: 'megaphone' },
   { label: 'Flows', icon: 'flow' },
   { label: 'Audiences', icon: 'users' },
@@ -24,12 +25,12 @@ const ITEMS: { label: string; icon: IconName }[] = [
   { label: 'Settings', icon: 'settings' },
 ]
 
-// Every built screen, by its More-sheet label — 15 of the 16 items. Only
-// Audiences is absent: saved audiences aren't a thing the backend has (no
-// table, no endpoint), so it falls through to the toast below.
-const ROUTES: Record<string, string> = {
+// Every More item has a built screen now — Audiences was the last holdout,
+// and its CRUD screen shipped with the creation flows.
+const ROUTES: Record<string, Href> = {
   Live: '/screens/live',
   Learnings: '/screens/learnings',
+  Queue: '/screens/queue',
   Analytics: '/screens/analytics',
   Funnel: '/screens/funnel',
   Heatmaps: '/screens/heatmaps',
@@ -41,29 +42,24 @@ const ROUTES: Record<string, string> = {
   Favorites: '/screens/favorites',
   Flows: '/screens/flows',
   Nudges: '/screens/nudges',
+  Audiences: '/screens/audiences',
   Team: '/screens/team',
   Settings: '/screens/settings',
 }
 
 export function MoreSheet() {
-  const show = useToast((s) => s.show)
   const close = useSheets((s) => s.close)
 
   const tap = (label: string) => {
     close()
-    const route = ROUTES[label]
-    if (route) {
-      router.push(route)
-      return
-    }
-    show('Saved audiences live on the desktop panel.')
+    router.push(ROUTES[label])
   }
 
   return (
     <View>
       <Text style={{ fontFamily: fonts.sansSemi, fontSize: 19, color: colors.ink, marginBottom: 4 }}>Everything else</Text>
       <Text style={{ fontFamily: fonts.sans, fontSize: 12.5, color: colors.muted, lineHeight: 17, marginBottom: 14 }}>
-        All 16 sidebar pages, adapted for one thumb. Only the heatmap overlay, flow canvas and variant editor stay on desktop.
+        Every panel page, adapted for one thumb. Only the heatmap overlay, flow canvas and variant editor stay on desktop.
       </Text>
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
         {ITEMS.map((item) => (

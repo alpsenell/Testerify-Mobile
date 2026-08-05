@@ -1,7 +1,7 @@
 import { act, cleanup, render, waitFor, fireEvent } from '@testing-library/react-native'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { router } from 'expo-router'
-import { FunnelScreen, FUNNEL_DAYS } from '../Funnel'
+import { FunnelScreen } from '../Funnel'
 import * as stats from '../../api/stats'
 import type { FunnelStep } from '../../api/stats'
 
@@ -38,6 +38,8 @@ afterEach(async () => {
   currentQueryClient = undefined
 })
 
+const spanDays = (from: string, to: string) => Math.round((Date.parse(to) - Date.parse(from)) / 86_400_000) + 1
+
 const renderScreen = async () => {
   const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } })
   currentQueryClient = qc
@@ -52,7 +54,7 @@ test('queries an inclusive 7-day window', async () => {
   expect(Object.keys(range).sort()).toEqual(['from', 'to'])
   expect(range.from).toMatch(/^\d{4}-\d{2}-\d{2}$/)
   expect(range.to).toMatch(/^\d{4}-\d{2}-\d{2}$/)
-  expect(FUNNEL_DAYS).toBe(7)
+  expect(spanDays(range.from, range.to)).toBe(7)
 })
 
 test('stat tiles read entry, purchase, reach and the biggest drop', async () => {

@@ -1,21 +1,21 @@
 import { useMemo, useState } from 'react'
-import { Image, Pressable, RefreshControl, ScrollView, Text, View } from 'react-native'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { Image, Pressable, Text, View } from 'react-native'
+import { useQuery } from '@tanstack/react-query'
 import { router } from 'expo-router'
 import { fetchProducts } from '../api/stats'
-import { Skeleton } from '../components/Skeleton'
-import { RetryCard } from '../components/RetryCard'
 import { EmptyState } from '../components/EmptyState'
 import { StatTile } from '../components/StatTile'
 import { SearchField } from '../components/SearchField'
+import { RangeChips } from '../components/RangeChips'
+import { ScreenShell } from '../components/ScreenShell'
 import { Icon } from '../components/Icon'
+import { qk } from '../api/keys'
 import { compact, money, pct } from '../utils/format'
-import { lastNDays } from '../utils/range'
+import { windowSentence } from '../utils/range'
+import { useDateRange } from '../hooks/useDateRange'
 import { filterProducts, isLeaky } from '../utils/products'
 import type { Product, ProductTotals } from '../utils/products'
 import { colors, fonts, type } from '../theme'
-
-export const PRODUCTS_DAYS = 7
 
 function Cell({ k, v }: { k: string; v: string }) {
   return (
@@ -30,9 +30,17 @@ function ProductCard({ product, totals, productCount, currency }: {
   product: Product; totals: ProductTotals; productCount: number; currency: string | null
 }) {
   const leaky = isLeaky(product, totals, productCount)
+  // The detail endpoint resolves a numeric product id or a handle — a
+  // title-only row (untracked source) has no detail page to open.
+  const detailParam = product.productId ?? product.handle
 
   return (
-    <View style={{
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={`Open ${product.title} details`}
+      disabled={!detailParam}
+      onPress={() => router.push({ pathname: '/screens/product-detail', params: { product: detailParam as string } })}
+      style={{
       backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, borderRadius: 15, padding: 15, gap: 12,
       shadowColor: '#282214', shadowOpacity: 0.04, shadowRadius: 2, shadowOffset: { width: 0, height: 1 }, elevation: 1,
     }}>
@@ -62,17 +70,16 @@ function ProductCard({ product, totals, productCount, currency }: {
         <Cell k="Sold" v={compact(product.units)} />
         <Cell k="Revenue" v={money(product.revenue, currency)} />
       </View>
-    </View>
+    </Pressable>
   )
 }
 
 export function ProductsScreen() {
-  const range = useMemo(() => lastNDays(PRODUCTS_DAYS), [])
+  const { days, setDays, range } = useDateRange(7)
   const products = useQuery({
-    queryKey: ['products', range.from, range.to],
+    queryKey: qk.products(range),
     queryFn: () => fetchProducts(range),
   })
-  const qc = useQueryClient()
   const [query, setQuery] = useState('')
 
   const data = products.data
@@ -82,33 +89,18 @@ export function ProductsScreen() {
   const currency = data && !data.currency.mixed ? data.currency.code : null
 
   return (
-    <ScrollView
-      style={{ flex: 1, backgroundColor: colors.paper }}
-      contentContainerStyle={{ padding: 16, paddingTop: 62, paddingBottom: 30, gap: 13 }}
+    <ScreenShell
+      title="Products"
+      subtitle={`Which products get seen, get added, and actually sell. ${windowSentence(days)}.`}
+      refreshing={products.isRefetching}
+      pending={products.isPending}
+      errored={products.isError || (!products.isPending && !data)}
+      onRetry={() => products.refetch()}
+      skeletonHeights={[88, 44, 130]}
       keyboardShouldPersistTaps="handled"
-      refreshControl={<RefreshControl refreshing={products.isRefetching} onRefresh={() => qc.invalidateQueries()} tintColor={colors.muted} />}
+      toolbar={<RangeChips days={days} onPick={setDays} />}
     >
-      <Pressable accessibilityRole="button" onPress={() => router.back()} style={{ flexDirection: 'row', alignItems: 'center', gap: 6, minHeight: 44, alignSelf: 'flex-start' }}>
-        <Icon name="arrowLeft" size={18} color={colors.secondary} />
-        <Text style={{ fontFamily: fonts.sansSemi, fontSize: 14, color: colors.secondary }}>Home</Text>
-      </Pressable>
-
-      <View>
-        <Text style={[type.h1]}>Products</Text>
-        <Text style={[type.body, { marginTop: 6 }]}>
-          Which products get seen, get added, and actually sell. Last {PRODUCTS_DAYS} days.
-        </Text>
-      </View>
-
-      {products.isPending ? (
-        <View style={{ gap: 10 }}>
-          <Skeleton height={88} />
-          <Skeleton height={44} />
-          <Skeleton height={130} />
-        </View>
-      ) : products.isError || !data ? (
-        <RetryCard onRetry={() => products.refetch()} />
-      ) : (
+      {!data ? null : (
         <>
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 11 }}>
             <StatTile icon="layers" label="Product views" value={compact(data.totals.views)}
@@ -137,6 +129,6 @@ export function ProductsScreen() {
           ))}
         </>
       )}
-    </ScrollView>
+    </ScreenShell>
   )
 }

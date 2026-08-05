@@ -1,15 +1,28 @@
-import { act, cleanup, render, waitFor, fireEvent } from '@testing-library/react-native'
+import { act, cleanup, render, waitFor, fireEvent, userEvent } from '@testing-library/react-native'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Alert } from 'react-native'
 import { router } from 'expo-router'
 import { SettingsScreen } from '../Settings'
 import * as companyApi from '../../api/company'
 import type { Company, Role } from '../../api/company'
+import * as authApi from '../../api/auth'
 import { useAuth } from '../../stores/auth'
+import { useSheets } from '../../stores/sheets'
 import { useToast } from '../../stores/toast'
 
 jest.mock('expo-router', () => ({ router: { push: jest.fn(), back: jest.fn() } }))
 jest.mock('../../api/company')
+jest.mock('../../api/auth')
+
+// One store is the common case, and it's the one that must NOT show a switcher.
+const ONE_STORE = {
+  stores: [{ id: 'c1', name: 'Alder & Ash', slug: 'alder-ash', role: 'admin' as const }],
+  activeCompanyId: 'c1',
+}
+const TWO_STORES = {
+  stores: [...ONE_STORE.stores, { id: 'c2', name: 'Beta Store', slug: 'beta', role: 'member' as const }],
+  activeCompanyId: 'c1',
+}
 
 const COMPANY: Company = {
   id: 'c1', name: 'Alder & Ash', slug: 'alder-ash', apiKey: 'k',
@@ -30,12 +43,27 @@ const realShow = useToast.getState().show
 const realSignOut = useAuth.getState().signOut
 let currentQueryClient: QueryClient | undefined
 
+const USAGE: companyApi.UsageResponse = {
+  usage: {
+    plan: 'growth', planName: 'Growth', testedSessions: 12_400, testedSessionsLimit: 50_000,
+    testedSessionsPct: 25, overSessionLimit: false, runningTests: 2, runningTestsLimit: null,
+    atTestLimit: false, periodStart: '2026-08-01T00:00:00Z', periodEnd: '2026-09-01T00:00:00Z',
+  },
+  plan: { key: 'growth', name: 'Growth', price: 49, features: ['aiAssist'], maxRunningTests: null, testedSessionsPerMonth: 50_000 },
+}
+
 beforeEach(() => {
   jest.clearAllMocks()
+  useToast.setState({ message: null })
   jest.spyOn(Alert, 'alert').mockImplementation(() => {})
   ;(companyApi.fetchCompany as jest.Mock).mockResolvedValue(COMPANY)
   ;(companyApi.setDataCollection as jest.Mock).mockImplementation((enabled: boolean) =>
     Promise.resolve({ ...COMPANY, dataCollectionEnabled: enabled }))
+  ;(companyApi.fetchUsage as jest.Mock).mockResolvedValue(USAGE)
+  ;(companyApi.updateNotifications as jest.Mock).mockImplementation((n: unknown) =>
+    Promise.resolve({ ...COMPANY, notifications: n }))
+  ;(authApi.fetchStores as jest.Mock).mockResolvedValue(ONE_STORE)
+  useSheets.setState({ sheet: null })
 })
 
 afterEach(async () => {
@@ -43,6 +71,7 @@ afterEach(async () => {
   await act(async () => { await new Promise((resolve) => setTimeout(resolve, 0)) })
   useToast.setState({ show: realShow })
   useAuth.setState({ status: 'signedOut', user: null, company: null, signOut: realSignOut })
+  useSheets.setState({ sheet: null })
   cleanup()
   currentQueryClient?.clear()
   currentQueryClient = undefined
@@ -149,4 +178,74 @@ test('back returns to Home and errors render a retry card', async () => {
 
   fireEvent.press(getByText('Home'))
   expect(router.back).toHaveBeenCalled()
+})
+
+test('the usage section shows the plan, session meter and running tests', async () => {
+  const { getByText } = await renderAs('admin')
+  await waitFor(() => expect(getByText('Plan & usage')).toBeTruthy())
+
+  expect(getByText('Growth')).toBeTruthy()
+  expect(getByText('$49/mo')).toBeTruthy()
+  expect(getByText('12.4k / 50k')).toBeTruthy()
+  expect(getByText('2 / unlimited')).toBeTruthy()
+})
+
+test('an admin edits alert settings and saves them', async () => {
+  const { getByText, getByLabelText } = await renderAs('admin')
+  await waitFor(() => expect(getByText('Test alerts')).toBeTruthy())
+
+  // userEvent (not fireEvent): concurrent rendering applies controlled-input
+  // state async, and userEvent's managed act keeps the save button's
+  // dirty-gating in sync without hand-rolled act() flushes (which overlap
+  // RNTL's own and poison the next test).
+  const user = userEvent.setup()
+  await user.paste(getByLabelText('Slack webhook URL'), 'https://hooks.slack.com/services/T1/B2/x')
+  await user.press(getByText('Save alert settings'))
+
+  await waitFor(() => expect(companyApi.updateNotifications).toHaveBeenCalledWith({
+    alertsEnabled: true, autoStop: false,
+    slackWebhookUrl: 'https://hooks.slack.com/services/T1/B2/x', alertEmail: '',
+  }))
+  await waitFor(() => expect(useToast.getState().message).toBe('Notification settings saved.'))
+})
+
+test('a failed notification save surfaces the server message', async () => {
+  ;(companyApi.updateNotifications as jest.Mock).mockRejectedValueOnce(new Error('That doesn\u2019t look like a Slack incoming webhook URL (https://hooks.slack.com/services/\u2026).'))
+  const { getByText, getByLabelText } = await renderAs('admin')
+  await waitFor(() => expect(getByText('Test alerts')).toBeTruthy())
+
+  const user = userEvent.setup()
+  await user.paste(getByLabelText('Slack webhook URL'), 'https://example.com/nope')
+  await user.press(getByText('Save alert settings'))
+  await waitFor(() => expect(useToast.getState().message).toMatch(/Slack incoming webhook/))
+})
+
+test('a non-admin sees alert state read-only with no save button', async () => {
+  const { getByText, queryByText, queryByLabelText } = await renderAs('member')
+  await waitFor(() => expect(getByText('Test alerts')).toBeTruthy())
+
+  expect(queryByText('Save alert settings')).toBeNull()
+  expect(queryByLabelText('Slack webhook URL')).toBeNull()
+  expect(getByText('Only admins can change alert delivery.')).toBeTruthy()
+})
+
+// --- Phase 3: store switching entry point ---
+
+test('a single-store identity gets no workspace switcher, matching the panel', async () => {
+  const { getByText, queryByLabelText } = await renderAs('admin')
+  await waitFor(() => expect(getByText('Collecting')).toBeTruthy())
+  await waitFor(() => expect(authApi.fetchStores).toHaveBeenCalled())
+
+  expect(queryByLabelText('Workspace: Alder & Ash. Switch workspace')).toBeNull()
+  expect(getByText('Alder & Ash')).toBeTruthy()
+})
+
+test('with two stores the workspace row opens the switcher sheet', async () => {
+  ;(authApi.fetchStores as jest.Mock).mockResolvedValue(TWO_STORES)
+  const { getByText, getByLabelText } = await renderAs('admin')
+  await waitFor(() => expect(getByText('Collecting')).toBeTruthy())
+
+  const row = await waitFor(() => getByLabelText('Workspace: Alder & Ash. Switch workspace'))
+  fireEvent.press(row)
+  expect(useSheets.getState().sheet).toEqual({ kind: 'storeSwitcher' })
 })

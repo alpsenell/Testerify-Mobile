@@ -251,6 +251,54 @@ export const fetchCustomEvents = (args: { from?: string; to?: string; view?: str
   return apiFetch<CustomEventsResponse>(`/api/stats/custom-events${qs ? `?${qs}` : ''}`)
 }
 
+// ===== Impact — estimated added revenue from shipped winners =====
+export type ImpactResponse = {
+  totalImpact: number
+  currency: { code: string | null; mixed: boolean }
+  campaigns: Array<{
+    id: string
+    name: string
+    promotedAt: string | null
+    upliftPct?: number | null
+    impact: number
+  }>
+}
+
+export const fetchImpact = () => apiFetch<ImpactResponse>('/api/stats/impact')
+
+// ===== Segment breakdown (control vs challenger by audience slice) =====
+export type SegmentDimension = 'device' | 'country' | 'utm_source' | 'returning'
+
+export type SegmentArm = { impressions: number; conversions: number; revenue: number; rate: number }
+
+export type SegmentRow = {
+  value: string
+  label: string
+  control: SegmentArm
+  challenger: SegmentArm
+  uplift: number
+  confidence: number
+  status: string
+  sequential: { pValue: number; decision: string; diffCI: unknown }
+  enoughData: boolean
+  controlRpv: number | null
+  variantRpv: number | null
+  impressions: number
+}
+
+export type SegmentResponse = {
+  dimension: SegmentDimension
+  controlId: string | null
+  challengerId: string | null
+  truncated: number
+  rows: SegmentRow[]
+}
+
+export const fetchSegment = (campaignId: string, dimension: SegmentDimension) => {
+  const params = new URLSearchParams({ campaignId, dimension })
+  return apiFetch<SegmentResponse>(`/api/stats/segment?${params}`)
+}
+
 // ===== Replays (§9) — 402 Plan-gated on Free/Growth (Scale-tier feature) =====
 export type ReplayListResponse = {
   origin: string | null

@@ -1,7 +1,7 @@
 import { act, cleanup, render, waitFor, fireEvent } from '@testing-library/react-native'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { router } from 'expo-router'
-import { TrackingScreen, TRACKING_DAYS } from '../Tracking'
+import { TrackingScreen } from '../Tracking'
 import * as stats from '../../api/stats'
 
 jest.mock('expo-router', () => ({ router: { push: jest.fn(), back: jest.fn() } }))
@@ -40,6 +40,8 @@ afterEach(async () => {
   currentQueryClient = undefined
 })
 
+const spanDays = (from: string, to: string) => Math.round((Date.parse(to) - Date.parse(from)) / 86_400_000) + 1
+
 const renderScreen = async () => {
   const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } })
   currentQueryClient = qc
@@ -54,7 +56,18 @@ test('queries the source dimension over an inclusive 7-day window', async () => 
   expect(args.dimension).toBe('source')
   expect(args.from).toMatch(/^\d{4}-\d{2}-\d{2}$/)
   expect(args.to).toMatch(/^\d{4}-\d{2}-\d{2}$/)
-  expect(TRACKING_DAYS).toBe(7)
+  expect(spanDays(args.from, args.to)).toBe(7)
+})
+
+test('switching the range preset refetches over the new window', async () => {
+  const { getByText } = await renderScreen()
+  await waitFor(() => expect(getByText('Breakdown')).toBeTruthy())
+
+  fireEvent.press(getByText('30d'))
+  await waitFor(() => {
+    const args = (stats.fetchUtm as jest.Mock).mock.calls.at(-1)[0]
+    expect(spanDays(args.from, args.to)).toBe(30)
+  })
 })
 
 test('tiles show totals with their period-over-period change', async () => {

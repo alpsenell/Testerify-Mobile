@@ -85,3 +85,43 @@ export const regenerateInvitation = (id: string) =>
 
 export const revokeInvitation = (id: string) =>
   apiFetch<{ message: string }>(`/api/company/invitations/${id}`, { method: 'DELETE' })
+
+// ── Notification settings (companies.notifications jsonb) ──────────────
+// The type + pure reader live in utils/notifications.ts so screen tests that
+// auto-mock this module keep the real normalization.
+import type { NotificationSettings } from '../utils/notifications'
+export type { NotificationSettings }
+
+// Admin-only on the server (403 otherwise); 400 carries the validation message.
+export const updateNotifications = (notifications: NotificationSettings) =>
+  apiFetch<{ company: Company }>('/api/company', {
+    method: 'PATCH',
+    body: JSON.stringify({ notifications }),
+  }).then((r) => r.company)
+
+// ── Plan & usage (soft metering) ───────────────────────────────────────
+export type UsageResponse = {
+  usage: {
+    plan: string
+    planName: string
+    testedSessions: number
+    testedSessionsLimit: number | null
+    testedSessionsPct: number | null
+    overSessionLimit: boolean
+    runningTests: number
+    runningTestsLimit: number | null
+    atTestLimit: boolean
+    periodStart: string
+    periodEnd: string
+  }
+  plan: {
+    key: string
+    name: string
+    price: number
+    features: string[]
+    maxRunningTests: number | null
+    testedSessionsPerMonth: number | null
+  }
+}
+
+export const fetchUsage = () => apiFetch<UsageResponse>('/api/company/usage')

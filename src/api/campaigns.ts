@@ -45,3 +45,9 @@ export const setCampaignStatus = (id: string, status: CampaignStatus) =>
   apiFetch<{ campaign: unknown }>(`/api/campaigns/${id}`, { method: 'PATCH', body: JSON.stringify({ status }) })
 export const rollbackCampaign = (id: string) =>
   apiFetch<{ campaign: unknown }>(`/api/campaigns/${id}`, { method: 'PATCH', body: JSON.stringify({ status: 'running' }) })
+// POST both enables sharing and rotates the token — every call mints a fresh
+// public /r/<token> link and the previous one stops resolving. Drafts 400.
+export const enableShare = (id: string) =>
+  apiFetch<{ token: string; url: string; shareEnabled: true }>(`/api/campaigns/${id}/share`, { method: 'POST' })
+export const disableShare = (id: string) =>
+  apiFetch<{ shareEnabled: false }>(`/api/campaigns/${id}/share`, { method: 'DELETE' })

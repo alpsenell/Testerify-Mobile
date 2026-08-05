@@ -1,7 +1,7 @@
 import { act, cleanup, render, waitFor, fireEvent } from '@testing-library/react-native'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { router } from 'expo-router'
-import { ProductsScreen, PRODUCTS_DAYS } from '../Products'
+import { ProductsScreen } from '../Products'
 import * as stats from '../../api/stats'
 
 jest.mock('expo-router', () => ({ router: { push: jest.fn(), back: jest.fn() } }))
@@ -40,6 +40,8 @@ afterEach(async () => {
   currentQueryClient = undefined
 })
 
+const spanDays = (from: string, to: string) => Math.round((Date.parse(to) - Date.parse(from)) / 86_400_000) + 1
+
 const renderScreen = async () => {
   const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } })
   currentQueryClient = qc
@@ -53,7 +55,7 @@ test('queries an inclusive 7-day window', async () => {
   const args = (stats.fetchProducts as jest.Mock).mock.calls[0][0]
   expect(args.from).toMatch(/^\d{4}-\d{2}-\d{2}$/)
   expect(args.to).toMatch(/^\d{4}-\d{2}-\d{2}$/)
-  expect(PRODUCTS_DAYS).toBe(7)
+  expect(spanDays(args.from, args.to)).toBe(7)
 })
 
 test('tiles summarise the window in the store currency', async () => {

@@ -103,10 +103,29 @@ test('a paused nudge resumes', async () => {
   await waitFor(() => expect(campaignsApi.setCampaignStatus).toHaveBeenCalledWith('n2', 'running'))
 })
 
-test('shows an empty state when the store runs no nudges', async () => {
+test('shows an empty state pointing at the native library, not the desktop', async () => {
   ;(campaignsApi.fetchCampaigns as jest.Mock).mockResolvedValue([{ ...base, id: 'a1', kind: 'ab' }])
   const { getByText } = await renderScreen()
-  await waitFor(() => expect(getByText('No nudges yet — build one on the desktop panel.')).toBeTruthy())
+  await waitFor(() => expect(getByText('No nudges yet — tap “New nudge” to pick one from the library.')).toBeTruthy())
+})
+
+test('"New nudge" opens the native library wizard', async () => {
+  const { getByText } = await renderScreen()
+  await waitFor(() => expect(getByText('New nudge')).toBeTruthy())
+
+  fireEvent.press(getByText('New nudge'))
+  expect(router.push).toHaveBeenCalledWith('/screens/nudge-create')
+})
+
+test('a draft nudge gets a Launch action that hits the status endpoint', async () => {
+  ;(campaignsApi.fetchCampaigns as jest.Mock).mockResolvedValue([
+    { ...base, id: 'n3', name: 'Countdown timer', status: 'draft' },
+  ])
+  const { getByLabelText } = await renderScreen()
+  await waitFor(() => expect(getByLabelText('Launch Countdown timer')).toBeTruthy())
+
+  fireEvent.press(getByLabelText('Launch Countdown timer'))
+  await waitFor(() => expect(campaignsApi.setCampaignStatus).toHaveBeenCalledWith('n3', 'running'))
 })
 
 test('back returns to Home and errors render a retry card', async () => {

@@ -1,20 +1,17 @@
-import { useMemo } from 'react'
-import { Pressable, RefreshControl, ScrollView, Text, View } from 'react-native'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { router } from 'expo-router'
+import { Text, View } from 'react-native'
+import { useQuery } from '@tanstack/react-query'
 import { fetchFunnel } from '../api/stats'
 import type { FunnelStep } from '../api/stats'
-import { Skeleton } from '../components/Skeleton'
-import { RetryCard } from '../components/RetryCard'
 import { EmptyState } from '../components/EmptyState'
 import { StatTile } from '../components/StatTile'
-import { Icon } from '../components/Icon'
+import { RangeChips } from '../components/RangeChips'
+import { ScreenShell } from '../components/ScreenShell'
+import { qk } from '../api/keys'
 import { compact, pct } from '../utils/format'
-import { lastNDays } from '../utils/range'
+import { windowSentence } from '../utils/range'
+import { useDateRange } from '../hooks/useDateRange'
 import { biggestDrop, isTracked, stepByKey } from '../utils/funnel'
 import { colors, fonts, type } from '../theme'
-
-export const FUNNEL_DAYS = 7
 
 function StepRow({ step, index }: { step: FunnelStep; index: number }) {
   const tracked = isTracked(step)
@@ -55,9 +52,8 @@ function StepRow({ step, index }: { step: FunnelStep; index: number }) {
 }
 
 export function FunnelScreen() {
-  const range = useMemo(() => lastNDays(FUNNEL_DAYS), [])
-  const funnel = useQuery({ queryKey: ['funnel', range.from, range.to], queryFn: () => fetchFunnel(range) })
-  const qc = useQueryClient()
+  const { days, setDays, range } = useDateRange(7)
+  const funnel = useQuery({ queryKey: qk.funnel(range), queryFn: () => fetchFunnel(range) })
 
   const steps = funnel.data?.steps ?? []
   const entry = stepByKey(steps, 'view')
@@ -65,33 +61,18 @@ export function FunnelScreen() {
   const worst = biggestDrop(steps)
 
   return (
-    <ScrollView
-      style={{ flex: 1, backgroundColor: colors.paper }}
-      contentContainerStyle={{ padding: 16, paddingTop: 62, paddingBottom: 30, gap: 13 }}
-      refreshControl={<RefreshControl refreshing={funnel.isRefetching} onRefresh={() => qc.invalidateQueries()} tintColor={colors.muted} />}
+    <ScreenShell
+      kicker="Conversion"
+      title="Funnel"
+      subtitle={`Where shoppers drop off between landing and purchase. ${windowSentence(days)}, all traffic.`}
+      refreshing={funnel.isRefetching}
+      pending={funnel.isPending}
+      errored={funnel.isError}
+      onRetry={() => funnel.refetch()}
+      skeletonHeights={[88, 88, 220]}
+      toolbar={<RangeChips days={days} onPick={setDays} />}
     >
-      <Pressable accessibilityRole="button" onPress={() => router.back()} style={{ flexDirection: 'row', alignItems: 'center', gap: 6, minHeight: 44, alignSelf: 'flex-start' }}>
-        <Icon name="arrowLeft" size={18} color={colors.secondary} />
-        <Text style={{ fontFamily: fonts.sansSemi, fontSize: 14, color: colors.secondary }}>Home</Text>
-      </Pressable>
-
-      <View>
-        <Text style={type.kicker}>Conversion</Text>
-        <Text style={[type.h1, { marginTop: 4 }]}>Funnel</Text>
-        <Text style={[type.body, { marginTop: 6 }]}>
-          Where shoppers drop off between landing and purchase. Last {FUNNEL_DAYS} days, all traffic.
-        </Text>
-      </View>
-
-      {funnel.isPending ? (
-        <View style={{ gap: 10 }}>
-          <Skeleton height={88} />
-          <Skeleton height={88} />
-          <Skeleton height={220} />
-        </View>
-      ) : funnel.isError ? (
-        <RetryCard onRetry={() => funnel.refetch()} />
-      ) : steps.length === 0 ? (
+      {steps.length === 0 ? (
         <EmptyState message="No funnel data for this window yet." />
       ) : (
         <>
@@ -118,6 +99,6 @@ export function FunnelScreen() {
           </View>
         </>
       )}
-    </ScrollView>
+    </ScreenShell>
   )
 }

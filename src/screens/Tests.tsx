@@ -4,7 +4,6 @@ import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { router } from 'expo-router'
 import { fetchCampaigns } from '../api/campaigns'
 import type { CampaignListItem } from '../api/campaigns'
-import { useSheets } from '../stores/sheets'
 import { Skeleton } from '../components/Skeleton'
 import { RetryCard } from '../components/RetryCard'
 import { EmptyState } from '../components/EmptyState'
@@ -26,7 +25,6 @@ const matchesFilter = (c: CampaignListItem, filter: FilterKey) => {
 
 export function TestsScreen() {
   const [filter, setFilter] = useState<FilterKey>('all')
-  const openCopilot = useSheets((s) => s.openCopilot)
   const camps = useQuery({ queryKey: ['campaigns'], queryFn: fetchCampaigns })
   const qc = useQueryClient()
 
@@ -44,12 +42,13 @@ export function TestsScreen() {
       contentContainerStyle={{ padding: 16, paddingTop: 62, paddingBottom: 30, gap: 14 }}
       refreshControl={<RefreshControl refreshing={camps.isRefetching} onRefresh={() => qc.invalidateQueries()} tintColor={colors.muted} />}>
 
-      {/* Header */}
+      {/* Header — creation goes to the native wizard; the co-pilot keeps its
+          own entries on Home and the tab bar. */}
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
         <Text style={type.h1}>Tests</Text>
-        <Pressable onPress={openCopilot} style={{ flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: colors.accent, borderRadius: 11, paddingHorizontal: 14, minHeight: 44, justifyContent: 'center' }}>
+        <Pressable onPress={() => router.push('/screens/create-test')} style={{ flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: colors.accent, borderRadius: 11, paddingHorizontal: 14, minHeight: 44, justifyContent: 'center' }}>
           <Icon name="plus" size={15} color={colors.white} />
-          <Text style={{ fontFamily: fonts.sansSemi, fontSize: 13.5, color: colors.white }}>New</Text>
+          <Text style={{ fontFamily: fonts.sansSemi, fontSize: 13.5, color: colors.white }}>New test</Text>
         </Pressable>
       </View>
 

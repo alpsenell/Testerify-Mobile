@@ -23,6 +23,101 @@ test('signIn stores tokens and user/company', async () => {
   expect(apiFetch).toHaveBeenCalledWith('/api/auth/login', expect.objectContaining({ auth: false }))
 })
 
+test('signUp posts the workspace fields unauthenticated and lands the session', async () => {
+  apiFetch.mockResolvedValue({
+    user: { id: 'u1', name: 'Alp', email: 'alp@x.com', role: 'admin' },
+    company: { id: 'c1', name: 'Alder & Ash', slug: 'alder-ash', websiteUrl: null },
+    stores: [{ id: 'c1', name: 'Alder & Ash', slug: 'alder-ash', role: 'admin' }],
+    tokens: { accessToken: 'A', refreshToken: 'R' },
+  })
+  await useAuth.getState().signUp('Alder & Ash', 'Alp', 'alp@x.com', 'longenough')
+
+  const [path, init] = apiFetch.mock.calls[0]
+  expect(path).toBe('/api/auth/register')
+  expect(init.auth).toBe(false)
+  expect(JSON.parse(init.body)).toEqual({
+    companyName: 'Alder & Ash', name: 'Alp', email: 'alp@x.com', password: 'longenough', includeTokens: true,
+  })
+  expect(tokens.setTokens).toHaveBeenCalledWith({ access: 'A', refresh: 'R' })
+  expect(useAuth.getState().status).toBe('signedIn')
+  expect(useAuth.getState().company?.name).toBe('Alder & Ash')
+})
+
+test('signUp surfaces the server message for a taken email and stays signed out', async () => {
+  apiFetch.mockRejectedValue(new Error('Email already registered'))
+  await expect(useAuth.getState().signUp('A', 'B', 'taken@x.com', 'longenough'))
+    .rejects.toThrow('Email already registered')
+  expect(tokens.setTokens).not.toHaveBeenCalled()
+  expect(useAuth.getState().status).toBe('restoring')
+})
+
+test('a session response without tokens is refused rather than half-signing-in', async () => {
+  apiFetch.mockResolvedValue({
+    user: { id: 'u1', name: 'Alp', email: 'alp@x.com', role: 'admin' },
+    company: { id: 'c1', name: 'A', slug: 'a', websiteUrl: null },
+  })
+  await expect(useAuth.getState().signUp('A', 'Alp', 'alp@x.com', 'longenough')).rejects.toThrow(/includeTokens/)
+  expect(useAuth.getState().status).not.toBe('signedIn')
+})
+
+test('acceptInvite posts the token unauthenticated and signs the new user in', async () => {
+  apiFetch.mockResolvedValue({
+    user: { id: 'u2', name: 'Sam', email: 'sam@x.com', role: 'member' },
+    company: { id: 'c1', name: 'Alder & Ash', slug: 'alder-ash', websiteUrl: null },
+    tokens: { accessToken: 'A2', refreshToken: 'R2' },
+  })
+  await useAuth.getState().acceptInvite('tok-abc', 'Sam', 'longenough')
+
+  const [path, init] = apiFetch.mock.calls[0]
+  expect(path).toBe('/api/auth/invite')
+  expect(init.auth).toBe(false)
+  expect(JSON.parse(init.body)).toEqual({ token: 'tok-abc', name: 'Sam', password: 'longenough', includeTokens: true })
+  expect(tokens.setTokens).toHaveBeenCalledWith({ access: 'A2', refresh: 'R2' })
+  expect(useAuth.getState().user?.email).toBe('sam@x.com')
+})
+
+test('switchStore re-mints the tokens, swaps the company and patches the role', async () => {
+  useAuth.setState({
+    status: 'signedIn',
+    user: { id: 'u1', name: 'Alp', email: 'alp@x.com', role: 'admin' },
+    company: { id: 'c1', name: 'Alder & Ash', slug: 'alder-ash', websiteUrl: null },
+  })
+  apiFetch.mockResolvedValue({
+    company: { id: 'c2', name: 'Beta Store', slug: 'beta', websiteUrl: null },
+    role: 'member',
+    stores: [],
+    tokens: { accessToken: 'A2', refreshToken: 'R2' },
+  })
+
+  const company = await useAuth.getState().switchStore('c2')
+
+  const [path, init] = apiFetch.mock.calls[0]
+  expect(path).toBe('/api/auth/switch-store')
+  // Authenticated: the current session proves the membership being switched to.
+  expect(init.auth).toBeUndefined()
+  expect(JSON.parse(init.body)).toEqual({ companyId: 'c2', includeTokens: true })
+  expect(tokens.setTokens).toHaveBeenCalledWith({ access: 'A2', refresh: 'R2' })
+  expect(company.name).toBe('Beta Store')
+  expect(useAuth.getState().company?.id).toBe('c2')
+  // Same identity, role scoped to the new store.
+  expect(useAuth.getState().user?.id).toBe('u1')
+  expect(useAuth.getState().user?.role).toBe('member')
+})
+
+test('switchStore without tokens leaves the session on the old store', async () => {
+  useAuth.setState({
+    status: 'signedIn',
+    user: { id: 'u1', name: 'Alp', email: 'alp@x.com', role: 'admin' },
+    company: { id: 'c1', name: 'Alder & Ash', slug: 'alder-ash', websiteUrl: null },
+  })
+  apiFetch.mockResolvedValue({ company: { id: 'c2', name: 'Beta', slug: 'beta', websiteUrl: null }, role: 'member', stores: [] })
+
+  await expect(useAuth.getState().switchStore('c2')).rejects.toThrow(/includeTokens/)
+  expect(tokens.setTokens).not.toHaveBeenCalled()
+  expect(useAuth.getState().company?.id).toBe('c1')
+  expect(useAuth.getState().user?.role).toBe('admin')
+})
+
 test('restore with no tokens → signedOut', async () => {
   ;(tokens.getTokens as jest.Mock).mockResolvedValue(null)
   await useAuth.getState().restore()

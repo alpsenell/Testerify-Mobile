@@ -1,9 +1,13 @@
 import { useState } from 'react'
-import { Alert, Platform, Pressable, ScrollView, Text, View } from 'react-native'
+import { Alert, Platform, Pressable, ScrollView, Share, Text, View } from 'react-native'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { router, useLocalSearchParams } from 'expo-router'
-import { fetchCampaign, rollbackCampaign } from '../api/campaigns'
+import { enableShare, fetchCampaign, rollbackCampaign } from '../api/campaigns'
 import type { CampaignDetailData, CampaignVariant } from '../api/campaigns'
+import { fetchSegment } from '../api/stats'
+import type { SegmentDimension } from '../api/stats'
+import { qk } from '../api/keys'
+import { SegmentedControl } from '../components/SegmentedControl'
 import { useSheets } from '../stores/sheets'
 import { useFavorites } from '../stores/favorites'
 import { useToast } from '../stores/toast'
@@ -90,6 +94,65 @@ function GridStat({ label, value }: { label: string; value: string }) {
   )
 }
 
+const SEGMENT_DIMENSIONS: Array<{ key: SegmentDimension; label: string }> = [
+  { key: 'device', label: 'Device' },
+  { key: 'country', label: 'Country' },
+  { key: 'utm_source', label: 'Source' },
+  { key: 'returning', label: 'Visitor' },
+]
+
+// Control vs challenger inside one audience slice. Only slices with enough
+// data get an uplift number — the rest say so instead of showing noise.
+function SegmentBreakdown({ campaignId }: { campaignId: string }) {
+  const [dimension, setDimension] = useState<SegmentDimension>('device')
+  const segment = useQuery({
+    queryKey: qk.segment(campaignId, dimension),
+    queryFn: () => fetchSegment(campaignId, dimension),
+  })
+
+  return (
+    <View style={{ marginTop: 14, gap: 12 }}>
+      <SegmentedControl
+        options={SEGMENT_DIMENSIONS}
+        active={dimension}
+        onPick={(k) => setDimension(k as SegmentDimension)}
+      />
+      {segment.isPending ? (
+        <Skeleton height={88} />
+      ) : segment.isError ? (
+        <RetryCard onRetry={() => segment.refetch()} />
+      ) : segment.data.rows.length === 0 ? (
+        <EmptyState message="No segment data yet — it appears once both variants have traffic." />
+      ) : (
+        <View>
+          {segment.data.rows.map((row) => (
+            <View key={row.value} style={{ flexDirection: 'row', alignItems: 'center', gap: 10, borderTopWidth: 1, borderTopColor: colors.hairline, paddingVertical: 10, minHeight: 44 }}>
+              <View style={{ flex: 1, minWidth: 0 }}>
+                <Text style={{ fontFamily: fonts.sansSemi, fontSize: 13, color: colors.ink }} numberOfLines={1}>{row.label}</Text>
+                <Text style={[type.small, { fontSize: 11.5, marginTop: 1 }]}>
+                  {compact(row.impressions)} visitors · {pct(row.control.rate)} → {pct(row.challenger.rate)}
+                </Text>
+              </View>
+              {row.enoughData ? (
+                <Text style={{ fontFamily: fonts.monoSemi, fontSize: 13.5, color: row.uplift < 0 ? colors.neg : colors.pos }}>
+                  {signedPct(row.uplift)}
+                </Text>
+              ) : (
+                <Text style={[type.small, { fontSize: 11.5 }]}>needs more data</Text>
+              )}
+            </View>
+          ))}
+          {segment.data.truncated > 0 ? (
+            <Text style={[type.small, { fontSize: 11.5, marginTop: 6 }]}>
+              Top 20 shown · {segment.data.truncated} smaller values hidden
+            </Text>
+          ) : null}
+        </View>
+      )}
+    </View>
+  )
+}
+
 export function TestDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>()
   const [chartOpen, setChartOpen] = useState(false)
@@ -108,6 +171,20 @@ export function TestDetailScreen() {
       show('Rolled back — the test is collecting again.')
     },
     onError: (e) => show(e instanceof Error ? e.message : 'Could not roll back.'),
+  })
+  const [segOpen, setSegOpen] = useState(false)
+  // Every POST mints a fresh public link (enable + rotate in one), then hands
+  // it to the native share sheet. Aggregates only — safe to send around.
+  const shareResult = useMutation({
+    mutationFn: () => enableShare(id as string),
+    onSuccess: async ({ url }) => {
+      try {
+        await Share.share(Platform.OS === 'ios' ? { url, message: url } : { message: url })
+      } catch {
+        // The user dismissed the sheet — the link stays live; nothing to say.
+      }
+    },
+    onError: (e) => show(e instanceof Error ? e.message : 'Could not create a share link.'),
   })
 
   if (detail.isPending) {
@@ -176,15 +253,29 @@ export function TestDetailScreen() {
             drives the Favorites screen, not any server-side state. */}
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
           <StatusPill label={statusLabel(c.status)} tone={statusTone(c.status)} pulse={statusPulse(c.status)} />
-          <Pressable
-            accessibilityRole="button"
-            accessibilityState={{ selected: pinnedIds.includes(c.id) }}
-            accessibilityLabel={pinnedIds.includes(c.id) ? 'Unpin from favorites' : 'Pin to favorites'}
-            onPress={() => togglePin(c.id)}
-            style={{ minHeight: 44, minWidth: 44, alignItems: 'flex-end', justifyContent: 'center' }}
-          >
-            <Icon name="star" size={20} color={pinnedIds.includes(c.id) ? colors.warn : colors.faint} filled={pinnedIds.includes(c.id)} />
-          </Pressable>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 2 }}>
+            {/* Drafts have no results to share — the server rejects them. */}
+            {c.status !== 'draft' ? (
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel="Share result link"
+                disabled={shareResult.isPending}
+                onPress={() => shareResult.mutate()}
+                style={{ minHeight: 44, minWidth: 44, alignItems: 'center', justifyContent: 'center', opacity: shareResult.isPending ? 0.5 : 1 }}
+              >
+                <Icon name="send" size={19} color={colors.secondary} />
+              </Pressable>
+            ) : null}
+            <Pressable
+              accessibilityRole="button"
+              accessibilityState={{ selected: pinnedIds.includes(c.id) }}
+              accessibilityLabel={pinnedIds.includes(c.id) ? 'Unpin from favorites' : 'Pin to favorites'}
+              onPress={() => togglePin(c.id)}
+              style={{ minHeight: 44, minWidth: 44, alignItems: 'flex-end', justifyContent: 'center' }}
+            >
+              <Icon name="star" size={20} color={pinnedIds.includes(c.id) ? colors.warn : colors.faint} filled={pinnedIds.includes(c.id)} />
+            </Pressable>
+          </View>
         </View>
         <Text style={type.h1}>{c.name}</Text>
         <Text style={type.small}>{targetPath(c.targetUrl)} · started {shortDate(c.createdAt)}</Text>
@@ -259,6 +350,30 @@ export function TestDetailScreen() {
             )
           )}
         </Card>
+
+        {/* Segment breakdown — where the challenger wins and loses. Drafts
+            have no traffic to slice. */}
+        {c.status !== 'draft' ? (
+          <Card>
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+              <View style={{ flex: 1 }}>
+                <Text style={type.title}>Segment breakdown</Text>
+                <Text style={[type.small, { marginTop: 2 }]}>Control vs challenger by audience slice</Text>
+              </View>
+              <Pressable
+                accessibilityRole="button"
+                accessibilityState={{ expanded: segOpen }}
+                onPress={() => setSegOpen((o) => !o)}
+                style={{ minHeight: 44, minWidth: 44, alignItems: 'flex-end', justifyContent: 'center' }}
+              >
+                <Text style={{ fontFamily: fonts.sansSemi, fontSize: 13.5, color: colors.accent }}>
+                  {segOpen ? 'Hide' : 'Show'}
+                </Text>
+              </Pressable>
+            </View>
+            {segOpen ? <SegmentBreakdown campaignId={c.id} /> : null}
+          </Card>
+        ) : null}
       </ScrollView>
 
       {/* Floating bars — plain paper-colored container rather than a real gradient

@@ -3,10 +3,12 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { router } from 'expo-router'
 import { AnalyticsScreen } from '../Analytics'
 import * as campaignsApi from '../../api/campaigns'
+import * as statsApi from '../../api/stats'
 import type { CampaignListItem } from '../../api/campaigns'
 
 jest.mock('expo-router', () => ({ router: { push: jest.fn(), back: jest.fn() } }))
 jest.mock('../../api/campaigns')
+jest.mock('../../api/stats')
 
 const base: CampaignListItem = {
   id: 'x', name: '', kind: 'ab', status: 'completed', targetUrl: null, goals: null,
@@ -35,8 +37,18 @@ const CAMPAIGNS: CampaignListItem[] = [
 
 let currentQueryClient: QueryClient | undefined
 
+const IMPACT: statsApi.ImpactResponse = {
+  totalImpact: 12400,
+  currency: { code: 'USD', mixed: false },
+  campaigns: [
+    { id: 'a', name: 'Sticky add-to-cart', promotedAt: '2026-07-01T00:00:00Z', impact: 9100 },
+    { id: 'b', name: 'Single-column checkout', promotedAt: '2026-07-01T00:00:00Z', impact: 3300 },
+  ],
+}
+
 beforeEach(() => {
   ;(campaignsApi.fetchCampaigns as jest.Mock).mockResolvedValue(CAMPAIGNS)
+  ;(statsApi.fetchImpact as jest.Mock).mockResolvedValue(IMPACT)
 })
 
 afterEach(async () => {
@@ -122,4 +134,27 @@ test('back returns to Home and errors render a retry card', async () => {
 
   fireEvent.press(getByText('Home'))
   expect(router.back).toHaveBeenCalled()
+})
+
+test('the impact card totals shipped winners and links each row to its test', async () => {
+  const { getByText } = await renderScreen()
+  await waitFor(() => expect(getByText('Estimated impact')).toBeTruthy())
+
+  expect(getByText('$12.4k')).toBeTruthy()
+  fireEvent.press(getByText('$9.1k'))
+  expect(router.push).toHaveBeenCalledWith('/test/a')
+})
+
+test('a failed impact call hides the card instead of blocking the page', async () => {
+  ;(statsApi.fetchImpact as jest.Mock).mockRejectedValue(new Error('boom'))
+  const { getByText, queryByText } = await renderScreen()
+  await waitFor(() => expect(getByText('Tests run')).toBeTruthy())
+  expect(queryByText('Estimated impact')).toBeNull()
+})
+
+test('an empty impact list renders no card', async () => {
+  ;(statsApi.fetchImpact as jest.Mock).mockResolvedValue({ ...IMPACT, totalImpact: 0, campaigns: [] })
+  const { getByText, queryByText } = await renderScreen()
+  await waitFor(() => expect(getByText('Tests run')).toBeTruthy())
+  expect(queryByText('Estimated impact')).toBeNull()
 })

@@ -3,6 +3,8 @@ import { Pressable, RefreshControl, ScrollView, Text, View } from 'react-native'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { router } from 'expo-router'
 import { fetchCampaigns } from '../api/campaigns'
+import { fetchImpact } from '../api/stats'
+import { qk } from '../api/keys'
 import { Skeleton } from '../components/Skeleton'
 import { RetryCard } from '../components/RetryCard'
 import { EmptyState } from '../components/EmptyState'
@@ -35,7 +37,10 @@ function LegendSwatch({ color, label }: { color: string; label: string }) {
 }
 
 export function AnalyticsScreen() {
-  const campaigns = useQuery({ queryKey: ['campaigns'], queryFn: fetchCampaigns })
+  const campaigns = useQuery({ queryKey: qk.campaigns(), queryFn: fetchCampaigns })
+  // Server-computed added revenue from shipped winners — quietly absent on
+  // error rather than blocking the on-device stats below.
+  const impact = useQuery({ queryKey: qk.impact(), queryFn: fetchImpact })
   const qc = useQueryClient()
 
   const data = campaigns.data
@@ -77,6 +82,29 @@ export function AnalyticsScreen() {
         <EmptyState message="No launched tests yet — analytics appear once your first test starts collecting." />
       ) : (
         <>
+          {impact.data && impact.data.campaigns.length > 0 ? (
+            <View style={{ backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, borderRadius: 16, padding: 16, gap: 4 }}>
+              <Text style={type.kicker}>Estimated impact</Text>
+              <Text style={{ fontFamily: fonts.sans, fontSize: 30, lineHeight: 34, color: colors.ink }}>
+                {money(impact.data.totalImpact, impact.data.currency.mixed ? null : impact.data.currency.code)}
+              </Text>
+              <Text style={[type.small, { marginBottom: 4 }]}>Added revenue from shipped winners, vs the old control experience</Text>
+              {impact.data.campaigns.slice(0, 5).map((c) => (
+                <Pressable
+                  key={c.id}
+                  accessibilityRole="button"
+                  onPress={() => router.push(`/test/${c.id}`)}
+                  style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 10, borderTopWidth: 1, borderTopColor: colors.hairline, paddingVertical: 10, minHeight: 44 }}
+                >
+                  <Text style={{ flex: 1, fontFamily: fonts.sansMedium, fontSize: 13, color: colors.ink }} numberOfLines={1}>{c.name}</Text>
+                  <Text style={{ fontFamily: fonts.monoSemi, fontSize: 13, color: c.impact < 0 ? colors.neg : colors.pos }}>
+                    {money(c.impact, impact.data!.currency.mixed ? null : impact.data!.currency.code)}
+                  </Text>
+                </Pressable>
+              ))}
+            </View>
+          ) : null}
+
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 11 }}>
             <StatTile icon="beaker" label="Tests run" value={String(stats.testsRun)}
               sub={`${stats.inconclusive} without a winner`} />

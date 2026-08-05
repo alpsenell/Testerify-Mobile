@@ -9,6 +9,8 @@ test('sheet transitions', () => {
   expect(useSheets.getState().sheet).toEqual({ kind: 'more' })
   useSheets.getState().openShip('c1')
   expect(useSheets.getState().sheet).toEqual({ kind: 'ship', campaignId: 'c1' })
+  useSheets.getState().openStoreSwitcher()
+  expect(useSheets.getState().sheet).toEqual({ kind: 'storeSwitcher' })
   useSheets.getState().close()
   expect(useSheets.getState().sheet).toBeNull()
 })
