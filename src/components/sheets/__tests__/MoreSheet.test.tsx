@@ -10,9 +10,8 @@ jest.useFakeTimers()
 
 jest.mock('expo-router', () => ({ router: { push: jest.fn() } }))
 
-// Labels that still toast. Built Phase-2 screens ('Live', 'Learnings') are
-// excluded — they navigate to a real screen instead of showing the generic
-// "coming to mobile" toast; each is covered by its own case below.
+// The five Phase-3 screens — the only More items that still toast. Every
+// Phase-2 screen navigates instead, and each route is asserted below.
 const LABELS = [
   'Nudges', 'Flows', 'Audiences',
   'Team', 'Settings',
@@ -43,7 +42,7 @@ test.each(LABELS)('tapping "%s" closes the sheet and shows its own toast', async
   fireEvent.press(screen.getAllByText(label)[0])
   expect(useSheets.getState().sheet).toBeNull()
   expect(useToast.getState().message).toBe(
-    `${label} is coming to mobile — it lives on the desktop panel for now.`
+    `${label} arrives in Phase 3 — it lives on the desktop panel for now.`
   )
 })
 

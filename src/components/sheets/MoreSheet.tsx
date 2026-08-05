@@ -24,9 +24,9 @@ const ITEMS: { label: string; icon: IconName }[] = [
   { label: 'Settings', icon: 'settings' },
 ]
 
-// Built Phase-2 screens, by their More-sheet label. Anything absent still
-// falls through to the "coming to mobile" toast — each screen task moves its
-// own label in here as the route lands.
+// Every built screen, by its More-sheet label. The five absent labels
+// (Nudges, Flows, Audiences, Team, Settings) are the Phase-3 screens and
+// fall through to the "arrives in Phase 3" toast.
 const ROUTES: Record<string, string> = {
   Live: '/screens/live',
   Learnings: '/screens/learnings',
@@ -52,7 +52,7 @@ export function MoreSheet() {
       router.push(route)
       return
     }
-    show(`${label} is coming to mobile — it lives on the desktop panel for now.`)
+    show(`${label} arrives in Phase 3 — it lives on the desktop panel for now.`)
   }
 
   return (
