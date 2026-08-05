@@ -25,24 +25,33 @@ export function TabBar({ state, navigation, badgeCount = 0 }: BottomTabBarProps 
   }
 
   return (
-    <View style={{ borderTopWidth: 1, borderTopColor: colors.border, backgroundColor: colors.tabBar, flexDirection: 'row', alignItems: 'flex-end', paddingHorizontal: 8, paddingTop: 8, paddingBottom: Platform.OS === 'ios' ? 30 : 14 }}>
-      {tab('index', 'Home', 'home')}
-      {tab('tests', 'Tests', 'beaker')}
-      <View style={{ width: 76, alignItems: 'center', paddingTop: 7, minHeight: 52 }}>
-        <View style={{ height: 26 }} />
-        <Text style={{ fontFamily: fonts.sansSemi, fontSize: 10.5, color: colors.muted }}>Co-pilot</Text>
-      </View>
-      {tab('alerts', 'Alerts', 'bell', badgeCount > 0 ? (
-        <View style={{ position: 'absolute', top: -3, right: -7, minWidth: 16, height: 16, paddingHorizontal: 4, borderRadius: 8, backgroundColor: colors.neg, alignItems: 'center', justifyContent: 'center' }}>
-          <Text style={{ fontFamily: fonts.monoSemi, fontSize: 9.5, color: colors.white }}>{badgeCount}</Text>
+    // The FAB rises 22px above the bar. Touches outside a parent's bounds are
+    // never delivered on iOS or Android, so the bar row lives inside a taller
+    // transparent wrapper and the FAB is positioned fully WITHIN that
+    // wrapper's bounds — visually identical, but the whole circle is tappable.
+    // box-none: the transparent strip beside the FAB stays touch-transparent.
+    <View style={{ paddingTop: 22, pointerEvents: 'box-none' }}>
+      {/* Explicit auto on both children: RN-web implements box-none as CSS
+          pointer-events:none, which cascades — children must opt back in. */}
+      <View style={{ pointerEvents: 'auto', borderTopWidth: 1, borderTopColor: colors.border, backgroundColor: colors.tabBar, flexDirection: 'row', alignItems: 'flex-end', paddingHorizontal: 8, paddingTop: 8, paddingBottom: Platform.OS === 'ios' ? 30 : 14 }}>
+        {tab('index', 'Home', 'home')}
+        {tab('tests', 'Tests', 'beaker')}
+        <View style={{ width: 76, alignItems: 'center', paddingTop: 7, minHeight: 52 }}>
+          <View style={{ height: 26 }} />
+          <Text style={{ fontFamily: fonts.sansSemi, fontSize: 10.5, color: colors.muted }}>Co-pilot</Text>
         </View>
-      ) : undefined)}
-      <Pressable onPress={openMore} accessibilityRole="button" style={{ flex: 1, alignItems: 'center', gap: 4, paddingTop: 7, minHeight: 52 }}>
-        <Icon name="layers" size={23} color={colors.muted} />
-        <Text style={{ fontFamily: fonts.sansSemi, fontSize: 10.5, color: colors.muted }}>More</Text>
-      </Pressable>
+        {tab('alerts', 'Alerts', 'bell', badgeCount > 0 ? (
+          <View style={{ position: 'absolute', top: -3, right: -7, minWidth: 16, height: 16, paddingHorizontal: 4, borderRadius: 8, backgroundColor: colors.neg, alignItems: 'center', justifyContent: 'center' }}>
+            <Text style={{ fontFamily: fonts.monoSemi, fontSize: 9.5, color: colors.white }}>{badgeCount}</Text>
+          </View>
+        ) : undefined)}
+        <Pressable onPress={openMore} accessibilityRole="button" style={{ flex: 1, alignItems: 'center', gap: 4, paddingTop: 7, minHeight: 52 }}>
+          <Icon name="layers" size={23} color={colors.muted} />
+          <Text style={{ fontFamily: fonts.sansSemi, fontSize: 10.5, color: colors.muted }}>More</Text>
+        </Pressable>
+      </View>
       <Pressable onPress={openCopilot} accessibilityRole="button" accessibilityLabel="Ask the co-pilot"
-        style={{ position: 'absolute', alignSelf: 'center', left: '50%', marginLeft: -30, bottom: 52, width: 60, height: 60, borderRadius: 30, backgroundColor: colors.accent, alignItems: 'center', justifyContent: 'center', borderWidth: 6, borderColor: colors.paper, shadowColor: colors.accent, shadowOpacity: 0.45, shadowRadius: 12, shadowOffset: { width: 0, height: 10 }, elevation: 8 }}>
+        style={{ pointerEvents: 'auto', position: 'absolute', top: 0, left: '50%', marginLeft: -30, width: 60, height: 60, borderRadius: 30, backgroundColor: colors.accent, alignItems: 'center', justifyContent: 'center', borderWidth: 6, borderColor: colors.paper, shadowColor: colors.accent, shadowOpacity: 0.45, shadowRadius: 12, shadowOffset: { width: 0, height: 10 }, elevation: 8 }}>
         <Icon name="sparkle" size={26} color={colors.white} />
       </Pressable>
     </View>
