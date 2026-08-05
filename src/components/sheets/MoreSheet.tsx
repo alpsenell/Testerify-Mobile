@@ -40,6 +40,7 @@ const ROUTES: Record<string, string> = {
   Replays: '/screens/replays',
   Favorites: '/screens/favorites',
   Flows: '/screens/flows',
+  Nudges: '/screens/nudges',
 }
 
 export function MoreSheet() {

@@ -38,5 +38,10 @@ export const promoteCampaign = (id: string, variantId: string) =>
   apiFetch<{ campaign: unknown; rollout: unknown }>(`/api/campaigns/${id}`, { method: 'POST', body: JSON.stringify({ action: 'promote', variantId }) })
 export const updateLearningNote = (id: string, learningNote: string) =>
   apiFetch<{ campaign: unknown }>(`/api/campaigns/${id}`, { method: 'PATCH', body: JSON.stringify({ learningNote }) })
+// Status writes for any campaign (used by the Nudges screen's pause/resume).
+// rollbackCampaign below is the same call pinned to 'running' — kept as its
+// own name because the ship/rollback flow reads better that way.
+export const setCampaignStatus = (id: string, status: CampaignStatus) =>
+  apiFetch<{ campaign: unknown }>(`/api/campaigns/${id}`, { method: 'PATCH', body: JSON.stringify({ status }) })
 export const rollbackCampaign = (id: string) =>
   apiFetch<{ campaign: unknown }>(`/api/campaigns/${id}`, { method: 'PATCH', body: JSON.stringify({ status: 'running' }) })

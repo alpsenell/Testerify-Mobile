@@ -13,7 +13,7 @@ jest.mock('expo-router', () => ({ router: { push: jest.fn() } }))
 // The five Phase-3 screens — the only More items that still toast. Every
 // Phase-2 screen navigates instead, and each route is asserted below.
 const LABELS = [
-  'Nudges', 'Audiences',
+  'Audiences',
   'Team', 'Settings',
 ]
 
@@ -31,6 +31,7 @@ const ROUTED: [string, string][] = [
   ['Replays', '/screens/replays'],
   ['Favorites', '/screens/favorites'],
   ['Flows', '/screens/flows'],
+  ['Nudges', '/screens/nudges'],
 ]
 
 beforeEach(() => {

@@ -181,6 +181,12 @@ All eleven are reached from the More sheet only, so **back always returns to Hom
     - **Pause while offline** (airplane mode) → the pill flips, then rolls back to Active with an error toast. This is the rollback path; verify it doesn't leave a lying pill.
     - **Delete a flow** → native confirm first; cancelling must not delete. Confirming removes the row and it stays gone after pull-to-refresh.
 
+23. **Nudges screen (test store only)**
+    - Open via More sheet → "Nudges" → back returns to Home. Only nudges appear — an A/B test must not show up here. Cross-check each card's visitors, conversion rate, uplift-vs-holdout and confidence against the same campaign on desktop (the holdout is the campaign's control variant).
+    - **Pause a running nudge** → pill flips instantly; confirm on the storefront that the widget stops appearing. Resume and re-check.
+    - Pause while offline → pill rolls back with an error toast.
+    - Draft or concluded nudges show no pause/resume control at all.
+
 Log anything off-script (visual glitch, crash, wrong number) against the screen/step above rather than as a vague "something looked wrong."
 
 ## Android notes
