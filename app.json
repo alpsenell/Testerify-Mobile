@@ -8,7 +8,10 @@
     "scheme": "testerifymobile",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "icon": "./assets/expo.icon"
+      "icon": "./assets/expo.icon",
+      "bundleIdentifier": "com.testerify.mobile",
+      "appleTeamId": "6S7Q8F967Q",
+      "supportsTablet": false
     },
     "android": {
       "adaptiveIcon": {
