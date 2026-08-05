@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@testing-library/react-native'
+import { render, screen, fireEvent, waitFor } from '@testing-library/react-native'
 import { Animated, Text, processColor } from 'react-native'
 import { Icon, IconName } from '../Icon'
 import { StatusPill } from '../StatusPill'
@@ -106,6 +106,9 @@ test('Skeleton stops its animation loop on unmount', async () => {
     const spy = jest.spyOn(Animated, 'loop')
       .mockReturnValue({ start: jest.fn(), stop, reset: jest.fn() } as any)
     const r = await render(<Skeleton height={20} />)
+    // The shimmer waits for onLayout before starting its sweep.
+    fireEvent(screen.getByTestId('skeleton'), 'layout', { nativeEvent: { layout: { width: 300, height: 20 } } })
+    await waitFor(() => expect(Animated.loop).toHaveBeenCalled())
     await r.unmount()
     expect(stop).toHaveBeenCalledTimes(1)
     spy.mockRestore()
@@ -220,13 +223,16 @@ test('RetryCard shows a custom message', async () => {
 })
 
 // Animation start tests
-test('Skeleton starts its shimmer loop on mount', async () => {
+test('Skeleton starts its shimmer loop once laid out', async () => {
   await withRealAnimations(async () => {
     const start = jest.fn()
     const spy = jest.spyOn(Animated, 'loop')
       .mockReturnValue({ start, stop: jest.fn(), reset: jest.fn() } as any)
     await render(<Skeleton height={20} />)
-    expect(start).toHaveBeenCalledTimes(1)
+    // No sweep before layout — the band needs a measured width to travel.
+    expect(start).not.toHaveBeenCalled()
+    fireEvent(screen.getByTestId('skeleton'), 'layout', { nativeEvent: { layout: { width: 300, height: 20 } } })
+    await waitFor(() => expect(start).toHaveBeenCalledTimes(1))
     spy.mockRestore()
   })
 })
@@ -293,14 +299,18 @@ test('Icon color drives the stroke of an unfilled icon', async () => {
 // Animated value wiring tests
 afterEach(() => { jest.restoreAllMocks() })
 
-test('Skeleton binds its animated value to the rendered opacity', async () => {
+test('Skeleton renders its shimmer band only after layout', async () => {
   await withRealAnimations(async () => {
     const timing = jest.spyOn(Animated, 'timing')
     const r = await render(<Skeleton height={20} />)
+    // Before layout there is no band — the sweep needs a measured width.
+    expect((r.toJSON() as any).children ?? []).toHaveLength(0)
+    fireEvent(screen.getByTestId('skeleton'), 'layout', { nativeEvent: { layout: { width: 300, height: 20 } } })
+    await waitFor(() => expect(timing).toHaveBeenCalled())
+    // The sweep drives the animated value from 0 (band off-canvas left).
     const value = timing.mock.calls[0][0] as Animated.Value
-    value.setValue(0.42)
-    await r.rerender(<Skeleton height={20} />)
-    expect(flat((r.toJSON() as any).props.style).opacity).toBe(0.42)
+    expect(value).toBeTruthy()
+    expect((r.toJSON() as any).children?.length).toBe(1)
   })
 })
 
