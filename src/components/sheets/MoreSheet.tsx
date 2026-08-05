@@ -24,9 +24,9 @@ const ITEMS: { label: string; icon: IconName }[] = [
   { label: 'Settings', icon: 'settings' },
 ]
 
-// Every built screen, by its More-sheet label. The five absent labels
-// (Nudges, Flows, Audiences, Team, Settings) are the Phase-3 screens and
-// fall through to the "arrives in Phase 3" toast.
+// Every built screen, by its More-sheet label — 15 of the 16 items. Only
+// Audiences is absent: saved audiences aren't a thing the backend has (no
+// table, no endpoint), so it falls through to the toast below.
 const ROUTES: Record<string, string> = {
   Live: '/screens/live',
   Learnings: '/screens/learnings',
@@ -56,7 +56,7 @@ export function MoreSheet() {
       router.push(route)
       return
     }
-    show(`${label} arrives in Phase 3 — it lives on the desktop panel for now.`)
+    show('Saved audiences live on the desktop panel.')
   }
 
   return (

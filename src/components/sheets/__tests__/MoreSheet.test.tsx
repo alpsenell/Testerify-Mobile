@@ -10,8 +10,9 @@ jest.useFakeTimers()
 
 jest.mock('expo-router', () => ({ router: { push: jest.fn() } }))
 
-// The five Phase-3 screens — the only More items that still toast. Every
-// Phase-2 screen navigates instead, and each route is asserted below.
+// Audiences is the only More item that still toasts — it has no backing
+// entity in the panel (see the Phase 3 spec). All 15 others navigate, and
+// every route is asserted below.
 const LABELS = ['Audiences']
 
 // Built screens, by label and route.
@@ -43,7 +44,7 @@ test.each(LABELS)('tapping "%s" closes the sheet and shows its own toast', async
   fireEvent.press(screen.getAllByText(label)[0])
   expect(useSheets.getState().sheet).toBeNull()
   expect(useToast.getState().message).toBe(
-    `${label} arrives in Phase 3 — it lives on the desktop panel for now.`
+    'Saved audiences live on the desktop panel.'
   )
 })
 

@@ -63,11 +63,11 @@ npm test    # jest (jest-expo preset + @testing-library/react-native)
 npm run lint # expo lint
 ```
 
-Coverage: API client (Bearer injection, 401 → refresh → retry, refresh-failure logout), formatters, alert-derivation logic, the persisted favorites/alerts-read stores, and every derivation module behind a Phase 2 screen (learnings, analytics, funnel, heatmap, tracking, products, pages, events, plan gating). Component/screen tests cover every Phase 1 and Phase 2 screen and sheet: loading/error/empty/data states, filters and search, the ship confirm flow against a mocked API, co-pilot sheet states, inline learning-note editing, plan-gated vs ordinary failures, and the offline banner.
+Coverage: API client (Bearer injection, 401 → refresh → retry, refresh-failure logout), formatters, alert-derivation logic, the persisted favorites/alerts-read stores, and every derivation module behind a Phase 2 screen (learnings, analytics, funnel, heatmap, tracking, products, pages, events, plan gating). Component/screen tests cover every screen and sheet in the app: loading/error/empty/data states, filters and search, the ship confirm flow against a mocked API, co-pilot sheet states, inline learning-note editing, plan-gated vs ordinary failures, the offline banner, the Phase-3 permission matrix (what an admin, a manager and a member each see), optimistic pause/resume with rollback, and every destructive confirm asserted through a mocked `Alert.alert`.
 
 ## Manual regression (run on device)
 
-Automated tests don't touch a real device, a real network toggle, or the real backend end-to-end. Before calling a build done — and after any change to auth, navigation, a sheet, or a screen's data source — run this checklist by hand against the test store, on both an iOS simulator/device and an Android emulator/device. Steps 1–10 are the core loop; steps 11–21 are the Phase 2 secondary screens and share the preamble in front of step 11.
+Automated tests don't touch a real device, a real network toggle, or the real backend end-to-end. Before calling a build done — and after any change to auth, navigation, a sheet, or a screen's data source — run this checklist by hand against the test store, on both an iOS simulator/device and an Android emulator/device. Steps 1–10 are the core loop; steps 11–25 are the secondary screens and share the preamble in front of step 11.
 
 **Setup:** test-store credentials, airplane mode toggle available, app freshly installed (or storage cleared) for the "relaunch restores session" step.
 
@@ -96,8 +96,8 @@ Automated tests don't touch a real device, a real network toggle, or the real ba
    - Build draft on a generated idea → toast confirms, and the new draft appears under the Tests tab (Draft filter).
 8. **More sheet** — all 16 entries, no exceptions
    - Open via the tab bar "More" button.
-   - **11 navigate** to a real screen: Live, Learnings, Analytics, Funnel, Heatmaps, Tracking, Products, Pages, Events, Replays, Favorites (steps 11–21 below).
-   - **5 still toast**: Nudges, Flows, Audiences, Team, Settings → "<name> arrives in Phase 3 — it lives on the desktop panel for now." No crash, no navigation to nowhere.
+   - **15 navigate** to a real screen: Live, Learnings, Analytics, Funnel, Heatmaps, Tracking, Products, Pages, Events, Replays, Favorites, Flows, Nudges, Team, Settings (steps 11–25 below).
+   - **1 toasts**: Audiences → "Saved audiences live on the desktop panel." Saved audiences have no backing entity in the panel, so there is nothing to show; no crash, no navigation to nowhere.
 9. **Session persistence**
    - Kill the app fully (swipe away / force-stop) and relaunch → should land signed-in on Home without hitting the login screen again (session restores from `expo-secure-store`).
 10. **Offline handling**
@@ -105,15 +105,17 @@ Automated tests don't touch a real device, a real network toggle, or the real ba
     - Previously-loaded screens still show their last-fetched (cached) data rather than going blank.
     - Try pull-to-refresh or a mutation (e.g. ship) while offline → fails gracefully with a toast/retry affordance, no crash.
     - Disable airplane mode → banner disappears, next refresh succeeds.
-### Steps 11–21: Phase 2 secondary screens
+### Steps 11–25: secondary screens
 
-All eleven are reached from the More sheet only, so **back always returns to Home**, not to the tab you came from. Check these on every one of them before the per-screen rows:
+All fifteen are reached from the More sheet only, so **back always returns to Home**, not to the tab you came from. Check these on every one of them before the per-screen rows:
 
 - Loading shows skeletons (not a blank screen), a failed load shows the retry card and **Retry actually recovers**, and a genuinely empty window shows its own message rather than zeros.
 - Pull-to-refresh works and doesn't flash the empty/error state.
 - Screens with a window use a **fixed last 7 days, UTC, today inclusive** (Funnel, Tracking, Products, Pages) — cross-check against the same window on desktop, not against "last 7 days" in your local timezone.
 - **Live is the only polling screen** (15s); everything else refreshes on focus/pull only.
 - **Plan-gated features must show an upgrade note, never a retry loop** — Pages' AI insight (Growth+) and Replays (Scale). Verify on a store whose plan excludes them; on an entitled store, verify the real content renders instead.
+- **Steps 22–25 write to the backend.** Every destructive action confirms first, and cancelling must change nothing. Reversible toggles (flow and nudge pause/resume) move instantly and roll back on failure; everything else waits for the server before the UI moves. Run these against the test store only.
+- **Roles change what renders.** Team and Settings hide controls the signed-in role can't use, so check them with both an admin and a non-admin account.
 
 11. **Live screen**
     - Open via More sheet → "Live" → back button returns to Home (not the tab you came from — Live is only reachable from the More sheet).
@@ -219,11 +221,11 @@ Nothing was changed as a result of this audit — every Android note from the de
 
 ## Roadmap
 
-This build covers Phase 0 (foundation) + Phase 1 (core loop) — auth, Home, Tests, Test detail, ship/rollback, Alerts, Co-pilot, the More sheet — and **Phase 2**, the eleven read-mostly secondary screens: Live, Learnings, Analytics, Funnel, Heatmaps, Tracking, Products, Pages, Events, Replays and Favorites. Phase 2 also closed two Phase-1 deviations: alerts-read state and favorites now persist on device (AsyncStorage), and the co-pilot's idea cards have their save affordance.
+This build covers every phase of the spec: Phase 0 (foundation) + Phase 1 (core loop) — auth, Home, Tests, Test detail, ship/rollback, Alerts, Co-pilot, the More sheet — **Phase 2**, the eleven read-mostly secondary screens (Live, Learnings, Analytics, Funnel, Heatmaps, Tracking, Products, Pages, Events, Replays, Favorites), and **Phase 3**, the management screens (Flows, Nudges, Team, Settings) with the app's first logout. Phase 2 closed two Phase-1 deviations: alerts-read state and favorites now persist on device (AsyncStorage), and the co-pilot's idea cards have their save affordance.
 
-- **Phase 3** (management screens — Flows, Nudges, Audiences, Team, Settings) is intentionally deferred and still toasts from the More sheet; see [`docs/superpowers/specs/2026-07-25-testerify-mobile-design.md`](docs/superpowers/specs/2026-07-25-testerify-mobile-design.md) (section "Phase 3") for scope and endpoint mapping. Each phase gets its own implementation plan before work starts: [Phase 0+1](docs/superpowers/plans/2026-07-25-testerify-mobile-phase-1.md), [Phase 2](docs/superpowers/plans/2026-07-26-testerify-mobile-phase-2.md).
+- **Audiences is the one More-sheet item without a screen.** It isn't deferred work — the panel has no saved-audience entity at all (no table, no endpoint, no page); `audience` is an inline object on a campaign. Building it is a product decision for the desktop panel first — see the [Phase 3 design](docs/superpowers/specs/2026-08-05-testerify-mobile-phase-3-design.md) for the evidence. Each phase got its own implementation plan before work started: [Phase 0+1](docs/superpowers/plans/2026-07-25-testerify-mobile-phase-1.md), [Phase 2](docs/superpowers/plans/2026-07-26-testerify-mobile-phase-2.md), [Phase 3](docs/superpowers/plans/2026-08-05-testerify-mobile-phase-3.md).
 
-### Phase 2 deviations (deliberate, verify rather than "fix")
+### Deviations (deliberate, verify rather than "fix")
 
 Where the design shows a value no endpoint provides, the screen renders a real substitute instead of inventing one:
 
@@ -234,3 +236,7 @@ Where the design shows a value no endpoint provides, the screen renders a real s
 - **Replays** — no mobile player; the play button says replays open on the desktop panel.
 - **Favorites** — pins and saved ideas are device-local (AsyncStorage); no server-side favorites store exists.
 - **Heatmaps** — the click overlay stays on desktop, per the design.
+- **Audiences** — cut entirely; no backing entity exists in the panel.
+- **Settings** — no purchase-tracking card; nothing in the panel records whether an order has been seen end-to-end.
+- **Flows** — no "New" button; building a flow is the desktop canvas.
+- **Team** — "Get link" is "New link": invite links are one-time, so producing one again means regenerating, which invalidates the link already sent.
